@@ -1,0 +1,119 @@
+import logging
+
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
+from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.orm import Session
+
+from app.database.connection import get_db
+from app.config import get_settings
+from app.database.repositories import ContactRepository, MessageRepository
+from app.schemas.advisor_schema import AdvisorRequestRead
+from app.schemas.contact_schema import ContactCreate, ContactRead
+from app.schemas.message_schema import MessageRead
+from app.schemas.webhook_schema import InboundMessage, InboundResponse
+from app.services.advisor_service import AdvisorService
+from app.services.campaign_service import CampaignService
+from app.services.conversation_service import ConversationService
+from app.services.lead_service import LeadService
+from app.utils.logger import configure_logging
+
+
+configure_logging()
+logger = logging.getLogger(__name__)
+app = FastAPI(title="Orientador USIL", version="1.0.0")
+settings = get_settings()
+
+
+@app.get("/")
+def root():
+    return {
+        "ok": True,
+        "service": "orientador-usil",
+        "health": "/health",
+        "docs": "/docs",
+    }
+
+
+@app.get("/health")
+def health(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+        return {"ok": True, "service": "orientador-usil", "database": "connected"}
+    except SQLAlchemyError as error:
+        logger.exception("PostgreSQL no disponible")
+        raise HTTPException(503, "database unavailable") from error
+
+
+@app.post("/webhooks/whatsapp/inbound", response_model=InboundResponse)
+@app.post("/simulate/inbound", response_model=InboundResponse)
+def inbound(
+    payload: InboundMessage,
+    request: Request,
+    db: Session = Depends(get_db),
+    x_inbound_api_key: str | None = Header(default=None),
+):
+    is_webhook = request.url.path == "/webhooks/whatsapp/inbound"
+    if is_webhook and settings.inbound_api_key and x_inbound_api_key != settings.inbound_api_key:
+        raise HTTPException(401, "Clave inbound inválida")
+    try:
+        return ConversationService(db).process_inbound(payload)
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    except SQLAlchemyError as error:
+        db.rollback()
+        logger.exception("Error procesando inbound")
+        raise HTTPException(503, "No se pudo guardar la conversación") from error
+
+
+@app.post("/campaigns/send")
+def send_campaign(
+    limit: int | None = Query(default=None, ge=1),
+    phone_number: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
+    return CampaignService(db).send_initial(limit, phone_number)
+
+
+@app.get("/contacts", response_model=list[ContactRead])
+def list_contacts(db: Session = Depends(get_db)):
+    return ContactRepository(db).list()
+
+
+@app.post("/contacts", response_model=ContactRead, status_code=201)
+def create_contact(payload: ContactCreate, db: Session = Depends(get_db)):
+    try:
+        contact, created = LeadService(db).create(payload)
+        if not created:
+            raise HTTPException(409, "El teléfono ya está registrado")
+        return contact
+    except IntegrityError as error:
+        db.rollback()
+        raise HTTPException(409, "El teléfono ya está registrado") from error
+
+
+@app.post("/contacts/import")
+def import_contacts(payload: list[ContactCreate], db: Session = Depends(get_db)):
+    service = LeadService(db)
+    result = {"created": 0, "duplicates": 0, "errors": []}
+    for index, item in enumerate(payload, start=1):
+        try:
+            _, created = service.create(item)
+            result["created" if created else "duplicates"] += 1
+        except (ValueError, IntegrityError) as error:
+            db.rollback()
+            result["errors"].append({"row": index, "error": str(error)})
+    return result
+
+
+@app.get("/contacts/{phone_number}/messages", response_model=list[MessageRead])
+def contact_messages(phone_number: str, db: Session = Depends(get_db)):
+    contact = ContactRepository(db).get_by_phone(phone_number)
+    if not contact:
+        raise HTTPException(404, "Contacto no encontrado")
+    return MessageRepository(db).history(contact.id)
+
+
+@app.get("/advisor-requests", response_model=list[AdvisorRequestRead])
+def advisor_requests(status: str | None = None, db: Session = Depends(get_db)):
+    return AdvisorService(db).list(status)

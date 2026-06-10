@@ -1,0 +1,5 @@
+Hola, *{nombre}*:
+
+Escribe aquí el mensaje que deseas enviar.
+
+Puedes usar negritas de WhatsApp encerrando el texto entre asteriscos.

@@ -1,0 +1,42 @@
+{
+  "saludo": [
+    "¡Hola{nombre}! 😊 Gracias por responder. Puedo orientarte sobre carreras, admisión, becas o enviarte el portal oficial de USIL. ¿Qué te gustaría saber?",
+    "¡Hola{nombre}! 😊 Estoy para orientarte. Puedes preguntarme sobre carreras, admisión, becas o pedir el enlace del portal oficial."
+  ],
+  "presentacion_nombre": [
+    "Mucho gusto, {nombre} 😊 ¿Te gustaría recibir información sobre carreras, admisión, becas o hablar con un asesor?",
+    "Encantado de saludarte, {nombre} 😊 Puedo orientarte sobre carreras, admisión o el portal oficial de USIL."
+  ],
+  "consulta_carreras": [
+    "Claro 😊 Puedes revisar las carreras disponibles en el portal oficial de USIL: {portal_url}. También puedes escribirme el nombre de una carrera, por ejemplo “Administración” o “Ingeniería de Sistemas”, y te doy una orientación breve."
+  ],
+  "consulta_admision": [
+    "Claro 😊 Para información oficial sobre admisión, inscripción y próximos pasos, revisa el portal institucional de USIL: {portal_url}. También puedo registrar que deseas hablar con un asesor.",
+    "Sobre admisión, lo más seguro es revisar la información oficial en el portal de USIL: {portal_url}. Si deseas, también puedo registrar que un asesor te contacte."
+  ],
+  "consulta_becas": [
+    "Para información oficial sobre becas, beneficios o descuentos, te recomiendo revisar el portal institucional de USIL o hablar con un asesor. No quiero darte un dato desactualizado. 😊"
+  ],
+  "consulta_portal": [
+    "Claro 📄 Puedes revisar la información oficial en el portal de USIL: {portal_url}",
+    "Te comparto el portal oficial de USIL para que revises información actualizada: {portal_url}"
+  ],
+  "asesor": [
+    "Perfecto 😊 Registraré que deseas recibir orientación de un asesor. El equipo correspondiente podrá comunicarse contigo.",
+    "Listo 😊 Dejaré registrado que quieres hablar con un asesor para recibir orientación personalizada."
+  ],
+  "llamada": [
+    "Perfecto 📞 Registraré que deseas recibir una llamada de orientación. El equipo correspondiente podrá comunicarse contigo."
+  ],
+  "baja": [
+    "Entendido. Registraremos que no deseas recibir más mensajes por este medio. Gracias.",
+    "De acuerdo, ya no te enviaremos más mensajes por este medio. Gracias."
+  ],
+  "agradecimiento": [
+    "¡De nada! 😊 Si necesitas más información, puedes escribirme sobre carreras, admisión, becas, el portal oficial o pedir hablar con un asesor.",
+    "Con gusto 😊 Si tienes otra duda sobre USIL, puedes escribirme por aquí."
+  ],
+  "no_entendido": [
+    "Disculpa, no logré entender bien tu consulta. Puedes escribirme con tus propias palabras si deseas información sobre carreras, admisión, becas, el portal oficial o hablar con un asesor. 😊"
+  ]
+}

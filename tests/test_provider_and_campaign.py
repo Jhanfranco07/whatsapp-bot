@@ -1,0 +1,68 @@
+from types import SimpleNamespace
+
+from app.services.campaign_service import CampaignService
+from app.whatsapp.provider import SendResult
+from app.whatsapp.pywhatkit_sender import PyWhatKitProvider
+
+
+class FakeProvider:
+    def __init__(self):
+        self.sent = []
+
+    def send_message(self, phone, message):
+        self.sent.append((phone, message))
+        return SendResult(True, "fake")
+
+
+class FakeDb:
+    def add(self, item):
+        pass
+
+    def flush(self):
+        pass
+
+    def commit(self):
+        pass
+
+
+def test_dry_run_does_not_import_or_send(monkeypatch):
+    provider = PyWhatKitProvider()
+    monkeypatch.setattr(provider.settings, "whatsapp_dry_run", True)
+    result = provider.send_message("51999999999", "hola")
+    assert result.success is True
+    assert result.raw_response == {"dry_run": True}
+
+
+def test_campaign_only_uses_filtered_candidates():
+    allowed = SimpleNamespace(
+        id="1", full_name="Ana", phone_number="51999999999", status="NUEVO"
+    )
+    provider = FakeProvider()
+    service = CampaignService(FakeDb(), provider)
+    service.contacts = SimpleNamespace(campaign_candidates=lambda: [allowed])
+    service.messages = SimpleNamespace(create=lambda *args, **kwargs: None)
+
+    result = service.send_initial()
+
+    assert result["sent"] == 1
+    assert provider.sent[0][0] == "51999999999"
+    assert allowed.status == "MENSAJE_ENVIADO"
+
+
+def test_campaign_can_target_phone():
+    target = SimpleNamespace(
+        id="2",
+        full_name="Fiorella",
+        phone_number="51984738899",
+        status="NUEVO",
+        opt_out=False,
+    )
+    provider = FakeProvider()
+    service = CampaignService(FakeDb(), provider)
+    service.contacts = SimpleNamespace(get_by_phone=lambda phone: target)
+    service.messages = SimpleNamespace(create=lambda *args, **kwargs: None)
+
+    result = service.send_initial(phone_number="984738899")
+
+    assert result["sent"] == 1
+    assert provider.sent[0][0] == "51984738899"

@@ -1,0 +1,93 @@
+from types import SimpleNamespace
+
+import app.services.conversation_service as module
+from app.schemas.webhook_schema import InboundMessage
+from app.services.conversation_service import ConversationService
+
+
+class FakeDb:
+    def commit(self):
+        pass
+
+
+class FakeContacts:
+    def __init__(self, contact):
+        self.contact = contact
+
+    def get_or_create(self, phone, **values):
+        return self.contact, False
+
+
+class FakeMessages:
+    def __init__(self):
+        self.rows = []
+
+    def create(self, contact, direction, text, intent=None, entities=None, raw_payload=None):
+        self.rows.append((direction, text, intent, entities))
+
+
+class FakeAdvisors:
+    def __init__(self):
+        self.requests = []
+
+    def request(self, contact, reason):
+        self.requests.append(reason)
+
+
+def build_service(monkeypatch, context=None):
+    contact = SimpleNamespace(
+        id="contact-1",
+        full_name=None,
+        phone_number="51999999999",
+        status="NUEVO",
+        opt_out=False,
+        requires_advisor=False,
+        last_intent=None,
+        last_message_at=None,
+        career_interest=None,
+    )
+    service = ConversationService(FakeDb())
+    service.contacts = FakeContacts(contact)
+    service.messages = FakeMessages()
+    service.advisors = FakeAdvisors()
+    captured = {}
+    monkeypatch.setattr(module, "get_conversation_context", lambda db, contact_id: dict(context or {}))
+    monkeypatch.setattr(
+        module,
+        "upsert_conversation",
+        lambda db, contact, user, bot, state, saved_context: captured.update(saved_context),
+    )
+    return service, contact, captured
+
+
+def test_presentation_updates_contact_name(monkeypatch):
+    service, contact, context = build_service(monkeypatch)
+    result = service.process_inbound(
+        InboundMessage(phone_number="999999999", message="me llamo fiorella")
+    )
+    assert contact.full_name == "Fiorella"
+    assert contact.status == "RESPONDIO"
+    assert context["detected_name"] == "Fiorella"
+    assert "Fiorella" in result["bot_reply"]
+
+
+def test_advisor_uses_last_career_as_reason(monkeypatch):
+    service, contact, context = build_service(
+        monkeypatch, {"last_career": "Administración"}
+    )
+    service.process_inbound(
+        InboundMessage(phone_number="999999999", message="quiero hablar con un asesor")
+    )
+    assert contact.requires_advisor is True
+    assert contact.status == "QUIERE_ASESOR"
+    assert service.advisors.requests == ["Interesado en Administración"]
+    assert context["advisor_requested"] is True
+
+
+def test_opt_out_updates_contact(monkeypatch):
+    service, contact, _ = build_service(monkeypatch)
+    service.process_inbound(
+        InboundMessage(phone_number="999999999", message="ya no quiero mensajes")
+    )
+    assert contact.opt_out is True
+    assert contact.status == "SALIR"

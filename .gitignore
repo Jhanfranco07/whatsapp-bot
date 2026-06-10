@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+resultados/
+PyWhatKit_DB.txt
+~$*.xlsx
+dataAlumnos.xlsx
+bridge/node_modules/
+bridge/.wwebjs_auth/
+bridge/.wwebjs_cache/
