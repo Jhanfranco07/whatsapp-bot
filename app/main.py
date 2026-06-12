@@ -1,4 +1,5 @@
 import logging
+import inspect
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from sqlalchemy import text
@@ -8,6 +9,8 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.config import get_settings
 from app.database.repositories import ContactRepository, MessageRepository
+from app.llm import LLMService
+from app.llm.provider import LLMError
 from app.schemas.advisor_schema import AdvisorRequestRead
 from app.schemas.contact_schema import ContactCreate, ContactRead
 from app.schemas.message_schema import MessageRead
@@ -45,9 +48,17 @@ def health(db: Session = Depends(get_db)):
         raise HTTPException(503, "database unavailable") from error
 
 
+@app.get("/health/llm")
+def llm_health():
+    try:
+        return LLMService().health()
+    except LLMError as error:
+        raise HTTPException(503, str(error)) from error
+
+
 @app.post("/webhooks/whatsapp/inbound", response_model=InboundResponse)
 @app.post("/simulate/inbound", response_model=InboundResponse)
-def inbound(
+async def inbound(
     payload: InboundMessage,
     request: Request,
     db: Session = Depends(get_db),
@@ -57,7 +68,10 @@ def inbound(
     if is_webhook and settings.inbound_api_key and x_inbound_api_key != settings.inbound_api_key:
         raise HTTPException(401, "Clave inbound inválida")
     try:
-        return ConversationService(db).process_inbound(payload)
+        service = ConversationService(db)
+        handler = getattr(service, "process_inbound_async", service.process_inbound)
+        result = handler(payload)
+        return await result if inspect.isawaitable(result) else result
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
     except SQLAlchemyError as error:

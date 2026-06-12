@@ -20,6 +20,7 @@ class FakeConversationService:
             "contact_status": "INTERESADO_CARRERA",
             "intent": "consulta_carrera_especifica",
             "entities": {"career": "Ingeniería de Sistemas"},
+            "classification_source": "rules",
             "bot_reply": "Respuesta controlada",
             "reply_sent": False,
         }
@@ -44,6 +45,7 @@ def test_simulate_inbound_endpoint(monkeypatch):
     app.dependency_overrides.clear()
     assert response.status_code == 200
     assert response.json()["intent"] == "consulta_carrera_especifica"
+    assert response.json()["classification_source"] == "rules"
     assert response.json()["bot_reply"] == "Respuesta controlada"
 
 

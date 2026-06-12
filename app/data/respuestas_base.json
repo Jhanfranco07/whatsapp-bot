@@ -11,8 +11,35 @@
     "Claro 😊 Puedes revisar las carreras disponibles en el portal oficial de USIL: {portal_url}. También puedes escribirme el nombre de una carrera, por ejemplo “Administración” o “Ingeniería de Sistemas”, y te doy una orientación breve."
   ],
   "consulta_admision": [
-    "Claro 😊 Para información oficial sobre admisión, inscripción y próximos pasos, revisa el portal institucional de USIL: {portal_url}. También puedo registrar que deseas hablar con un asesor.",
-    "Sobre admisión, lo más seguro es revisar la información oficial en el portal de USIL: {portal_url}. Si deseas, también puedo registrar que un asesor te contacte."
+    "Claro 😊 Para información oficial sobre admisión, inscripción y próximos pasos, revisa el portal de admisión de pregrado: https://descubre.usil.edu.pe/landings/pregrado/admision/",
+    "Sobre admisión, lo más seguro es revisar la información actualizada en el portal oficial: https://descubre.usil.edu.pe/landings/pregrado/admision/"
+  ],
+  "comparacion_carrera": [
+    "Puedo orientarte de forma general, pero para comparar carreras con información oficial y actualizada te recomiendo revisar el portal de USIL o hablar con un asesor: {portal_url}"
+  ],
+  "consulta_campo_laboral": [
+    "El campo laboral depende de la carrera y puede variar. Indícame el nombre de la carrera que te interesa o revisa el portal oficial de USIL: {portal_url}"
+  ],
+  "consulta_malla": [
+    "Para revisar la malla curricular oficial y actualizada de la carrera, consulta el portal de USIL: {portal_url}."
+  ],
+  "consulta_duracion": [
+    "Para confirmar la duración oficial de la carrera, revisa el portal de USIL: {portal_url}. Prefiero no darte un dato que pueda estar desactualizado."
+  ],
+  "consulta_modalidad": [
+    "Las modalidades disponibles pueden variar según la carrera y el periodo. Puedes revisar la información oficial en el portal de USIL: {portal_url}"
+  ],
+  "consulta_costos": [
+    "Los costos pueden variar según la carrera, modalidad y periodo. Revisa la información actualizada en el portal de admisión: https://descubre.usil.edu.pe/landings/pregrado/admision/"
+  ],
+  "consulta_campus": [
+    "USIL cuenta con los siguientes campus:\n{campus_list}\n\nPara confirmar dónde se dicta una carrera específica, revisa el portal oficial: {portal_url}"
+  ],
+  "consulta_internacionalidad": [
+    "USIL ofrece alternativas de internacionalidad como alianzas internacionales, programas de doble grado, study tours y experiencias académicas en el extranjero. Para detalles oficiales, revisa el portal de USIL: {portal_url}"
+  ],
+  "consulta_institucional": [
+    "USIL es una universidad orientada a la formación de profesionales con visión global, innovación, emprendimiento e internacionalidad. Puedes ampliar la información en: {portal_url}"
   ],
   "consulta_becas": [
     "Para información oficial sobre becas, beneficios o descuentos, te recomiendo revisar el portal institucional de USIL o hablar con un asesor. No quiero darte un dato desactualizado. 😊"
@@ -20,6 +47,12 @@
   "consulta_portal": [
     "Claro 📄 Puedes revisar la información oficial en el portal de USIL: {portal_url}",
     "Te comparto el portal oficial de USIL para que revises información actualizada: {portal_url}"
+  ],
+  "cierres_orientacion": [
+    "Puedes revisar más información oficial en el portal de USIL:\nhttps://www.usil.edu.pe/",
+    "Para conocer más detalles sobre carreras y admisión, visita:\nhttps://www.usil.edu.pe/",
+    "Si deseas revisar información actualizada, puedes ingresar al portal oficial de USIL:\nhttps://www.usil.edu.pe/",
+    "Encuentra más información sobre pregrado y admisión en:\nhttps://descubre.usil.edu.pe/landings/pregrado/admision/"
   ],
   "asesor": [
     "Perfecto 😊 Registraré que deseas recibir orientación de un asesor. El equipo correspondiente podrá comunicarse contigo.",
@@ -35,6 +68,12 @@
   "agradecimiento": [
     "¡De nada! 😊 Si necesitas más información, puedes escribirme sobre carreras, admisión, becas, el portal oficial o pedir hablar con un asesor.",
     "Con gusto 😊 Si tienes otra duda sobre USIL, puedes escribirme por aquí."
+  ],
+  "despedida": [
+    "Gracias por escribirnos. Si luego necesitas orientación sobre carreras o admisión, puedes volver a contactarnos. 😊"
+  ],
+  "fuera_de_alcance": [
+    "Puedo ayudarte con orientación sobre carreras, admisión, malla curricular, modalidades o contacto con un asesor de USIL. 😊"
   ],
   "no_entendido": [
     "Disculpa, no logré entender bien tu consulta. Puedes escribirme con tus propias palabras si deseas información sobre carreras, admisión, becas, el portal oficial o hablar con un asesor. 😊"

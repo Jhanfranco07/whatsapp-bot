@@ -2,14 +2,14 @@
   "carreras": [
     {
       "nombre": "Ingeniería de Sistemas",
-      "aliases": ["ingenieria de sistemas", "ingeniería de sistemas", "sistemas", "software", "computacion", "computación", "tecnologia", "tecnología"],
+      "aliases": ["ingenieria de sistemas", "ingeniería de sistemas", "ing sistemas", "sitemas", "sistemas", "software", "computacion", "computación", "tecnologia", "tecnología"],
       "area": "Tecnología",
       "descripcion_corta": "Carrera orientada al desarrollo de software, tecnología, datos e innovación digital.",
       "url": ""
     },
     {
       "nombre": "Administración",
-      "aliases": ["administracion", "administración", "admin", "gestion de empresas", "gestión de empresas", "negocios", "empresa", "gestión"],
+      "aliases": ["administracion", "administración", "adminsitracion", "admisnitracion", "adminstracion", "admin", "gestion de empresas", "gestión de empresas", "negocios", "empresa", "gestión"],
       "area": "Negocios",
       "descripcion_corta": "Carrera orientada a la gestión de empresas, emprendimiento y toma de decisiones.",
       "url": ""
@@ -37,7 +37,7 @@
     },
     {
       "nombre": "Derecho",
-      "aliases": ["derecho", "leyes"],
+      "aliases": ["derecho", "derehco", "leyes"],
       "area": "Derecho",
       "descripcion_corta": "Carrera orientada al análisis jurídico y la solución responsable de conflictos.",
       "url": ""

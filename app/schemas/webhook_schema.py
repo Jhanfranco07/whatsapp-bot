@@ -17,5 +17,7 @@ class InboundResponse(BaseModel):
     contact_status: str
     intent: str
     entities: dict
-    bot_reply: str
+    classification_source: str
+    bot_reply: str | None
+    should_reply: bool = True
     reply_sent: bool = False

@@ -41,6 +41,7 @@ def build_service(monkeypatch, context=None):
         phone_number="51999999999",
         status="NUEVO",
         opt_out=False,
+        stop_bot=False,
         requires_advisor=False,
         last_intent=None,
         last_message_at=None,
@@ -91,3 +92,48 @@ def test_opt_out_updates_contact(monkeypatch):
     )
     assert contact.opt_out is True
     assert contact.status == "SALIR"
+    assert contact.stop_bot is True
+
+
+def test_stopped_contact_is_saved_without_reply(monkeypatch):
+    service, contact, _ = build_service(monkeypatch)
+    contact.stop_bot = True
+    contact.status = "SALIR"
+    result = service.process_inbound(
+        InboundMessage(phone_number="999999999", message="hola otra vez")
+    )
+    assert result["should_reply"] is False
+    assert result["bot_reply"] is None
+    assert result["intent"] == "bot_detenido"
+    assert [row[0] for row in service.messages.rows] == ["inbound"]
+
+
+def test_conversational_noise_is_saved_without_reply(monkeypatch):
+    service, contact, _ = build_service(monkeypatch)
+    result = service.process_inbound(
+        InboundMessage(phone_number="999999999", message="JAJAJA")
+    )
+    assert result["intent"] == "ruido_conversacional"
+    assert result["should_reply"] is False
+    assert result["bot_reply"] is None
+    assert contact.stop_bot is False
+    assert [row[0] for row in service.messages.rows] == ["inbound"]
+
+
+def test_conversation_saves_last_three_history_messages(monkeypatch):
+    service, _, context = build_service(
+        monkeypatch,
+        {
+            "historial": [
+                {"role": "user", "content": "uno"},
+                {"role": "assistant", "content": "dos"},
+                {"role": "user", "content": "tres"},
+            ]
+        },
+    )
+    service.process_inbound(
+        InboundMessage(phone_number="999999999", message="hola")
+    )
+    assert len(context["historial"]) == 3
+    assert context["historial"][-2]["content"] == "hola"
+    assert context["historial"][-1]["role"] == "assistant"
