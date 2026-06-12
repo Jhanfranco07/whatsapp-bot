@@ -76,8 +76,14 @@ client.on("message", async (message) => {
     }
 
     const result = await response.json();
-    await message.reply(result.bot_reply);
-    console.log(`Respuesta enviada a ${phoneNumber}. Intent: ${result.intent}`);
+    if (result.should_reply && result.bot_reply) {
+      await message.reply(result.bot_reply);
+      console.log(
+        `Respuesta enviada a ${phoneNumber}. Intent: ${result.intent}. Clasificador: ${result.classification_source}`
+      );
+    } else {
+      console.log(`Mensaje guardado sin respuesta para ${phoneNumber}. Intent: ${result.intent}`);
+    }
   } catch (error) {
     console.error(`No se pudo procesar el mensaje de ${phoneNumber}:`, error.message);
   }

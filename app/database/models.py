@@ -25,6 +25,7 @@ class Contact(Base):
     source: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(40), default="NUEVO", nullable=False, index=True)
     opt_out: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
+    stop_bot: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
     requires_advisor: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     last_intent: Mapped[str | None] = mapped_column(String(80))
     last_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

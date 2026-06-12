@@ -44,6 +44,7 @@ class ContactRepository:
             self.db.scalars(
                 select(Contact).where(
                     Contact.opt_out.is_(False),
+                    Contact.stop_bot.is_(False),
                     Contact.status.not_in(("SALIR", "NO_INTERESADO")),
                 )
             )

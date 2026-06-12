@@ -20,6 +20,7 @@ class ContactRead(ContactCreate):
     id: UUID
     status: str
     opt_out: bool
+    stop_bot: bool
     requires_advisor: bool
     last_intent: str | None
     created_at: datetime

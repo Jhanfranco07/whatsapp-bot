@@ -28,6 +28,7 @@ class CampaignService:
                 [contact]
                 if contact
                 and not contact.opt_out
+                and not getattr(contact, "stop_bot", False)
                 and contact.status not in ("SALIR", "NO_INTERESADO")
                 else []
             )

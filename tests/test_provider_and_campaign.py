@@ -56,6 +56,7 @@ def test_campaign_can_target_phone():
         phone_number="51984738899",
         status="NUEVO",
         opt_out=False,
+        stop_bot=False,
     )
     provider = FakeProvider()
     service = CampaignService(FakeDb(), provider)
@@ -66,3 +67,23 @@ def test_campaign_can_target_phone():
 
     assert result["sent"] == 1
     assert provider.sent[0][0] == "51984738899"
+
+
+def test_campaign_does_not_target_stopped_contact():
+    target = SimpleNamespace(
+        id="3",
+        full_name="Ana",
+        phone_number="51981111111",
+        status="NUEVO",
+        opt_out=False,
+        stop_bot=True,
+    )
+    provider = FakeProvider()
+    service = CampaignService(FakeDb(), provider)
+    service.contacts = SimpleNamespace(get_by_phone=lambda phone: target)
+    service.messages = SimpleNamespace(create=lambda *args, **kwargs: None)
+
+    result = service.send_initial(phone_number=target.phone_number)
+
+    assert result["sent"] == 0
+    assert provider.sent == []
