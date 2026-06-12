@@ -256,3 +256,13 @@ def test_plain_text_from_small_model_is_safely_accepted():
     assert result["response"].startswith("Te cuento")
     assert "**" not in result["response"]
     assert result["stop_bot"] is False
+
+
+def test_repeated_closing_is_removed():
+    service = LLMService(provider=OllamaProvider(session=FakeSession()))
+    result = service._parse_and_validate(
+        "Ciencia de Datos combina estadística y programación.\n\n"
+        "¿Qué estás buscando exactamente por ahora?",
+        "consulta_carrera_especifica",
+    )
+    assert result["response"] == "Ciencia de Datos combina estadística y programación."

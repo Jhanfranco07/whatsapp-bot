@@ -39,6 +39,9 @@ def classifier():
         ("cuánto dura sistemas", "consulta_duracion"),
         ("modalidad de derecho", "consulta_modalidad"),
         ("costos de administración", "consulta_costos"),
+        ("en que se diferencia cyberseguridad y analisis de datos", "comparacion_carrera"),
+        ("ciberseguridad vs ciencia de datos", "comparacion_carrera"),
+        ("qué es Big Data", "consulta_carrera_especifica"),
         ("dónde queda el campus", "consulta_campus"),
         ("tienen intercambios internacionales", "consulta_internacionalidad"),
         ("hablar con Jhan", "quiere_asesor"),
@@ -88,6 +91,20 @@ def test_specific_careers(classifier, message, career):
     assert entities["classification_source"] == "rules"
 
 
+@pytest.mark.parametrize(
+    ("message", "career"),
+    [
+        ("qué es Big Data", "Ciencia de Datos"),
+        ("me interesa cyberseguridad", "Ingeniería en Ciberseguridad"),
+        ("quiero estudiar análisis de datos", "Ciencia de Datos"),
+    ],
+)
+def test_digital_career_aliases(classifier, message, career):
+    intent, entities = classifier.classify(message)
+    assert intent == "consulta_carrera_especifica"
+    assert entities["career"] == career
+
+
 def test_compound_career_and_admission(classifier):
     intent, entities = classifier.classify(
         "quiero informacion sobre administracion y admision"
@@ -121,6 +138,24 @@ def test_llm_is_only_used_as_fallback():
     assert intent == "consulta_admision"
     assert entities["classification_source"] == "ollama"
     assert llm.calls == ["quisiera conocer el proceso universitario"]
+
+
+def test_known_comparison_does_not_call_classifier_llm():
+    class CountingLLM:
+        def __init__(self):
+            self.calls = []
+
+        def classify(self, message):
+            self.calls.append(message)
+            return {"intent": "no_entendido"}
+
+    llm = CountingLLM()
+    intent, entities = IntentClassifier(llm_service=llm).classify(
+        "diferencia entre ciberseguridad y análisis de datos"
+    )
+    assert intent == "comparacion_carrera"
+    assert entities["classification_source"] == "rules"
+    assert llm.calls == []
 
 
 def test_llm_cannot_stop_without_explicit_opt_out():

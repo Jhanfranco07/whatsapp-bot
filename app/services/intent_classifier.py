@@ -24,8 +24,8 @@ class IntentClassifier:
 
     def classify(self, original: str):
         intent, entities = self._classify_rules(original)
-        requires_llm_response = entities.pop("requires_llm_response", False)
-        if intent != "no_entendido" and not requires_llm_response:
+        entities.pop("requires_llm_response", False)
+        if intent != "no_entendido":
             return intent, {**entities, "classification_source": "rules"}
         try:
             llm_result = self.llm_service.classify(original)
@@ -44,8 +44,6 @@ class IntentClassifier:
                 )
                 llm_intent = "no_entendido"
                 llm_response = None
-            if requires_llm_response and llm_intent == "no_entendido":
-                llm_intent = intent
             merged_entities = {
                 **entities,
                 "career": llm_entities.get("carrera") or entities.get("career"),
@@ -61,8 +59,6 @@ class IntentClassifier:
                 key: value for key, value in merged_entities.items() if value is not None
             }
             return llm_intent, {**merged_entities, "classification_source": "ollama"}
-        if requires_llm_response:
-            return intent, {**entities, "classification_source": "rules"}
         return "no_entendido", {"classification_source": "rules"}
 
     def _classify_rules(self, original: str):
@@ -118,7 +114,10 @@ class IntentClassifier:
         ]):
             return "consulta_internacionalidad", entities
         specialized_rules = [
-            ("comparacion_carrera", ["se asemeja", "comparar", "comparacion", "parecida", "se parece", "similar"]),
+            ("comparacion_carrera", [
+                "se asemeja", "comparar", "comparacion", "parecida", "se parece",
+                "similar", "diferencia", "diferencias", "versus", "vs",
+            ]),
             ("consulta_malla", ["malla", "malla curricular", "cursos", "plan de estudios"]),
             ("consulta_duracion", ["duracion", "cuanto dura", "años dura", "ciclos dura"]),
             ("consulta_modalidad", ["modalidad", "presencial", "virtual", "semipresencial"]),

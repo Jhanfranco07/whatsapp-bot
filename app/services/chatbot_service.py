@@ -1,5 +1,6 @@
 import json
 import random
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -65,14 +66,19 @@ class ChatbotService:
         if intent in fixed_intents:
             return fallback.bot_reply, True
 
-        career_info = self._find_career_info(
-            entities.get("career") or entities.get("carrera")
+        relevant_history = self._select_relevant_history(
+            user_message, intent, entities, context
         )
+        career_name = entities.get("career") or entities.get("carrera")
+        if not career_name and relevant_history:
+            career_name = context.get("last_career")
+        career_info = self._find_career_info(career_name)
         llm_context = {
             "institucion": self.institution,
             "carrera_info": career_info,
-            "historial": list(context.get("historial", []))[-3:],
+            "historial": relevant_history,
             "plantilla_guia": fallback.bot_reply,
+            "intent_actual": intent,
         }
         generated = await self.llm_service.generate_response(
             user_message=user_message,
@@ -278,3 +284,24 @@ class ChatbotService:
             if target in {normalize_text(value) for value in aliases}:
                 return career
         return None
+
+    @staticmethod
+    def _select_relevant_history(user_message, intent, entities, context):
+        history = list(context.get("historial", []))[-3:]
+        if not history:
+            return []
+        text = normalize_text(user_message)
+        is_followup = bool(
+            re.match(
+                r"^(y|entonces|tambien|esa|ese|eso|esto|ademas|pero|"
+                r"cuanto|donde|como|por que|de que|en que|que|y en)",
+                text,
+            )
+        )
+        current_career = entities.get("career") or entities.get("carrera")
+        same_career = bool(
+            current_career
+            and normalize_text(current_career) == normalize_text(context.get("last_career"))
+        )
+        same_intent = intent == context.get("last_intent")
+        return history if is_followup or (same_career and same_intent) else []

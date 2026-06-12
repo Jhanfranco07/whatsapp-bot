@@ -78,6 +78,20 @@
       "url": ""
     },
     {
+      "nombre": "Ingeniería en Ciberseguridad",
+      "aliases": ["ingenieria en ciberseguridad", "ingeniería en ciberseguridad", "ciberseguridad", "cyberseguridad", "seguridad informatica", "seguridad informática"],
+      "area": "Tecnología",
+      "descripcion_corta": "Carrera orientada a proteger sistemas, redes, datos e infraestructura digital.",
+      "url": ""
+    },
+    {
+      "nombre": "Ciencia de Datos",
+      "aliases": ["ciencia de datos", "analisis de datos", "análisis de datos", "data science", "big data", "datos"],
+      "area": "Tecnología",
+      "descripcion_corta": "Carrera orientada al análisis de datos, estadística, programación e inteligencia artificial.",
+      "url": ""
+    },
+    {
       "nombre": "Economía",
       "aliases": ["economía"],
       "area": "Negocios",

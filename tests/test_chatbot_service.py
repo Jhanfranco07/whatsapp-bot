@@ -191,3 +191,36 @@ def test_generate_response_falls_back_when_ollama_fails():
     )
     assert "costos pueden variar" in reply.lower()
     assert should_reply is True
+
+
+def test_unrelated_history_is_not_sent_to_writer():
+    context = {
+        "last_intent": "consulta_admision",
+        "last_topic": "admision",
+        "historial": [
+            {"role": "user", "content": "¿Cuándo empieza admisión?"},
+            {"role": "assistant", "content": "Revisa el portal de admisión."},
+        ],
+    }
+    history = ChatbotService._select_relevant_history(
+        "Compara ciberseguridad y análisis de datos",
+        "comparacion_carrera",
+        {"career": "Ingeniería en Ciberseguridad"},
+        context,
+    )
+    assert history == []
+
+
+def test_followup_keeps_relevant_history():
+    context = {
+        "last_intent": "consulta_carrera_especifica",
+        "last_career": "Ciencia de Datos",
+        "historial": [{"role": "assistant", "content": "Ciencia de Datos analiza información."}],
+    }
+    history = ChatbotService._select_relevant_history(
+        "¿Y en qué trabaja?",
+        "consulta_campo_laboral",
+        {},
+        context,
+    )
+    assert history

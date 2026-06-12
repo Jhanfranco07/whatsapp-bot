@@ -269,6 +269,12 @@ class LLMService:
             response = cls._remove_emojis(response)
         response = re.sub(r"[ \t]+\n", "\n", response)
         response = re.sub(r"\n{3,}", "\n\n", response).strip()
+        response = re.sub(
+            r"(?:\n\s*)*¿Qué estás buscando exactamente por ahora\?\s*$",
+            "",
+            response,
+            flags=re.IGNORECASE,
+        ).strip()
         if len(response) <= 800:
             return response
         shortened = response[:780].rstrip()
