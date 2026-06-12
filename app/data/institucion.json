@@ -1,0 +1,88 @@
+{
+  "institucion": {
+    "nombre": "Universidad San Ignacio de Loyola",
+    "sigla": "USIL",
+    "descripcion_corta": "Institución educativa orientada a formar profesionales con visión global, espíritu emprendedor e innovación.",
+    "portal_oficial": "https://www.usil.edu.pe",
+    "admision_pregrado": "https://descubre.usil.edu.pe/landings/pregrado/admision/"
+  },
+  "contacto": {
+    "central_admision": "(01) 317-1050",
+    "whatsapp_admision": "+51 998 179 223",
+    "atencion_alumno": "(01) 317-1010",
+    "correo_atencion_alumno": "atencionalumno@usil.edu.pe"
+  },
+  "campus": [
+    {
+      "nombre": "Campus La Molina - Arq. Fernando Belaunde Terry",
+      "direccion": "Av. La Fontana 550, La Molina"
+    },
+    {
+      "nombre": "Campus La Molina - Gran Almirante Miguel Grau",
+      "direccion": "Av. La Fontana 750, La Molina"
+    },
+    {
+      "nombre": "Campus Lima Norte",
+      "direccion": "Av. Industrial 3484 con Av. El Pacífico N.° 297-299, Independencia"
+    },
+    {
+      "nombre": "Campus Magdalena",
+      "direccion": "Jr. José Gálvez 386, Magdalena del Mar"
+    }
+  ],
+  "internacionalidad": [
+    "Más de 320 alianzas internacionales",
+    "Programa de Doble Grado con San Ignacio University",
+    "Disney International Programs",
+    "Study Tours",
+    "Study Abroad Program SIU"
+  ],
+  "carreras_oficiales": [
+    "Administración Hotelera",
+    "Administración en Turismo",
+    "Arte Culinario",
+    "Gestión e Innovación en Gastronomía",
+    "Arquitectura, Urbanismo y Territorio",
+    "Arte y Diseño Empresarial",
+    "Música",
+    "Ciencias de la Actividad Física y del Deporte",
+    "Enfermería",
+    "Medicina Humana",
+    "Nutrición y Dietética",
+    "Psicología",
+    "Tecnología Médica en Terapia Física y Rehabilitación",
+    "Administración",
+    "Administración y Emprendimiento",
+    "Administración y Finanzas Corporativas",
+    "Digital Business Management",
+    "Economía y Finanzas",
+    "Economía y Negocios Internacionales",
+    "International Business",
+    "Marketing",
+    "Comunicaciones",
+    "Derecho",
+    "Relaciones Internacionales",
+    "Educación Inicial",
+    "Educación Secundaria con Especialidad en Inglés",
+    "Ingeniería Agroindustrial",
+    "Ingeniería Ambiental",
+    "Ingeniería Biomédica",
+    "Ingeniería Civil",
+    "Ingeniería Empresarial",
+    "Ingeniería en Ciberseguridad",
+    "Ingeniería en Industrias Alimentarias",
+    "Ingeniería Industrial y Comercial",
+    "Ingeniería Mecatrónica",
+    "Ingeniería de Sistemas de Información",
+    "Ingeniería de Software",
+    "Ciencia de Datos"
+  ],
+  "politicas_respuesta": {
+    "no_inventar": true,
+    "no_dar_costos_exactos": true,
+    "no_confirmar_vacantes": true,
+    "no_confirmar_horarios": true,
+    "derivar_si_no_hay_dato": true,
+    "responder_solo_con_fuentes_controladas": true
+  }
+}

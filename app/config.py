@@ -15,6 +15,14 @@ class Settings(BaseSettings):
     whatsapp_close_time: int = 3
     inbound_api_key: str = ""
     portal_oficial_url: str = "https://www.usil.edu.pe/"
+    llm_provider: str = "ollama"
+    ollama_enabled: bool = False
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_model: str = "qwen3.5:0.8b"
+    ollama_think: bool = False
+    ollama_temperature: float = 0.2
+    ollama_max_tokens: int = 400
+    ollama_timeout: int = 120
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
