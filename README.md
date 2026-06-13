@@ -71,6 +71,78 @@ postgresql+psycopg2://postgres:postgres@localhost:5432/orientador_usil
 
 Si tu usuario o contraseña son diferentes, actualiza `DATABASE_URL` en `.env`.
 
+## Inicio real con WhatsApp Web
+
+Este es el flujo para usar el chatbot con mensajes reales. La simulación descrita
+más adelante es opcional y no inicia WhatsApp Web.
+
+### 1. Preparar la base e importar el Excel
+
+Ejecuta estos comandos desde la raíz del proyecto:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python scripts/init_db.py
+python scripts/import_contacts.py --file dataAlumnos.xlsx
+```
+
+El Excel debe estar dentro del proyecto. El importador reconoce `COMPLETO` como
+nombre y `CELULAR` como teléfono.
+
+### 2. Enviar la campaña inicial por WhatsApp
+
+En `.env`, cambia temporalmente:
+
+```text
+WHATSAPP_DRY_RUN=false
+```
+
+Prueba primero con un solo número:
+
+```powershell
+python scripts/send_campaign.py --phone 51999999999
+```
+
+Para enviar a todos los contactos importados que todavía pueden recibir
+campañas:
+
+```powershell
+python scripts/send_campaign.py
+```
+
+Este envío usa `pywhatkit`: abrirá WhatsApp Web en el navegador y requiere que
+la cuenta ya tenga una sesión iniciada. `pywhatkit` solo envía la campaña; no
+escucha ni responde mensajes entrantes.
+
+### 3. Iniciar el chatbot que responde mensajes reales
+
+Mantén abiertas dos terminales.
+
+Terminal 1, desde la raíz del proyecto:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -m uvicorn app.main:app --reload
+```
+
+Terminal 2, desde la raíz del proyecto:
+
+```powershell
+cd bridge
+npm start
+```
+
+La primera vez aparecerá un QR. Escanéalo desde WhatsApp en
+`Dispositivos vinculados > Vincular dispositivo`. Cuando aparezca
+`Puente listo. Esperando mensajes entrantes...`, el chatbot ya está activo.
+
+La sesión queda guardada automáticamente en `bridge/.wwebjs_auth`. En los
+siguientes inicios normalmente solo debes volver a ejecutar las dos terminales;
+no borres esa carpeta si quieres conservar la sesión. Si WhatsApp cierra o
+invalida la sesión, aparecerá un nuevo QR.
+
+Para detener el chatbot, presiona `Ctrl+C` en ambas terminales.
+
 ## Ejecutar API
 
 ```powershell
@@ -127,7 +199,10 @@ Para probar primero con una sola persona:
 python scripts/send_campaign.py --phone 51984738899
 ```
 
-## Simular conversación
+## Probar sin WhatsApp Web
+
+Estos comandos solo simulan una conversación contra el backend. No vinculan
+WhatsApp Web ni dejan el chatbot escuchando mensajes reales.
 
 ```powershell
 python scripts/simulate_inbound.py --phone 51999999999 --message "quiero saber sobre ingeniería de sistemas"
@@ -153,6 +228,9 @@ El puente opcional `bridge/` usa `whatsapp-web.js` para escuchar mensajes
 entrantes desde una sesión vinculada de WhatsApp Web. Es una integración no
 oficial: puede dejar de funcionar o provocar restricciones de WhatsApp. Úsala
 solo como prototipo y con una cuenta autorizada para pruebas.
+
+Para el procedimiento completo de arranque, consulta
+[Inicio real con WhatsApp Web](#inicio-real-con-whatsapp-web).
 
 Mantén FastAPI ejecutándose en una terminal:
 
