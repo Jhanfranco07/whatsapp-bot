@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-usil}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-usil}
+      POSTGRES_DB: ${POSTGRES_DB:-usil_db}
+    volumes:
+      - usil_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-usil} -d ${POSTGRES_DB:-usil_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-usil}:${POSTGRES_PASSWORD:-usil}@postgres:5432/${POSTGRES_DB:-usil_db}
+      WHATSAPP_PROVIDER: bridge
+      BRIDGE_SEND_URL: http://bridge:3001/send
+      INBOUND_API_KEY: ${INBOUND_API_KEY:-cambia-esta-clave-local}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-cambia-esta-clave-admin}
+      RATE_LIMIT_MESSAGES: ${RATE_LIMIT_MESSAGES:-6}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-60}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "alembic upgrade head && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  bridge:
+    build: ./bridge
+    environment:
+      BRIDGE_API_URL: http://api:8000
+      BRIDGE_OUTBOUND_HOST: 0.0.0.0
+      BRIDGE_OUTBOUND_PORT: 3001
+      INBOUND_API_KEY: ${INBOUND_API_KEY:-cambia-esta-clave-local}
+      BRIDGE_HEADLESS: "true"
+    volumes:
+      - whatsapp_auth:/bridge/.wwebjs_auth
+    ports:
+      - "3001:3001"
+    depends_on:
+      - api
+
+volumes:
+  usil_pgdata:
+  whatsapp_auth:

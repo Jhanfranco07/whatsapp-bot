@@ -37,11 +37,12 @@ del puente `whatsapp-web.js`.
 - Contactos únicos por teléfono y normalización para Perú.
 - Historial inbound y outbound.
 - Clasificación determinista por reglas, patrones y diccionarios.
-- Respuestas controladas mediante plantillas y datos institucionales.
-- Contexto ampliable desde `app/data/conocimiento_institucional.json`.
-- Respuestas controladas, sin inventar costos, fechas o beneficios.
+- Respuestas controladas mediante plantillas, conocimiento verificable y datos institucionales.
+- Búsqueda semántica TF-IDF sobre `app/data/conocimiento_institucional.json`.
 - Baja persistente mediante `stop_bot` y bloqueo de campañas a contactos dados de baja.
-- Base de conocimiento ampliable con respuestas y fuentes verificadas.
+- Rate limit por contacto para evitar respuestas repetitivas.
+- Panel administrativo básico en `/admin` con métricas y conocimiento.
+- Migraciones Alembic.
 - API FastAPI y scripts de consola.
 - Modo `WHATSAPP_DRY_RUN=true` para no abrir WhatsApp Web.
 
@@ -57,20 +58,26 @@ por `.gitignore`.
 
 ## PostgreSQL
 
-El sistema no admite SQLite. Crea una base PostgreSQL:
+El sistema no admite SQLite. Para desarrollo local, levanta PostgreSQL con Docker
+y aplica migraciones:
 
 ```powershell
-createdb orientador_usil
+docker compose up -d
 python scripts/init_db.py
 ```
 
 La URL predeterminada de ejemplo es:
 
 ```text
-postgresql+psycopg2://postgres:postgres@localhost:5432/orientador_usil
+postgresql+psycopg2://usil:usil@localhost:5432/usil_db
 ```
 
 Si tu usuario o contraseña son diferentes, actualiza `DATABASE_URL` en `.env`.
+También puedes ejecutar migraciones directamente:
+
+```powershell
+python -m alembic upgrade head
+```
 
 ## Inicio real con WhatsApp Web
 
@@ -299,6 +306,8 @@ La baja exige una solicitud explícita: risas y respuestas breves como `JAJAJA`,
 `XD`, `OK`, `YA`, `AJA` o `no gracias` nunca activan `stop_bot`.
 
 `INBOUND_API_KEY` protege el webhook y debe coincidir entre FastAPI y el puente.
+`RATE_LIMIT_MESSAGES` y `RATE_LIMIT_WINDOW_SECONDS` controlan cuántos mensajes
+por contacto se procesan dentro de una ventana de tiempo.
 
 ## Motor semántico local
 
@@ -326,10 +335,53 @@ confirmadas sin modificar Python. Cada entrada debe incluir:
 - `fuente_url`: enlace oficial que respalda la respuesta.
 - `verificado_el`: fecha de la última revisión.
 
-El bot prioriza estas entradas verificadas antes de responder con una plantilla.
+El bot prioriza estas entradas verificadas antes de responder con una plantilla
+y las busca con TF-IDF, así que puede encontrar frases parecidas aunque no usen
+exactamente las mismas palabras clave.
 No solicita llamadas ni promete derivaciones; cuando alguien pide contacto
 humano, comparte únicamente los canales oficiales definidos en
 `app/data/institucion.json`.
+
+También puedes revisar el contexto desde:
+
+```text
+GET http://localhost:8000/admin/knowledge
+```
+
+Para agregar una entrada desde API, configura `ADMIN_API_KEY` y envía:
+
+```powershell
+Invoke-RestMethod -Method Post `
+  -Uri http://localhost:8000/admin/knowledge `
+  -Headers @{"X-Admin-Api-Key"="tu-clave"} `
+  -ContentType "application/json" `
+  -Body '{"palabras_clave":["tema real"],"respuesta":"Respuesta verificada.","fuente_url":"https://www.usil.edu.pe/","verificado_el":"2026-06-15"}'
+```
+
+## Panel Y Métricas
+
+Abre:
+
+```text
+http://localhost:8000/admin
+```
+
+Endpoints disponibles:
+
+- `GET /admin/metrics`: contactos, bajas, mensajes, campañas, intenciones, carreras y estados.
+- `GET /admin/knowledge`: entradas verificadas.
+- `POST /admin/knowledge`: agrega contexto verificable, protegido con `ADMIN_API_KEY`.
+
+## Producción Con Docker
+
+Para levantar PostgreSQL, FastAPI y el puente en contenedores:
+
+```powershell
+docker compose -f docker-compose.prod.yml up --build
+```
+
+El servicio `api` ejecuta `alembic upgrade head` antes de iniciar FastAPI.
+El bridge conserva la sesión de WhatsApp en el volumen `whatsapp_auth`.
 
 ## Pruebas
 
@@ -341,7 +393,7 @@ Las pruebas unitarias nunca usan SQLite. Para ejecutar también las pruebas
 reales de persistencia, define una base PostgreSQL exclusiva:
 
 ```powershell
-$env:TEST_DATABASE_URL="postgresql+psycopg2://postgres:clave@localhost:5432/orientador_usil_test"
+$env:TEST_DATABASE_URL="postgresql+psycopg2://postgres:clave@localhost:5432/usil_test"
 python -m pytest
 ```
 
@@ -355,6 +407,5 @@ python -m pytest
 ## Mejoras futuras
 
 - API oficial de WhatsApp Business.
-- Migraciones Alembic.
-- Panel administrativo y dashboard.
-- Analítica de conversiones y RAG con fuentes oficiales.
+- Autenticación completa para el panel administrativo.
+- Editor visual de conocimiento verificable.

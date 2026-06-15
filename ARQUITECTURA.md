@@ -242,6 +242,10 @@ docker compose up -d
 python scripts/init_db.py
 ```
 
+`scripts/init_db.py` ejecuta `alembic upgrade head`. Las migraciones viven en
+`migrations/` y la revisión inicial es segura para instalaciones nuevas o bases
+que ya tenían tablas del prototipo.
+
 Configuración:
 
 ```dotenv
@@ -264,6 +268,9 @@ DATABASE_URL=postgresql+psycopg2://usuario:clave@host:5432/postgres?sslmode=requ
 |---|---|---|
 | GET | `/health` | Salud de FastAPI y PostgreSQL |
 | GET | `/health/llm` | Salud del motor semántico, ruta conservada por compatibilidad |
+| GET | `/admin` | Panel administrativo básico |
+| GET | `/admin/metrics` | Métricas operativas |
+| GET/POST | `/admin/knowledge` | Conocimiento verificable |
 | POST | `/webhooks/whatsapp/inbound` | Entrada real desde WhatsApp |
 | POST | `/simulate/inbound` | Simulación manual |
 | POST | `/campaigns/send` | Campaña inicial |
@@ -291,6 +298,12 @@ Respuesta de salud semántica:
 docker compose up -d
 python scripts/init_db.py
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Producción en contenedores:
+
+```powershell
+docker compose -f docker-compose.prod.yml up --build
 ```
 
 En otra terminal:
