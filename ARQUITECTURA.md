@@ -1,749 +1,342 @@
-# Arquitectura y funcionamiento del Orientador USIL por WhatsApp
+# Arquitectura del Orientador USIL por WhatsApp
 
-## 1. Descripción general
+## Descripción
 
-Este proyecto es un prototipo de orientación universitaria por WhatsApp para
-USIL. Permite:
+Este proyecto recibe y envía mensajes reales mediante una sesión persistente de
+WhatsApp Web. FastAPI procesa cada mensaje, clasifica su intención con un motor
+semántico puro en Python, genera respuestas desde datos institucionales
+controlados y guarda toda la conversación en PostgreSQL.
 
-- Importar y almacenar contactos.
-- Enviar una campaña inicial a contactos autorizados.
-- Recibir mensajes reales mediante una sesión vinculada de WhatsApp Web.
-- Comprender consultas sobre carreras, admisión, campo laboral, costos, campus
-  e información institucional.
-- Responder mediante reglas, plantillas controladas y Ollama local.
-- Guardar contactos, mensajes y contexto conversacional en PostgreSQL/Supabase.
-- Respetar permanentemente las solicitudes explícitas de baja.
+No depende de APIs LLM ni servicios externos de inteligencia artificial.
 
-El sistema no usa la API oficial de WhatsApp Business. La recepción en tiempo
-real se realiza con `whatsapp-web.js`, que automatiza una sesión de WhatsApp Web.
-Por ello debe considerarse una integración no oficial y usarse solamente con
-una cuenta autorizada.
+## Stack
 
-## 2. Stack tecnológico
+| Componente | Tecnología |
+|---|---|
+| Backend | Python, FastAPI, Pydantic |
+| Motor semántico | scikit-learn TF-IDF, python-Levenshtein |
+| Persistencia | PostgreSQL local, Supabase u otro PostgreSQL remoto |
+| ORM | SQLAlchemy |
+| WhatsApp | Node.js, whatsapp-web.js |
+| Envío saliente | BridgeProvider |
+| Pruebas | Pytest |
 
-| Componente | Tecnología | Responsabilidad |
-|---|---|---|
-| API y lógica principal | Python, FastAPI | Recibir mensajes, ejecutar reglas y coordinar servicios |
-| Persistencia | PostgreSQL en Supabase | Guardar contactos, mensajes, campañas y conversaciones |
-| ORM | SQLAlchemy | Acceder a PostgreSQL mediante modelos y repositorios |
-| Validación de API | Pydantic | Validar entradas, respuestas y configuración |
-| WhatsApp entrante/saliente | Node.js, `whatsapp-web.js` | Escuchar, responder y enviar campañas con una sesión persistente |
-| Proveedor recomendado | `BridgeProvider` | Enviar desde FastAPI al servidor HTTP local del bridge |
-| Proveedor alternativo | PyWhatKit | Envío heredado o pruebas simples mediante navegador |
-| Inteligencia artificial local | Ollama, `qwen3.5:0.8b` | Comprender y redactar consultas que requieren explicación |
-| Pruebas | Pytest | Verificar reglas, servicios, API, campañas y Ollama |
-
-## 3. Arquitectura de alto nivel
+## Flujo principal
 
 ```text
 Usuario de WhatsApp
         |
         v
-WhatsApp Web vinculado
-        |
-        v
-bridge/index.js (whatsapp-web.js)
+bridge/index.js
         |
         | POST /webhooks/whatsapp/inbound
         v
-FastAPI - app/main.py
+FastAPI
         |
         v
 ConversationService
         |
-        +--> PostgreSQL/Supabase: busca o crea contacto
-        |
         +--> verifica stop_bot
-        |
         +--> IntentClassifier
         |       |
-        |       +--> reglas rápidas y seguras
-        |       |
-        |       +--> Ollama HTTP cuando se necesita comprensión o explicación
+        |       +--> SemanticEngine singleton
+        |               +--> reglas exactas
+        |               +--> alias de carreras
+        |               +--> TF-IDF
+        |               +--> Levenshtein
         |
         +--> ChatbotService
-        |       |
-        |       +--> plantilla controlada
-        |       |
-        |       +--> respuesta redactada por Ollama
+        |       +--> plantillas
+        |       +--> carreras.json
+        |       +--> institucion.json
         |
-        +--> PostgreSQL/Supabase: guarda inbound, outbound y contexto
-        |
-        v
-Respuesta JSON para bridge/index.js
+        +--> PostgreSQL
         |
         v
-Respuesta enviada al chat de WhatsApp si should_reply=true
-
-Campaña / envío iniciado desde FastAPI
+Respuesta JSON al bridge
         |
         v
-BridgeProvider
-        |
-        | POST http://127.0.0.1:3001/send
-        v
-Servidor HTTP saliente del bridge
-        |
-        v
-WhatsApp Web vinculado
+Respuesta enviada al chat
 ```
 
-## 4. Flujo completo de un mensaje entrante
+## Bridge bidireccional
 
-### 4.1 Recepción desde WhatsApp Web
+`bridge/index.js` mantiene la sesión autenticada mediante `LocalAuth` en
+`bridge/.wwebjs_auth/`.
 
-El archivo `bridge/index.js` crea un cliente de `whatsapp-web.js` usando
-`LocalAuth`.
+Funciones:
 
-La sesión autenticada se almacena dentro de:
+- Recibe mensajes de chats individuales.
+- Ignora grupos, estados y mensajes propios.
+- Resuelve identificadores `@lid` al teléfono real.
+- Mantiene una cola por contacto para preservar el orden.
+- Envía mensajes salientes mediante la misma sesión.
+- Expone `GET /health` y `POST /send` en `127.0.0.1:3001`.
+
+`BridgeProvider` llama a `POST /send` desde FastAPI y scripts de campaña.
+
+## Concurrencia
+
+Existen dos niveles de protección:
+
+1. El bridge serializa mensajes por contacto mediante colas de promesas.
+2. `ConversationService` utiliza un `asyncio.Lock` por teléfono normalizado.
+
+Contactos distintos pueden procesarse concurrentemente, pero dos mensajes del
+mismo contacto mantienen su orden.
+
+`ContactRepository.get_or_create` usa una transacción anidada para tolerar
+creaciones simultáneas del mismo teléfono.
+
+## Motor semántico
+
+`app/services/semantic_engine.py` implementa un pipeline en cascada.
+
+### Nivel 1: reglas exactas
+
+Se ejecuta siempre primero:
+
+- Bajas explícitas.
+- Ruido conversacional.
+- Saludos.
+- Agradecimientos.
+- Presentación de nombre.
+
+Una baja solo se activa con frases explícitas como `basta`, `stop`,
+`ya no me escriban` o `quiero darme de baja`.
+
+Mensajes como `JAJAJA`, `XD`, `OK`, `YA`, `AJA` y `no gracias` nunca activan
+`stop_bot`.
+
+### Nivel 2: carreras y temas
+
+El motor carga `app/data/carreras.json` una sola vez. Detecta nombres canónicos
+y alias, incluyendo errores frecuentes:
 
 ```text
-bridge/.wwebjs_auth/
+adminsitracion -> Administración
+sitemas        -> Ingeniería de Sistemas
+derehco        -> Derecho
+big data       -> Ciencia de Datos
 ```
 
-Al recibir un mensaje, el puente ignora:
+Si encuentra una carrera y un tema, produce una intención compuesta como
+`consulta_campo_laboral`, `consulta_costos`, `consulta_malla` o
+`consulta_modalidad`.
 
-- Mensajes enviados por la propia cuenta.
-- Estados de WhatsApp.
-- Mensajes de grupos.
-- Mensajes sin texto.
+### Nivel 3: TF-IDF
 
-WhatsApp puede entregar algunos remitentes con identificadores internos
-terminados en `@lid`. Antes de llamar a FastAPI, el bridge los resuelve al
-teléfono real mediante `getContactLidAndPhone`. El identificador original se
-conserva en `raw_payload.whatsapp_source_id` para auditoría.
+El corpus vive en `app/data/intent_corpus.json`. Contiene ocho intenciones y al
+menos veinte ejemplos por intención.
 
-Después envía a FastAPI:
+Configuración:
 
-```http
-POST /webhooks/whatsapp/inbound
-Content-Type: application/json
-X-Inbound-Api-Key: ...
+```python
+TfidfVectorizer(analyzer="char_wb", ngram_range=(2, 4))
 ```
 
-Ejemplo conceptual:
+El uso de n-gramas de caracteres permite tolerar errores ortográficos.
 
-```json
-{
-  "phone_number": "51999999999",
-  "message": "¿En qué trabaja alguien de Administración?",
-  "timestamp": "2026-06-12T15:00:00Z",
-  "raw_payload": {
-    "whatsapp_message_id": "...",
-    "source": "whatsapp-web.js"
-  },
-  "send_reply": false
-}
-```
+Si la similitud máxima es menor a `0.25`, retorna `fuera_de_alcance`.
 
-El puente no necesita que FastAPI envíe directamente por PyWhatKit. Recibe
-`bot_reply` en el JSON y responde en el mismo chat mediante
-`message.reply(...)`.
+### Nivel 4: Levenshtein
 
-El bridge mantiene una cola independiente por contacto. Mensajes de usuarios
-distintos pueden avanzar concurrentemente, pero dos mensajes consecutivos del
-mismo contacto se procesan en orden para evitar respuestas cruzadas.
-
-### 4.2 Procesamiento en FastAPI
-
-`app/main.py` recibe el webhook y crea un `ConversationService`.
-
-El servicio:
-
-1. Normaliza el teléfono.
-2. Busca el contacto en PostgreSQL o lo crea.
-3. Recupera el contexto anterior de la conversación.
-4. Comprueba si el contacto tiene `stop_bot=true`.
-5. Clasifica el mensaje.
-6. Genera una respuesta cuando corresponde.
-7. Guarda el mensaje entrante.
-8. Guarda el mensaje saliente solamente si realmente será respondido.
-9. Actualiza contacto, intención, estado y contexto.
-10. Devuelve el resultado al puente.
-
-`ConversationService` aplica además un `asyncio.Lock` por teléfono normalizado.
-Esta segunda protección ordena solicitudes simultáneas del mismo contacto
-dentro de FastAPI.
-
-Al crear contactos, el repositorio utiliza una transacción anidada. Si dos
-solicitudes intentan crear el mismo teléfono al mismo tiempo, recupera el
-contacto existente después del conflicto de unicidad sin invalidar la
-transacción principal.
-
-### 4.3 Envío saliente iniciado por FastAPI
-
-El bridge también expone un servidor HTTP local:
+Cuando la similitud coseno está entre `0.25` y `0.40`, se combina con distancia
+Levenshtein:
 
 ```text
-GET  http://127.0.0.1:3001/health
-POST http://127.0.0.1:3001/send
+score_final = 0.7 * score_coseno + 0.3 * (1 - levenshtein_normalizado)
 ```
 
-`BridgeProvider`, ubicado en `app/whatsapp/bridge_sender.py`, implementa
-`WhatsAppProvider`. Con `WHATSAPP_PROVIDER=bridge`, FastAPI y los scripts envían
-al endpoint `/send` usando la misma sesión persistente de WhatsApp Web.
+### Singleton
 
-El servidor saliente valida la clave compartida, comprueba que WhatsApp esté
-listo, verifica el número con `getNumberId`, envía mediante `client.sendMessage`
-y devuelve el identificador del mensaje enviado.
+`get_semantic_engine()` crea el índice una sola vez y lo reutiliza durante toda
+la vida de la aplicación.
 
-## 5. Regla persistente `stop_bot`
+## Clasificador
 
-`stop_bot` es la protección principal para respetar una baja.
+`IntentClassifier` mantiene la interfaz:
 
-Solo se activa cuando existe una solicitud explícita, por ejemplo:
+```python
+intent, entities = classifier.classify(message, conversation_context)
+```
 
-- `basta`
-- `stop`
-- `detente`
-- `ya no me escriban`
-- `no quiero mensajes`
-- `quiero darme de baja`
+Internamente delega en `SemanticEngine` y conserva una segunda verificación para
+impedir bajas falsas.
 
-No se activa con:
+## Generación de respuestas
 
-- `JAJAJA`
-- `XD`
-- `OK`
-- `YA`
-- `AJA`
-- `no gracias`
-- Bromas o mensajes ambiguos
+`ChatbotService` no genera texto libre. Selecciona variantes aleatorias desde
+`app/data/respuestas_base.json` e interpola:
 
-Si Ollama clasifica incorrectamente un mensaje como baja, el
-`IntentClassifier` vuelve a verificar el texto original y descarta la baja si
-no existe una expresión explícita.
+- Carrera.
+- Descripción controlada.
+- Campo laboral controlado.
+- Portal oficial.
+- Portal de admisión.
+- Lista de campus.
+
+Las respuestas:
+
+- Se limitan a 800 caracteres.
+- Eliminan emojis cuando el usuario no usó emojis.
+- Usan fallback estático si falla una interpolación.
+- No inventan costos, fechas, vacantes ni requisitos.
+
+## Persistencia
+
+### `contacts`
+
+Estado actual del contacto, teléfono, carrera de interés, última intención,
+`opt_out` y `stop_bot`.
+
+### `messages`
+
+Historial completo inbound y outbound con intención, entidades y payload.
+
+### `conversations`
+
+Último estado y contexto resumido de la conversación.
+
+### `campaign_messages`
+
+Resultado de cada envío de campaña.
+
+### `advisor_requests`
+
+Solicitudes de orientación humana.
+
+## Baja persistente
 
 Cuando `stop_bot=true`:
 
-- El mensaje entrante todavía se guarda para auditoría.
-- No se genera ni guarda mensaje saliente.
-- El puente no responde.
+- El mensaje entrante se guarda.
+- No se genera mensaje saliente.
+- El bridge no responde.
 - El contacto queda excluido de campañas futuras.
 
-## 6. Clasificación híbrida: reglas y Ollama
+## Campañas
 
-La clasificación vive en `app/services/intent_classifier.py`.
+El proveedor recomendado es `BridgeProvider`, que reutiliza la sesión de
+WhatsApp Web.
 
-### 6.1 Reglas rápidas
-
-Las reglas se ejecutan primero porque son rápidas, predecibles y seguras.
-
-Se usan principalmente para:
-
-- Solicitudes explícitas de baja.
-- Ruidos conversacionales conocidos.
-- Saludos y agradecimientos.
-- Admisión, costos, campus y enlaces.
-- Carreras exactas o alias conocidos.
-- Palabras con errores ortográficos frecuentes.
-
-Ejemplos:
-
-```text
-"adminsitracion" -> Administración
-"sitemas"        -> Ingeniería de Sistemas
-"derehco"        -> Derecho
+```powershell
+python scripts/send_campaign.py --limit 1
+python scripts/send_campaign.py --delay 10
 ```
 
-### 6.2 Ruido conversacional
+Cada resultado se guarda y confirma antes de procesar el siguiente contacto.
 
-Mensajes sin una consulta real se clasifican como `ruido_conversacional`.
+## Base de datos local o cloud
 
-Ejemplos:
+### Local con Docker
 
-```text
-JAJAJA
-XD
-OK
-YA
-AJA
+```powershell
+docker compose up -d
+python scripts/init_db.py
 ```
 
-Estos mensajes se guardan, pero devuelven:
+Configuración:
+
+```dotenv
+DB_MODE=local
+DATABASE_URL=postgresql+psycopg2://usil:usil@localhost:5432/usil_db
+```
+
+### Cloud
+
+Para Supabase u otro PostgreSQL remoto:
+
+```dotenv
+DB_MODE=cloud
+DATABASE_URL=postgresql+psycopg2://usuario:clave@host:5432/postgres?sslmode=require
+```
+
+## Endpoints
+
+| Método | Ruta | Uso |
+|---|---|---|
+| GET | `/health` | Salud de FastAPI y PostgreSQL |
+| GET | `/health/llm` | Salud del motor semántico, ruta conservada por compatibilidad |
+| POST | `/webhooks/whatsapp/inbound` | Entrada real desde WhatsApp |
+| POST | `/simulate/inbound` | Simulación manual |
+| POST | `/campaigns/send` | Campaña inicial |
+| GET/POST | `/contacts` | Gestión de contactos |
+| GET | `/contacts/{phone}/messages` | Historial |
+
+Respuesta de salud semántica:
 
 ```json
 {
-  "intent": "ruido_conversacional",
-  "should_reply": false,
-  "bot_reply": null
-}
-```
-
-### 6.3 Uso de Ollama
-
-Ollama cumple dos funciones separadas:
-
-1. Clasifica únicamente mensajes que las reglas no comprenden usando `/api/generate` y
-   temperatura `0.2`.
-2. Redacta la respuesta final de todas las intenciones no triviales usando
-   `/api/chat`, historial conversacional y temperatura `0.45`.
-
-El redactor final se usa especialmente para:
-
-- Explicar de qué trata una carrera.
-- Describir campo laboral general.
-- Comparar carreras.
-- Explicar modalidades.
-- Consultas institucionales.
-- Interpretar mensajes que las reglas no comprenden claramente.
-
-La aplicación no inicia, instala ni administra Ollama. Para clasificación llama:
-
-```http
-POST http://localhost:11434/api/generate
-```
-
-Cuerpo principal:
-
-```json
-{
-  "model": "qwen3.5:0.8b",
-  "prompt": "...",
-  "stream": false,
-  "think": false,
-  "options": {
-    "temperature": 0.2,
-    "num_predict": 400
+  "status": "ok",
+  "engine": "tfidf_semantic",
+  "intents_loaded": 8,
+  "probe": {
+    "text": "hola",
+    "intent": "saludo",
+    "confidence": 1.0
   }
 }
 ```
 
-`think=false` reduce el tiempo de respuesta. El timeout evita que una llamada
-bloqueada detenga indefinidamente la conversación.
-
-Para la redacción final llama:
-
-```http
-POST http://localhost:11434/api/chat
-```
-
-El payload conversacional contiene:
-
-- El prompt de sistema con límites y hechos institucionales.
-- La información de la carrera detectada.
-- Hasta los últimos tres mensajes cuando pertenecen al mismo tema o la consulta
-  actual es una continuación.
-- La plantilla controlada como guía de contenido.
-- El mensaje actual del usuario.
-
-Si `/api/chat` falla o devuelve una respuesta inválida, el sistema usa la
-plantilla estática como fallback.
-
-## 7. Contrato de respuesta de Ollama
-
-El prompt está en `app/llm/prompts.py`. Ollama debe devolver solamente JSON.
-
-Estructura esperada:
-
-```json
-{
-  "intent": "consulta_campo_laboral",
-  "confidence": 0.9,
-  "classifier": "ollama",
-  "entities": {
-    "carrera": "Administración",
-    "tema": "campo_laboral"
-  },
-  "response": "Respuesta breve y segura...",
-  "should_reply": true,
-  "stop_bot": false
-}
-```
-
-`app/llm/service.py` valida la respuesta:
-
-- Rechaza intenciones desconocidas.
-- Limita `confidence` entre `0` y `1`.
-- Exige una carrera para `consulta_carrera_especifica`.
-- Recalcula decisiones sensibles.
-- No permite que el modelo controle libremente una baja.
-- Marca ruido y contenido fuera de alcance como silencioso.
-
-El contexto institucional enviado a Ollama vive en:
-
-```text
-app/data/institucion.json
-```
-
-Esto reduce invenciones y mantiene las respuestas dentro de información
-institucional controlada.
-
-## 8. Generación de respuestas
-
-`app/services/chatbot_service.py` decide cómo responder.
-
-### Plantillas controladas
-
-Se usan directamente para baja, ruido y saludos. Para las demás intenciones
-funcionan como guía de contenido y fallback resiliente:
-
-- Admisión.
-- Costos.
-- Campus.
-- Listado de carreras.
-- Malla y duración.
-- Baja.
-- Saludos y agradecimientos.
-
-Las variantes viven en:
-
-```text
-app/data/respuestas_base.json
-```
-
-Se seleccionan variantes aleatorias para evitar respuestas repetitivas.
-
-### Respuestas de Ollama
-
-Se usan como redacción final para todas las respuestas no triviales. Las respuestas:
-
-- Deben ser breves y naturales.
-- No deben solicitar datos personales.
-- No deben prometer empleabilidad.
-- No deben inventar costos, fechas, vacantes o requisitos.
-- Deben usar información institucional controlada.
-- Pueden incluir un cierre variado con un enlace oficial.
-- Reciben hasta los últimos tres mensajes únicamente cuando son relevantes para
-  continuar el mismo tema.
-- Se truncan si superan 800 caracteres.
-- Eliminan emojis cuando el usuario no utilizó emojis.
-
-Si la respuesta ya contiene un enlace de USIL, el backend evita agregar otro
-cierre repetido.
-
-## 9. Persistencia en PostgreSQL/Supabase
-
-Los modelos están definidos en `app/database/models.py`.
-
-### Tabla `contacts`
-
-Guarda el estado actual de cada contacto:
-
-- Nombre y teléfono.
-- Carrera de interés.
-- Origen.
-- Estado conversacional.
-- Última intención.
-- `opt_out`.
-- `stop_bot`.
-- Fecha del último mensaje.
-
-### Tabla `messages`
-
-Guarda el historial completo:
-
-- Dirección `inbound` u `outbound`.
-- Texto.
-- Intención.
-- Entidades detectadas.
-- Payload original.
-- Fecha.
-
-### Tabla `conversations`
-
-Guarda el contexto resumido:
-
-- Último mensaje del usuario.
-- Último mensaje del bot.
-- Estado actual.
-- Última carrera mencionada.
-- Último tema consultado.
-- Otros datos contextuales.
-
-### Tabla `campaign_messages`
-
-Registra cada intento de campaña:
-
-- Mensaje enviado.
-- Contacto.
-- Estado de envío.
-- Error.
-- Fecha de envío.
-
-### Tabla `advisor_requests`
-
-Conserva compatibilidad con solicitudes de asesor existentes, aunque el flujo
-actual evita insistir o solicitar datos personales.
-
-## 10. Campañas iniciales
-
-La campaña inicial se coordina desde:
-
-```text
-app/services/campaign_service.py
-scripts/send_campaign.py
-```
-
-Antes de enviar, se excluyen contactos con:
-
-- `opt_out=true`
-- `stop_bot=true`
-- Estado `SALIR`
-- Estado `NO_INTERESADO`
-
-El proveedor recomendado para campañas reales es `BridgeProvider`, porque
-reutiliza la sesión autenticada del bridge y no abre una pestaña por contacto.
-PyWhatKit se mantiene como alternativa heredada y no recibe mensajes.
-
-Cada envío registra su resultado en `campaign_messages`, guarda el outbound
-exitoso en `messages`, actualiza el contacto y confirma la transacción antes de
-continuar.
-
-El script espera 5 segundos entre contactos de forma predeterminada. Puede
-ajustarse con:
+## Ejecución
 
 ```powershell
-python scripts/send_campaign.py --delay 10
-```
-
-FastAPI y el bridge deben permanecer activos durante campañas mediante
-`BridgeProvider`.
-
-## 11. Endpoints principales
-
-| Método | Ruta | Uso |
-|---|---|---|
-| GET | `/` | Información básica del servicio |
-| GET | `/health` | Verifica API y PostgreSQL |
-| GET | `/health/llm` | Verifica Ollama y el modelo |
-| POST | `/webhooks/whatsapp/inbound` | Entrada real desde el puente |
-| POST | `/simulate/inbound` | Simulación manual |
-| POST | `/campaigns/send` | Envía campaña inicial |
-| GET | `/contacts` | Lista contactos |
-| POST | `/contacts` | Crea contacto |
-| POST | `/contacts/import` | Importa contactos |
-| GET | `/contacts/{phone}/messages` | Consulta historial |
-| GET | `/advisor-requests` | Lista solicitudes existentes |
-
-La documentación interactiva está disponible en:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-## 12. Configuración mediante `.env`
-
-Variables principales:
-
-```dotenv
-DATABASE_URL=postgresql+psycopg2://...
-INBOUND_API_KEY=una-clave-compartida
-BRIDGE_API_URL=http://127.0.0.1:8000
-
-WHATSAPP_PROVIDER=bridge
-WHATSAPP_DRY_RUN=true
-BRIDGE_SEND_URL=http://127.0.0.1:3001/send
-BRIDGE_SEND_TIMEOUT=60
-BRIDGE_OUTBOUND_HOST=127.0.0.1
-BRIDGE_OUTBOUND_PORT=3001
-BRIDGE_HEADLESS=false
-
-LLM_PROVIDER=ollama
-OLLAMA_ENABLED=true
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=qwen3.5:0.8b
-OLLAMA_THINK=false
-OLLAMA_TEMPERATURE=0.2
-OLLAMA_MAX_TOKENS=400
-OLLAMA_TIMEOUT=120
-```
-
-`.env` contiene secretos y no debe publicarse en Git.
-
-## 13. Cómo ejecutar el sistema
-
-### Inicializar tablas
-
-```powershell
-cd C:\Users\PC\Downloads\enviarWHATSAPP
+docker compose up -d
 python scripts/init_db.py
-```
-
-### Verificar Ollama
-
-```powershell
-python scripts/check_ollama.py
-```
-
-### Ejecutar FastAPI
-
-```powershell
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
-
-### Ejecutar el puente de WhatsApp Web
 
 En otra terminal:
 
 ```powershell
-cd C:\Users\PC\Downloads\enviarWHATSAPP\bridge
+cd bridge
 npm start
 ```
 
-La primera vez debe escanearse el QR desde:
-
-```text
-WhatsApp > Dispositivos vinculados
-```
-
-Después, `LocalAuth` reutiliza la sesión guardada.
-
-Al iniciar correctamente, la consola debe mostrar:
-
-```text
-Sesión de WhatsApp autenticada.
-Puente listo. Esperando mensajes entrantes...
-Envío saliente disponible en http://127.0.0.1:3001/send
-```
-
-`BRIDGE_HEADLESS=false` muestra el navegador para facilitar autenticación y
-diagnóstico. Con una sesión estable puede configurarse en `true`.
-
-## 14. Cómo verificar el funcionamiento
-
-### Salud de FastAPI y PostgreSQL
-
-```powershell
-Invoke-RestMethod http://127.0.0.1:8000/health
-```
-
-### Salud de Ollama
-
-```powershell
-Invoke-RestMethod http://127.0.0.1:8000/health/llm
-```
-
-### Salud del envío saliente por WhatsApp
-
-```powershell
-Invoke-RestMethod http://127.0.0.1:3001/health
-```
-
-Devuelve HTTP `200` cuando WhatsApp está listo y `503` mientras todavía no se
-ha autenticado.
-
-### Simular un mensaje
-
-```powershell
-python scripts/simulate_inbound.py `
-  --phone 51999999999 `
-  --message "¿En qué trabaja alguien de Administración?"
-```
-
-### Casos recomendados
-
-| Mensaje | Resultado esperado |
-|---|---|
-| `Administración` | Información inicial de la carrera |
-| `¿En qué trabaja alguien de Administración?` | Respuesta explicativa con Ollama |
-| `¿Cuánto cuesta?` | Respuesta segura y portal de admisión |
-| `JAJAJA` | Guardado sin respuesta |
-| `sabes zonificar` | Fuera de alcance, sin respuesta |
-| `basta de mensajes` | Confirma baja y activa `stop_bot=true` |
-| Mensaje después de la baja | Guardado sin respuesta |
-
-## 15. Pruebas automatizadas
-
-Ejecutar:
+## Pruebas
 
 ```powershell
 python -m pytest -q
 ```
 
-Las pruebas cubren:
+La suite cubre reglas, TF-IDF, Levenshtein, alias, errores ortográficos, bajas,
+ruido silencioso, plantillas, campañas, API y persistencia.
 
-- Clasificación por reglas.
-- Errores ortográficos.
-- Ruido conversacional silencioso.
-- Protección contra bajas falsas de Ollama.
-- Baja persistente.
-- Respuestas controladas.
-- Flujo de conversación.
-- Campañas y exclusión de contactos.
-- Contrato HTTP de Ollama.
-- Endpoints FastAPI.
+## Seguridad
 
-Las pruebas reales contra PostgreSQL requieren una base exclusiva definida en
-`TEST_DATABASE_URL`.
-
-## 16. Seguridad y controles
-
-- `INBOUND_API_KEY` protege el webhook entre el puente y FastAPI.
-- `.env` no debe subirse al repositorio.
-- Las decisiones de baja no dependen únicamente de Ollama.
-- Costos, fechas, vacantes y requisitos exactos no son inventados.
-- El sistema evita solicitar nombre, DNI, correo o celular durante la
-  conversación.
-- Los mensajes de grupos y estados son ignorados por el puente.
+- `.env` está ignorado por Git.
+- `INBOUND_API_KEY` protege webhook y envío saliente.
 - El servidor saliente escucha por defecto solo en `127.0.0.1`.
-- La misma `INBOUND_API_KEY` protege el webhook y el endpoint saliente.
-- Colas y locks por contacto evitan procesar simultáneamente dos mensajes del
-  mismo usuario.
+- `stop_bot` tiene verificación doble.
+- No se inventan datos institucionales variables.
 - El historial se conserva para auditoría.
 
-## 17. Limitaciones
-
-- `whatsapp-web.js` es una integración no oficial.
-- WhatsApp puede cambiar su funcionamiento y romper la automatización.
-- La sesión depende del navegador y de la cuenta vinculada.
-- FastAPI y el bridge deben permanecer activos para campañas con
-  `BridgeProvider`.
-- Ollama debe estar ejecutándose localmente para respuestas generativas.
-- El modelo liviano puede equivocarse; por ello existen reglas y validaciones.
-- No existe todavía un panel administrativo para revisar conversaciones.
-- La inicialización usa SQLAlchemy y SQL directo; una evolución recomendable es
-  usar migraciones con Alembic.
-
-## 18. Estructura principal del proyecto
+## Estructura relevante
 
 ```text
 app/
-  main.py                         API FastAPI
-  config.py                       Configuración .env
+  main.py
+  config.py
   services/
-    conversation_service.py       Orquestación de mensajes
-    intent_classifier.py          Reglas y selección de Ollama
-    chatbot_service.py            Generación final de respuestas
-    campaign_service.py           Campañas iniciales
-  llm/
-    ollama_provider.py            Cliente HTTP de Ollama
-    service.py                    Validación del contrato LLM
-    prompts.py                    Instrucciones para el modelo
+    semantic_engine.py
+    intent_classifier.py
+    chatbot_service.py
+    conversation_service.py
+    campaign_service.py
   database/
-    models.py                     Tablas SQLAlchemy
-    repositories.py               Consultas y persistencia
+    models.py
+    repositories.py
   whatsapp/
-    bridge_sender.py              Proveedor HTTP hacia la sesión persistente
-    sender.py                     Selección del proveedor configurado
-    pywhatkit_sender.py           Proveedor alternativo heredado
+    bridge_sender.py
+    sender.py
   data/
-    institucion.json              Contexto institucional controlado
-    carreras.json                 Carreras y alias
-    respuestas_base.json          Plantillas y cierres
+    intent_corpus.json
+    carreras.json
+    institucion.json
+    respuestas_base.json
 bridge/
-  index.js                        Puente bidireccional WhatsApp Web <-> FastAPI
-scripts/
-  init_db.py                      Inicialización de PostgreSQL
-  import_contacts.py              Importación de contactos
-  send_campaign.py                Campaña inicial
-  simulate_inbound.py             Simulación de mensajes
-  check_ollama.py                 Verificación de Ollama
-tests/                             Pruebas automatizadas
+  index.js
+docker-compose.yml
+tests/
 ```
-
-## 19. Resumen de la decisión arquitectónica
-
-La arquitectura es híbrida porque combina:
-
-- Reglas para velocidad, seguridad y decisiones sensibles.
-- Plantillas para información que debe mantenerse controlada.
-- Ollama para comprensión semántica y respuestas más naturales.
-- PostgreSQL/Supabase para conservar estado y trazabilidad.
-- `whatsapp-web.js` para conectar la conversación real con la API.
-- `BridgeProvider` para reutilizar esa sesión en campañas salientes.
-- Colas y locks por contacto para preservar orden y contexto bajo concurrencia.
-
-La idea central es que la IA ayuda a comprender y orientar, pero no controla
-por sí sola acciones sensibles como detener permanentemente el bot ni inventa
-información institucional variable.

@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: usil
+      POSTGRES_PASSWORD: usil
+      POSTGRES_DB: usil_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - usil_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usil -d usil_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  usil_pgdata:

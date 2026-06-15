@@ -15,29 +15,29 @@ oficial de WhatsApp Business.
 Contacto PostgreSQL
   -> CampaignService
   -> WhatsAppProvider
-  -> PyWhatKitProvider / dry-run
+  -> BridgeProvider / dry-run
 
 Webhook o simulador inbound
   -> ConversationService
       -> verifica stop_bot persistente
   -> IntentClassifier
       -> reglas rápidas para consultas simples
-      -> Ollama para explicaciones, campo laboral y comparaciones
+      -> SemanticEngine: reglas, TF-IDF y Levenshtein
   -> ChatbotService
   -> PostgreSQL
   -> respuesta JSON o proveedor configurado
 ```
 
 La lógica del chatbot, PostgreSQL, recepción y envío están desacoplados.
-`pywhatkit` solamente implementa `WhatsAppProvider`, por lo que puede
-reemplazarse posteriormente.
+`BridgeProvider` implementa `WhatsAppProvider` y reutiliza la sesión autenticada
+del puente `whatsapp-web.js`.
 
 ## Funciones
 
 - Contactos únicos por teléfono y normalización para Perú.
 - Historial inbound y outbound.
 - Clasificación determinista por reglas, patrones y diccionarios.
-- Respuestas híbridas: plantillas controladas y Ollama local cuando aporta valor.
+- Respuestas controladas mediante plantillas y datos institucionales.
 - Respuestas controladas, sin inventar costos, fechas o beneficios.
 - Baja persistente mediante `stop_bot` y bloqueo de campañas a contactos dados de baja.
 - Solicitudes de asesor sin duplicados pendientes.
@@ -169,6 +169,17 @@ invalida la sesión, aparecerá un nuevo QR.
 
 Para detener el chatbot, presiona `Ctrl+C` en ambas terminales.
 
+
+### PostgreSQL local con Docker
+
+```powershell
+docker compose up -d
+python scripts/init_db.py
+```
+
+Usa `DB_MODE=local` con la URL incluida en `.env.example`. Para Supabase u otro
+PostgreSQL remoto usa `DB_MODE=cloud` y configura `DATABASE_URL`.
+
 ## Ejecutar API
 
 ```powershell
@@ -275,10 +286,10 @@ La primera vez aparecerá un código QR. Escanéalo desde WhatsApp en
 `Dispositivos vinculados`. Cuando aparezca `Puente listo`, cada mensaje nuevo:
 
 1. Se envía al webhook FastAPI.
-2. Se verifica en Supabase si el contacto tiene `stop_bot=true`.
+2. Se verifica en PostgreSQL si el contacto tiene `stop_bot=true`.
 3. Se aplican reglas rápidas para consultas simples y seguras.
-4. Se usa una plantilla o se consulta Ollama para explicaciones, campo laboral y comparaciones.
-5. Se guarda la conversación en Supabase.
+4. Se genera una respuesta desde plantillas y datos institucionales controlados.
+5. Se guarda la conversación en PostgreSQL.
 6. Se responde automáticamente en el mismo chat, salvo que el contacto esté detenido.
 
 Cuando un contacto escribe `basta`, `stop`, `ya no` o una frase equivalente,
@@ -289,67 +300,21 @@ La baja exige una solicitud explícita: risas y respuestas breves como `JAJAJA`,
 
 `INBOUND_API_KEY` protege el webhook y debe coincidir entre FastAPI y el puente.
 
-## Ollama local opcional
+## Motor semántico local
 
-Ollama se integra como proveedor LLM local mediante HTTP. La aplicación no
-instala, inicia ni administra el proceso de Ollama. Las reglas existentes
-siempre tienen prioridad para consultas simples y seguras. Ollama se utiliza
-para consultas explicativas sobre una carrera, campo laboral, comparaciones y
-como respaldo cuando las reglas no comprenden el mensaje.
+El sistema no depende de servicios LLM externos. `SemanticEngine` clasifica en
+cascada mediante reglas exactas, alias de carreras, TF-IDF por caracteres y
+Levenshtein para consultas de baja confianza. El índice se construye una sola
+vez al iniciar FastAPI usando `app/data/intent_corpus.json`.
 
-Ollama devuelve un contrato JSON validado con intención, confianza, entidades y
-una respuesta. El backend recalcula las decisiones sensibles (`response_key`,
-`should_escalate` y `stop_bot`) y usa plantillas para admisión, costos, campus,
-listado de carreras, bajas y derivación a asesores.
-
-Las respuestas redactadas por Ollama mantienen un tono breve de orientación y
-usan cierres variados con enlaces oficiales. El backend descarta cualquier baja
-propuesta por el modelo cuando el mensaje original no solicita detenerse de
-forma explícita.
-
-El contexto institucional controlado vive en `app/data/institucion.json` e
-incluye portal oficial, admisión, contacto, campus, internacionalidad, catálogo
-oficial de carreras y políticas de respuesta. Ollama usa ese contexto para
-clasificar y redactar respuestas acotadas sin inventar información.
-
-Intenciones LLM soportadas:
-
-```text
-saludo, consulta_carreras, consulta_carrera_especifica, consulta_campo_laboral,
-comparacion_carrera, consulta_admision, consulta_costos, consulta_campus,
-quiere_asesor, agradecimiento, despedida,
-detener_conversacion, fuera_de_alcance, no_entendido
-```
-
-Configuración:
-
-```text
-LLM_PROVIDER=ollama
-OLLAMA_ENABLED=true
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=qwen3.5:0.8b
-OLLAMA_THINK=false
-OLLAMA_TEMPERATURE=0.2
-OLLAMA_MAX_TOKENS=400
-OLLAMA_TIMEOUT=120
-```
-
-Verifica que Ollama y el modelo estén disponibles:
-
-```powershell
-Invoke-RestMethod http://localhost:11434/api/tags
-python scripts/check_ollama.py
-```
-
-Con FastAPI ejecutándose, también puedes consultar:
+Verifica el motor con:
 
 ```text
 GET http://localhost:8000/health/llm
 ```
 
-Si Ollama no está ejecutándose, `/health/llm` devuelve HTTP `503` con un mensaje
-claro. Durante una conversación, el chatbot registra el error y continúa con
-las reglas y la plantilla `no_entendido`.
+El nombre del endpoint se conserva por compatibilidad, pero devuelve el estado
+del motor `tfidf_semantic`.
 
 ## Pruebas
 
@@ -369,13 +334,11 @@ python -m pytest
 
 - `whatsapp-web.js` es una integración no oficial y puede dejar de funcionar.
 - La sesión vinculada de WhatsApp Web debe mantenerse autenticada.
-- `pywhatkit` depende del navegador y solo sirve para campañas iniciales.
 - PostgreSQL debe configurarse antes de usar servicios persistentes.
-- Las respuestas LLM requieren que Ollama esté ejecutándose localmente.
+- El motor semántico funciona localmente sin servicios LLM.
 
 ## Mejoras futuras
 
-- Adaptador propio con whatsapp-web.js o Baileys.
 - API oficial de WhatsApp Business.
 - Migraciones Alembic.
 - Panel para asesores y dashboard.
