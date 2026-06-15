@@ -10,6 +10,10 @@
   "consulta_carreras": [
     "Claro 😊 Puedes revisar las carreras disponibles en el portal oficial de USIL: {portal_url}. También puedes escribirme el nombre de una carrera, por ejemplo “Administración” o “Ingeniería de Sistemas”, y te doy una orientación breve."
   ],
+  "consulta_carrera_especifica": [
+    "{carrera} es una carrera enfocada en {descripcion_carrera}\n\nPuedes revisar información oficial en el portal de USIL: {portal_url}",
+    "Sobre {carrera}: {descripcion_carrera}\n\nMás información oficial en el portal de USIL: {portal_url}"
+  ],
   "consulta_admision": [
     "Claro 😊 Para información oficial sobre admisión, inscripción y próximos pasos, revisa el portal de admisión de pregrado: https://descubre.usil.edu.pe/landings/pregrado/admision/",
     "Sobre admisión, lo más seguro es revisar la información actualizada en el portal oficial: https://descubre.usil.edu.pe/landings/pregrado/admision/"
@@ -18,7 +22,8 @@
     "Puedo orientarte de forma general, pero para comparar carreras con información oficial y actualizada te recomiendo revisar el portal de USIL o hablar con un asesor: {portal_url}"
   ],
   "consulta_campo_laboral": [
-    "El campo laboral depende de la carrera y puede variar. Indícame el nombre de la carrera que te interesa o revisa el portal oficial de USIL: {portal_url}"
+    "{campo_laboral}\n\nPuedes ampliar la información de {carrera} en: {portal_url}",
+    "Sobre el campo laboral de {carrera}: {campo_laboral}\n\nInformación oficial: {portal_url}"
   ],
   "consulta_malla": [
     "Para revisar la malla curricular oficial y actualizada de la carrera, consulta el portal de USIL: {portal_url}."

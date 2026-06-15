@@ -1,5 +1,6 @@
 import logging
 import inspect
+from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from sqlalchemy import text
@@ -9,8 +10,6 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.config import get_settings
 from app.database.repositories import ContactRepository, MessageRepository
-from app.llm import LLMService
-from app.llm.provider import LLMError
 from app.schemas.advisor_schema import AdvisorRequestRead
 from app.schemas.contact_schema import ContactCreate, ContactRead
 from app.schemas.message_schema import MessageRead
@@ -19,13 +18,23 @@ from app.services.advisor_service import AdvisorService
 from app.services.campaign_service import CampaignService
 from app.services.conversation_service import ConversationService
 from app.services.lead_service import LeadService
+from app.services.semantic_engine import get_semantic_engine
 from app.utils.logger import configure_logging
 
 
 configure_logging()
 logger = logging.getLogger(__name__)
-app = FastAPI(title="Orientador USIL", version="1.0.0")
 settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Construye el índice TF-IDF una sola vez al iniciar FastAPI."""
+    get_semantic_engine()
+    yield
+
+
+app = FastAPI(title="Orientador USIL", version="1.0.0", lifespan=lifespan)
 
 
 @app.get("/")
@@ -50,10 +59,20 @@ def health(db: Session = Depends(get_db)):
 
 @app.get("/health/llm")
 def llm_health():
-    try:
-        return LLMService().health()
-    except LLMError as error:
-        raise HTTPException(503, str(error)) from error
+    engine = get_semantic_engine()
+    probe = engine.classify("hola")
+    if engine.intents_loaded < 8 or probe.intent != "saludo" or probe.confidence <= 0.5:
+        raise HTTPException(503, "semantic engine unavailable")
+    return {
+        "status": "ok",
+        "engine": "tfidf_semantic",
+        "intents_loaded": engine.intents_loaded,
+        "probe": {
+            "text": "hola",
+            "intent": probe.intent,
+            "confidence": probe.confidence,
+        },
+    }
 
 
 @app.post("/webhooks/whatsapp/inbound", response_model=InboundResponse)

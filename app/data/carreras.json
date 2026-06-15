@@ -1,109 +1,285 @@
 {
-  "carreras": [
-    {
-      "nombre": "Ingeniería de Sistemas",
-      "aliases": ["ingenieria de sistemas", "ingeniería de sistemas", "ing sistemas", "sitemas", "sistemas", "software", "computacion", "computación", "tecnologia", "tecnología"],
-      "area": "Tecnología",
-      "descripcion_corta": "Carrera orientada al desarrollo de software, tecnología, datos e innovación digital.",
-      "url": ""
-    },
-    {
-      "nombre": "Administración",
-      "aliases": ["administracion", "administración", "adminsitracion", "admisnitracion", "adminstracion", "admin", "gestion de empresas", "gestión de empresas", "negocios", "empresa", "gestión"],
-      "area": "Negocios",
-      "descripcion_corta": "Carrera orientada a la gestión de empresas, emprendimiento y toma de decisiones.",
-      "url": ""
-    },
-    {
-      "nombre": "Marketing",
-      "aliases": ["marketing", "mercadotecnia"],
-      "area": "Negocios",
-      "descripcion_corta": "Carrera orientada al conocimiento del consumidor, estrategia comercial y comunicación de marcas.",
-      "url": ""
-    },
-    {
-      "nombre": "Arquitectura",
-      "aliases": ["arquitectura"],
-      "area": "Diseño",
-      "descripcion_corta": "Carrera orientada al diseño responsable de espacios y proyectos arquitectónicos.",
-      "url": ""
-    },
-    {
-      "nombre": "Comunicaciones",
-      "aliases": ["comunicaciones", "comunicación"],
-      "area": "Comunicaciones",
-      "descripcion_corta": "Carrera orientada a la creación y gestión estratégica de contenidos y medios.",
-      "url": ""
-    },
-    {
-      "nombre": "Derecho",
-      "aliases": ["derecho", "derehco", "leyes"],
-      "area": "Derecho",
-      "descripcion_corta": "Carrera orientada al análisis jurídico y la solución responsable de conflictos.",
-      "url": ""
-    },
-    {
-      "nombre": "Gastronomía",
-      "aliases": ["gastronomía", "cocina"],
-      "area": "Hospitalidad",
-      "descripcion_corta": "Carrera orientada a la gestión y creación gastronómica.",
-      "url": ""
-    },
-    {
-      "nombre": "Psicología",
-      "aliases": ["psicología"],
-      "area": "Ciencias Humanas",
-      "descripcion_corta": "Carrera orientada al estudio del comportamiento y bienestar de las personas.",
-      "url": ""
-    },
-    {
-      "nombre": "Medicina Veterinaria",
-      "aliases": ["veterinaria", "medicina veterinaria"],
-      "area": "Salud",
-      "descripcion_corta": "Carrera orientada a la salud y bienestar animal.",
-      "url": ""
-    },
-    {
-      "nombre": "Diseño Gráfico",
-      "aliases": ["diseño grafico", "diseño gráfico", "diseno grafico", "diseno gráfico", "diseño", "diseño visual"],
-      "area": "Diseño",
-      "descripcion_corta": "Carrera orientada a la creación de soluciones visuales y experiencias de comunicación.",
-      "url": ""
-    },
-    {
-      "nombre": "Negocios Internacionales",
-      "aliases": ["negocios internacionales", "comercio internacional"],
-      "area": "Negocios",
-      "descripcion_corta": "Carrera orientada a la gestión de negocios en entornos internacionales.",
-      "url": ""
-    },
-    {
-      "nombre": "Ingeniería en Ciberseguridad",
-      "aliases": ["ingenieria en ciberseguridad", "ingeniería en ciberseguridad", "ciberseguridad", "cyberseguridad", "seguridad informatica", "seguridad informática"],
-      "area": "Tecnología",
-      "descripcion_corta": "Carrera orientada a proteger sistemas, redes, datos e infraestructura digital.",
-      "url": ""
-    },
-    {
-      "nombre": "Ciencia de Datos",
-      "aliases": ["ciencia de datos", "analisis de datos", "análisis de datos", "data science", "big data", "datos"],
-      "area": "Tecnología",
-      "descripcion_corta": "Carrera orientada al análisis de datos, estadística, programación e inteligencia artificial.",
-      "url": ""
-    },
-    {
-      "nombre": "Economía",
-      "aliases": ["economía"],
-      "area": "Negocios",
-      "descripcion_corta": "Carrera orientada al análisis económico y la toma de decisiones.",
-      "url": ""
-    },
-    {
-      "nombre": "Contabilidad",
-      "aliases": ["contabilidad"],
-      "area": "Negocios",
-      "descripcion_corta": "Carrera orientada a la gestión contable, financiera y tributaria.",
-      "url": ""
-    }
-  ]
+    "carreras":  [
+                     {
+                         "nombre":  "Ingeniería de Sistemas",
+                         "aliases":  [
+                                         "ingenieria de sistemas",
+                                         "ingeniería de sistemas",
+                                         "ing sistemas",
+                                         "sitemas",
+                                         "sistemas",
+                                         "software",
+                                         "computacion",
+                                         "computación",
+                                         "tecnologia",
+                                         "tecnología"
+                                     ],
+                         "area":  "Tecnología",
+                         "descripcion_corta":  "Carrera orientada al desarrollo de software, tecnología, datos e innovación digital.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Administración",
+                         "aliases":  [
+                                         "administracion",
+                                         "administración",
+                                         "adminsitracion",
+                                         "admisnitracion",
+                                         "adminstracion",
+                                         "admin",
+                                         "gestion de empresas",
+                                         "gestión de empresas",
+                                         "negocios",
+                                         "empresa",
+                                         "gestión"
+                                     ],
+                         "area":  "Negocios",
+                         "descripcion_corta":  "Carrera orientada a la gestión de empresas, emprendimiento y toma de decisiones.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Marketing",
+                         "aliases":  [
+                                         "marketing",
+                                         "mercadotecnia"
+                                     ],
+                         "area":  "Negocios",
+                         "descripcion_corta":  "Carrera orientada al conocimiento del consumidor, estrategia comercial y comunicación de marcas.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Arquitectura",
+                         "aliases":  [
+                                         "arquitectura"
+                                     ],
+                         "area":  "Diseño",
+                         "descripcion_corta":  "Carrera orientada al diseño responsable de espacios y proyectos arquitectónicos.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Comunicaciones",
+                         "aliases":  [
+                                         "comunicaciones",
+                                         "comunicación"
+                                     ],
+                         "area":  "Comunicaciones",
+                         "descripcion_corta":  "Carrera orientada a la creación y gestión estratégica de contenidos y medios.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Derecho",
+                         "aliases":  [
+                                         "derecho",
+                                         "derehco",
+                                         "leyes"
+                                     ],
+                         "area":  "Derecho",
+                         "descripcion_corta":  "Carrera orientada al análisis jurídico y la solución responsable de conflictos.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Gastronomía",
+                         "aliases":  [
+                                         "gastronomía",
+                                         "cocina"
+                                     ],
+                         "area":  "Hospitalidad",
+                         "descripcion_corta":  "Carrera orientada a la gestión y creación gastronómica.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Psicología",
+                         "aliases":  [
+                                         "psicología"
+                                     ],
+                         "area":  "Ciencias Humanas",
+                         "descripcion_corta":  "Carrera orientada al estudio del comportamiento y bienestar de las personas.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Medicina Veterinaria",
+                         "aliases":  [
+                                         "veterinaria",
+                                         "medicina veterinaria"
+                                     ],
+                         "area":  "Salud",
+                         "descripcion_corta":  "Carrera orientada a la salud y bienestar animal.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Diseño Gráfico",
+                         "aliases":  [
+                                         "diseño grafico",
+                                         "diseño gráfico",
+                                         "diseno grafico",
+                                         "diseno gráfico",
+                                         "diseño",
+                                         "diseño visual"
+                                     ],
+                         "area":  "Diseño",
+                         "descripcion_corta":  "Carrera orientada a la creación de soluciones visuales y experiencias de comunicación.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Negocios Internacionales",
+                         "aliases":  [
+                                         "negocios internacionales",
+                                         "comercio internacional"
+                                     ],
+                         "area":  "Negocios",
+                         "descripcion_corta":  "Carrera orientada a la gestión de negocios en entornos internacionales.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Ingeniería en Ciberseguridad",
+                         "aliases":  [
+                                         "ingenieria en ciberseguridad",
+                                         "ingeniería en ciberseguridad",
+                                         "ciberseguridad",
+                                         "cyberseguridad",
+                                         "seguridad informatica",
+                                         "seguridad informática"
+                                     ],
+                         "area":  "Tecnología",
+                         "descripcion_corta":  "Carrera orientada a proteger sistemas, redes, datos e infraestructura digital.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Ciencia de Datos",
+                         "aliases":  [
+                                         "ciencia de datos",
+                                         "analisis de datos",
+                                         "análisis de datos",
+                                         "data science",
+                                         "big data",
+                                         "datos"
+                                     ],
+                         "area":  "Tecnología",
+                         "descripcion_corta":  "Carrera orientada al análisis de datos, estadística, programación e inteligencia artificial.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Economía",
+                         "aliases":  [
+                                         "economía"
+                                     ],
+                         "area":  "Negocios",
+                         "descripcion_corta":  "Carrera orientada al análisis económico y la toma de decisiones.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     },
+                     {
+                         "nombre":  "Contabilidad",
+                         "aliases":  [
+                                         "contabilidad"
+                                     ],
+                         "area":  "Negocios",
+                         "descripcion_corta":  "Carrera orientada a la gestión contable, financiera y tributaria.",
+                         "url":  "",
+                         "temas":  [
+                                       "descripcion",
+                                       "campo_laboral",
+                                       "malla",
+                                       "costos",
+                                       "modalidad"
+                                   ]
+                     }
+                 ]
 }

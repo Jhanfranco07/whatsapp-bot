@@ -32,6 +32,22 @@ def test_root_endpoint():
     assert response.json()["docs"] == "/docs"
 
 
+def test_semantic_health_endpoint():
+    response = TestClient(app).get("/health/llm")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "ok",
+        "engine": "tfidf_semantic",
+        "intents_loaded": 8,
+        "probe": {
+            "text": "hola",
+            "intent": "saludo",
+            "confidence": 1.0,
+        },
+    }
+
+
 def test_simulate_inbound_endpoint(monkeypatch):
     app.dependency_overrides[get_db] = fake_db
     monkeypatch.setattr(main_module, "ConversationService", FakeConversationService)

@@ -70,7 +70,7 @@ class ConversationService:
                 "should_reply": False,
                 "reply_sent": False,
             }
-        intent, entities = self.classifier.classify(payload.message)
+        intent, entities = self.classifier.classify(payload.message, context)
         classification_source = entities.pop("classification_source", "rules")
         if entities.get("name"):
             contact.full_name = entities["name"]
