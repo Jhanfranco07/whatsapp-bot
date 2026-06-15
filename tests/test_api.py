@@ -32,6 +32,18 @@ def test_root_endpoint():
     assert response.json()["docs"] == "/docs"
 
 
+def test_admin_panel_endpoint():
+    response = TestClient(app).get("/admin")
+    assert response.status_code == 200
+    assert "Orientador USIL" in response.text
+
+
+def test_admin_knowledge_endpoint():
+    response = TestClient(app).get("/admin/knowledge")
+    assert response.status_code == 200
+    assert "entries" in response.json()
+
+
 def test_semantic_health_endpoint():
     response = TestClient(app).get("/health/llm")
 
@@ -48,7 +60,7 @@ def test_semantic_health_endpoint():
     }
 
 
-def test_advisor_requests_endpoint_does_not_exist():
+def test_removed_human_request_endpoint_does_not_exist():
     response = TestClient(app).get("/advisor-requests")
     assert response.status_code == 404
 

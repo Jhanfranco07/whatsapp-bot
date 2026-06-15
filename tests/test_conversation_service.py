@@ -69,7 +69,7 @@ def test_human_contact_request_only_shares_official_channels(monkeypatch):
     result = service.process_inbound(
         InboundMessage(phone_number="999999999", message="quiero hablar con un asesor")
     )
-    assert contact.status == "RESPONDIO"
+    assert contact.status == "PIDIO_CONTACTO"
     assert "canales oficiales" in result["bot_reply"].lower()
 
 
@@ -125,3 +125,29 @@ def test_conversation_saves_last_three_history_messages(monkeypatch):
     assert len(context["historial"]) == 3
     assert context["historial"][-2]["content"] == "hola"
     assert context["historial"][-1]["role"] == "assistant"
+
+
+def test_rate_limit_saves_without_reply(monkeypatch):
+    service, _, _ = build_service(monkeypatch)
+    service._rate_limiter = module.InMemoryRateLimiter(1, 60)
+    service.process_inbound(InboundMessage(phone_number="999999999", message="hola"))
+
+    result = service.process_inbound(
+        InboundMessage(phone_number="999999999", message="hola de nuevo")
+    )
+
+    assert result["intent"] == "rate_limited"
+    assert result["should_reply"] is False
+
+
+def test_explicit_stop_bypasses_rate_limit(monkeypatch):
+    service, contact, _ = build_service(monkeypatch)
+    service._rate_limiter = module.InMemoryRateLimiter(1, 60)
+    service.process_inbound(InboundMessage(phone_number="999999999", message="hola"))
+
+    result = service.process_inbound(
+        InboundMessage(phone_number="999999999", message="ya no quiero mensajes")
+    )
+
+    assert result["intent"] == "detener_conversacion"
+    assert contact.stop_bot is True

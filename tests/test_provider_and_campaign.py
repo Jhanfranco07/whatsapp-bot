@@ -70,7 +70,7 @@ def test_campaign_only_uses_filtered_candidates():
 
     assert result["sent"] == 1
     assert provider.sent[0][0] == "51999999999"
-    assert allowed.status == "MENSAJE_ENVIADO"
+    assert allowed.status == "CONTACTADO"
 
 
 def test_campaign_can_target_phone():

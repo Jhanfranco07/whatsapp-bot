@@ -10,9 +10,12 @@ from app.database.repositories import (
     upsert_conversation,
 )
 from app.services.chatbot_service import ChatbotService
+from app.services.contact_states import ContactState
 from app.services.intent_classifier import IntentClassifier
+from app.services.rate_limiter import InMemoryRateLimiter
 from app.utils.phone_utils import normalize_phone
 from app.whatsapp.sender import get_whatsapp_provider
+from app.config import get_settings
 
 
 logger = logging.getLogger(__name__)
@@ -20,6 +23,11 @@ logger = logging.getLogger(__name__)
 
 class ConversationService:
     _contact_locks = defaultdict(asyncio.Lock)
+    _settings = get_settings()
+    _rate_limiter = InMemoryRateLimiter(
+        _settings.rate_limit_messages,
+        _settings.rate_limit_window_seconds,
+    )
 
     def __init__(self, db, provider=None):
         self.db = db
@@ -39,8 +47,36 @@ class ConversationService:
             return await self._process_inbound_async(payload)
 
     async def _process_inbound_async(self, payload):
+        phone_number = normalize_phone(payload.phone_number)
         contact, created = self.contacts.get_or_create(payload.phone_number, source="webhook")
         context = get_conversation_context(self.db, contact.id)
+        explicit_stop = self.classifier.semantic_engine.is_explicit_stop(payload.message)
+        if not explicit_stop and not self._rate_limiter.allow(phone_number):
+            self.messages.create(
+                contact,
+                "inbound",
+                payload.message,
+                "rate_limited",
+                {"rate_limited": True},
+                payload.raw_payload,
+            )
+            contact.status = ContactState.RATE_LIMITED
+            contact.last_intent = "rate_limited"
+            contact.last_message_at = payload.timestamp or datetime.now(timezone.utc)
+            context["last_intent"] = "rate_limited"
+            upsert_conversation(self.db, contact, payload.message, None, contact.status, context)
+            self.db.commit()
+            return {
+                "ok": True,
+                "phone_number": contact.phone_number,
+                "contact_status": contact.status,
+                "intent": "rate_limited",
+                "entities": {"rate_limited": True},
+                "classification_source": "system",
+                "bot_reply": None,
+                "should_reply": False,
+                "reply_sent": False,
+            }
         if getattr(contact, "stop_bot", False):
             self.messages.create(
                 contact,

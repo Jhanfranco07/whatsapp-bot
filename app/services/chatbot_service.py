@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from app.config import get_settings
+from app.services.contact_states import ContactState
 from app.services.knowledge_base import KnowledgeBase
 from app.services.semantic_engine import SemanticEngine
 
@@ -68,18 +69,18 @@ class ChatbotService:
         values = self._format_values(career, name)
 
         if intent == "ruido_conversacional":
-            return ChatbotResult("", "RESPONDIO", should_reply=False)
+            return ChatbotResult("", ContactState.RESPONDIO, should_reply=False)
         if intent in {"detener_conversacion", "salir_baja", "no_interesado"}:
-            status = "NO_INTERESADO" if intent == "no_interesado" else "SALIR"
+            status = ContactState.NO_INTERESADO if intent == "no_interesado" else ContactState.SALIR
             return ChatbotResult(self._reply("baja", values), status, opt_out=True)
         if intent == "presentacion_nombre":
             return ChatbotResult(
-                self._reply("presentacion_nombre", values), "RESPONDIO"
+                self._reply("presentacion_nombre", values), ContactState.RESPONDIO
             )
         if intent == "agradecimiento" and context.get("last_career"):
             return ChatbotResult(
                 f"De nada. Puedo seguir orientándote sobre {context['last_career']}.",
-                "RESPONDIO",
+                ContactState.RESPONDIO,
             )
         if intent == "consulta_carrera_especifica" and not career:
             requested = entities.get("carrera") or entities.get("career")
@@ -174,14 +175,16 @@ class ChatbotService:
             "consulta_modalidad",
             "comparacion_carrera",
         }:
-            return "INTERESADO_CARRERA"
+            return ContactState.INTERESADO_CARRERA
         if intent == "consulta_admision":
-            return "INTERESADO_ADMISION"
+            return ContactState.INTERESADO_ADMISION
         if intent == "consulta_becas":
-            return "INTERESADO_BECA"
+            return ContactState.INTERESADO_BECA
         if intent == "consulta_portal":
-            return "PIDIO_PORTAL"
-        return "RESPONDIO"
+            return ContactState.PIDIO_PORTAL
+        if intent == "consulta_contacto":
+            return ContactState.PIDIO_CONTACTO
+        return ContactState.RESPONDIO
 
     def _find_career(self, name: str | None) -> dict[str, Any] | None:
         if not name:

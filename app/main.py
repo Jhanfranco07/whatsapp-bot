@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.config import get_settings
 from app.database.repositories import ContactRepository, MessageRepository
+from app.routers.admin import router as admin_router
 from app.schemas.contact_schema import ContactCreate, ContactRead
 from app.schemas.message_schema import MessageRead
 from app.schemas.webhook_schema import InboundMessage, InboundResponse
@@ -33,6 +34,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="Orientador USIL", version="1.0.0", lifespan=lifespan)
+app.include_router(admin_router)
 
 
 @app.get("/")

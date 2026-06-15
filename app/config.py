@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     bridge_send_url: str = "http://127.0.0.1:3001/send"
     bridge_send_timeout: int = 60
     inbound_api_key: str = ""
+    admin_api_key: str = ""
+    rate_limit_messages: int = 6
+    rate_limit_window_seconds: int = 60
     portal_oficial_url: str = "https://www.usil.edu.pe/"
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"

@@ -11,6 +11,7 @@ from app.database.models import (
     Message,
 )
 from app.schemas.contact_schema import ContactCreate
+from app.services.contact_states import CAMPAIGN_EXCLUDED_STATES
 from app.utils.phone_utils import normalize_phone
 
 
@@ -55,7 +56,7 @@ class ContactRepository:
                 select(Contact).where(
                     Contact.opt_out.is_(False),
                     Contact.stop_bot.is_(False),
-                    Contact.status.not_in(("SALIR", "NO_INTERESADO")),
+                    Contact.status.not_in(CAMPAIGN_EXCLUDED_STATES),
                 )
             )
         )

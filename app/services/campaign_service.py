@@ -2,6 +2,7 @@ import logging
 import time
 
 from app.database.repositories import ContactRepository, MessageRepository, create_campaign_record
+from app.services.contact_states import CAMPAIGN_EXCLUDED_STATES, ContactState
 from app.whatsapp.sender import get_whatsapp_provider
 
 
@@ -30,7 +31,7 @@ class CampaignService:
                 if contact
                 and not contact.opt_out
                 and not getattr(contact, "stop_bot", False)
-                and contact.status not in ("SALIR", "NO_INTERESADO")
+                and contact.status not in CAMPAIGN_EXCLUDED_STATES
                 else []
             )
         else:
@@ -45,10 +46,10 @@ class CampaignService:
             create_campaign_record(self.db, contact, message, result)
             if result.success:
                 self.messages.create(contact, "outbound", message)
-                contact.status = "MENSAJE_ENVIADO"
+                contact.status = ContactState.CONTACTADO
                 summary["sent"] += 1
             else:
-                contact.status = "ERROR_ENVIO"
+                contact.status = ContactState.ERROR_ENVIO
                 summary["failed"] += 1
             self.db.commit()
             if delay_seconds > 0 and position < len(contacts) - 1:
