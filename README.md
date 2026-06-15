@@ -91,13 +91,16 @@ nombre y `CELULAR` como teléfono.
 
 ### 2. Enviar la campaña inicial por WhatsApp
 
-En `.env`, cambia temporalmente:
+El modo recomendado reutiliza la sesión persistente del puente y envía sin abrir
+y cerrar WhatsApp Web por cada contacto. En `.env`, configura:
 
 ```text
-WHATSAPP_DRY_RUN=false
+WHATSAPP_PROVIDER=bridge
+BRIDGE_HEADLESS=false
 ```
 
-Prueba primero con un solo número:
+Primero inicia el backend y el puente como se explica en el paso 3. Cuando la
+consola muestre `Puente listo`, prueba con un solo número:
 
 ```powershell
 python scripts/send_campaign.py --phone 51999999999
@@ -110,9 +113,32 @@ campañas:
 python scripts/send_campaign.py
 ```
 
-Este envío usa `pywhatkit`: abrirá WhatsApp Web en el navegador y requiere que
-la cuenta ya tenga una sesión iniciada. `pywhatkit` solo envía la campaña; no
-escucha ni responde mensajes entrantes.
+El script espera 5 segundos entre contactos. Puedes cambiarlo con `--delay`,
+por ejemplo `python scripts/send_campaign.py --delay 10`.
+
+Para dejar la campaña ejecutándose como proceso oculto en Windows:
+
+```powershell
+Start-Process -FilePath ".\.venv\Scripts\python.exe" `
+  -ArgumentList "scripts\send_campaign.py --delay 5" `
+  -RedirectStandardOutput "campaign.stdout.log" `
+  -RedirectStandardError "campaign.stderr.log" `
+  -WindowStyle Hidden
+```
+
+Consulta el resultado en `campaign.stdout.log` y los errores en
+`campaign.stderr.log`. FastAPI y el puente deben continuar activos.
+
+El envío se realiza mediante la misma sesión de `whatsapp-web.js` que recibe y
+responde mensajes. Se abre una sola ventana persistente de WhatsApp Web; puedes
+minimizarla y se reutilizará para toda la campaña. La consola del puente y
+FastAPI deben permanecer ejecutándose. `BRIDGE_HEADLESS=true` intenta ocultar
+Chromium por completo, pero WhatsApp Web puede no iniciar correctamente en todos
+los equipos.
+
+La integración no es oficial. Evita enviar grandes cantidades en poco tiempo,
+contacta únicamente personas autorizadas y respeta inmediatamente las bajas
+para reducir el riesgo de restricciones de WhatsApp.
 
 ### 3. Iniciar el chatbot que responde mensajes reales
 
@@ -183,21 +209,20 @@ La campaña siempre consulta PostgreSQL para poder respetar las bajas.
 
 ## Enviar campaña
 
-Mantén `WHATSAPP_DRY_RUN=true` durante las pruebas:
+Con `WHATSAPP_PROVIDER=bridge`, inicia primero FastAPI y el puente. Después:
 
 ```powershell
 python scripts/send_campaign.py --limit 1
 ```
-
-Para envío real, inicia sesión en WhatsApp Web y cambia
-`WHATSAPP_DRY_RUN=false`. `pywhatkit` controla el navegador y no permite recibir
-mensajes.
 
 Para probar primero con una sola persona:
 
 ```powershell
 python scripts/send_campaign.py --phone 51984738899
 ```
+
+El proveedor antiguo `pywhatkit` sigue disponible configurando
+`WHATSAPP_PROVIDER=pywhatkit`, pero abre WhatsApp Web para cada envío.
 
 ## Probar sin WhatsApp Web
 

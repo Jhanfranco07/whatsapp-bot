@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 
 from app.services.campaign_service import CampaignService
+from app.whatsapp.bridge_sender import BridgeProvider
 from app.whatsapp.provider import SendResult
 from app.whatsapp.pywhatkit_sender import PyWhatKitProvider
 
@@ -31,6 +32,29 @@ def test_dry_run_does_not_import_or_send(monkeypatch):
     result = provider.send_message("51999999999", "hola")
     assert result.success is True
     assert result.raw_response == {"dry_run": True}
+
+
+def test_bridge_provider_sends_through_persistent_session(monkeypatch):
+    class Response:
+        ok = True
+
+        @staticmethod
+        def json():
+            return {"ok": True, "message_id": "message-1"}
+
+    captured = {}
+
+    def fake_post(url, headers, json, timeout):
+        captured.update(url=url, headers=headers, json=json, timeout=timeout)
+        return Response()
+
+    provider = BridgeProvider()
+    monkeypatch.setattr("app.whatsapp.bridge_sender.requests.post", fake_post)
+    result = provider.send_message("51999999999", "hola")
+
+    assert result.success is True
+    assert result.provider == "bridge"
+    assert captured["json"] == {"phone_number": "51999999999", "message": "hola"}
 
 
 def test_campaign_only_uses_filtered_candidates():

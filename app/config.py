@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     whatsapp_dry_run: bool = True
     whatsapp_wait_time: int = 20
     whatsapp_close_time: int = 3
+    bridge_send_url: str = "http://127.0.0.1:3001/send"
+    bridge_send_timeout: int = 60
     inbound_api_key: str = ""
     portal_oficial_url: str = "https://www.usil.edu.pe/"
     llm_provider: str = "ollama"

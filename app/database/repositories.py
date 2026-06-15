@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database.models import (
@@ -31,10 +32,20 @@ class ContactRepository:
         contact = self.get_by_phone(phone)
         if contact:
             return contact, False
-        contact = Contact(phone_number=normalize_phone(phone), **values)
-        self.db.add(contact)
-        self.db.flush()
-        return contact, True
+        normalized_phone = normalize_phone(phone)
+        try:
+            with self.db.begin_nested():
+                contact = Contact(phone_number=normalized_phone, **values)
+                self.db.add(contact)
+                self.db.flush()
+            return contact, True
+        except IntegrityError:
+            contact = self.db.scalar(
+                select(Contact).where(Contact.phone_number == normalized_phone)
+            )
+            if contact:
+                return contact, False
+            raise
 
     def list(self):
         return list(self.db.scalars(select(Contact).order_by(Contact.created_at.desc())))

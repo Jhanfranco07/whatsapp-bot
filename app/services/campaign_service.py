@@ -1,4 +1,5 @@
 import logging
+import time
 
 from app.database.repositories import ContactRepository, MessageRepository, create_campaign_record
 from app.whatsapp.sender import get_whatsapp_provider
@@ -21,7 +22,7 @@ class CampaignService:
         self.contacts = ContactRepository(db)
         self.messages = MessageRepository(db)
 
-    def send_initial(self, limit=None, phone_number=None):
+    def send_initial(self, limit=None, phone_number=None, delay_seconds=0):
         if phone_number:
             contact = self.contacts.get_by_phone(phone_number)
             contacts = (
@@ -37,7 +38,7 @@ class CampaignService:
         if limit:
             contacts = contacts[:limit]
         summary = {"sent": 0, "failed": 0, "skipped": 0}
-        for contact in contacts:
+        for position, contact in enumerate(contacts):
             name = f", {contact.full_name}" if contact.full_name else ""
             message = MESSAGE_TEMPLATE.format(nombre=name)
             result = self.provider.send_message(contact.phone_number, message)
@@ -50,5 +51,7 @@ class CampaignService:
                 contact.status = "ERROR_ENVIO"
                 summary["failed"] += 1
             self.db.commit()
+            if delay_seconds > 0 and position < len(contacts) - 1:
+                time.sleep(delay_seconds)
         logger.info("Campaña finalizada: %s", summary)
         return summary

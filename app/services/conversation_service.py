@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from collections import defaultdict
 from datetime import datetime, timezone
 
 from app.database.repositories import (
@@ -11,6 +12,7 @@ from app.database.repositories import (
 from app.services.advisor_service import AdvisorService
 from app.services.chatbot_service import ChatbotService
 from app.services.intent_classifier import IntentClassifier
+from app.utils.phone_utils import normalize_phone
 from app.whatsapp.sender import get_whatsapp_provider
 
 
@@ -18,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 class ConversationService:
+    _contact_locks = defaultdict(asyncio.Lock)
+
     def __init__(self, db, provider=None):
         self.db = db
         self.contacts = ContactRepository(db)
@@ -32,6 +36,11 @@ class ConversationService:
         return asyncio.run(self.process_inbound_async(payload))
 
     async def process_inbound_async(self, payload):
+        phone_number = normalize_phone(payload.phone_number)
+        async with self._contact_locks[phone_number]:
+            return await self._process_inbound_async(payload)
+
+    async def _process_inbound_async(self, payload):
         contact, created = self.contacts.get_or_create(payload.phone_number, source="webhook")
         context = get_conversation_context(self.db, contact.id)
         if getattr(contact, "stop_bot", False):

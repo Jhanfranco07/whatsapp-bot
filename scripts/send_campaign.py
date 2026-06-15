@@ -12,6 +12,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--limit", type=int)
     parser.add_argument("--phone", help="Envía únicamente al teléfono indicado")
+    parser.add_argument(
+        "--delay",
+        type=float,
+        default=5,
+        help="Segundos de espera entre contactos (predeterminado: 5)",
+    )
     args = parser.parse_args()
     with SessionLocal() as db:
-        print(CampaignService(db).send_initial(args.limit, args.phone))
+        print(CampaignService(db).send_initial(args.limit, args.phone, args.delay))
