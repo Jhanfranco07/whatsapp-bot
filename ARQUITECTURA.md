@@ -27,8 +27,9 @@ una cuenta autorizada.
 | Persistencia | PostgreSQL en Supabase | Guardar contactos, mensajes, campañas y conversaciones |
 | ORM | SQLAlchemy | Acceder a PostgreSQL mediante modelos y repositorios |
 | Validación de API | Pydantic | Validar entradas, respuestas y configuración |
-| WhatsApp entrante/saliente | Node.js, `whatsapp-web.js` | Escuchar mensajes y responder en el mismo chat |
-| Campaña inicial | PyWhatKit | Abrir WhatsApp Web y enviar mensajes iniciales |
+| WhatsApp entrante/saliente | Node.js, `whatsapp-web.js` | Escuchar, responder y enviar campañas con una sesión persistente |
+| Proveedor recomendado | `BridgeProvider` | Enviar desde FastAPI al servidor HTTP local del bridge |
+| Proveedor alternativo | PyWhatKit | Envío heredado o pruebas simples mediante navegador |
 | Inteligencia artificial local | Ollama, `qwen3.5:0.8b` | Comprender y redactar consultas que requieren explicación |
 | Pruebas | Pytest | Verificar reglas, servicios, API, campañas y Ollama |
 
@@ -73,6 +74,18 @@ Respuesta JSON para bridge/index.js
         |
         v
 Respuesta enviada al chat de WhatsApp si should_reply=true
+
+Campaña / envío iniciado desde FastAPI
+        |
+        v
+BridgeProvider
+        |
+        | POST http://127.0.0.1:3001/send
+        v
+Servidor HTTP saliente del bridge
+        |
+        v
+WhatsApp Web vinculado
 ```
 
 ## 4. Flujo completo de un mensaje entrante
@@ -94,6 +107,11 @@ Al recibir un mensaje, el puente ignora:
 - Estados de WhatsApp.
 - Mensajes de grupos.
 - Mensajes sin texto.
+
+WhatsApp puede entregar algunos remitentes con identificadores internos
+terminados en `@lid`. Antes de llamar a FastAPI, el bridge los resuelve al
+teléfono real mediante `getContactLidAndPhone`. El identificador original se
+conserva en `raw_payload.whatsapp_source_id` para auditoría.
 
 Después envía a FastAPI:
 
@@ -122,6 +140,10 @@ El puente no necesita que FastAPI envíe directamente por PyWhatKit. Recibe
 `bot_reply` en el JSON y responde en el mismo chat mediante
 `message.reply(...)`.
 
+El bridge mantiene una cola independiente por contacto. Mensajes de usuarios
+distintos pueden avanzar concurrentemente, pero dos mensajes consecutivos del
+mismo contacto se procesan en orden para evitar respuestas cruzadas.
+
 ### 4.2 Procesamiento en FastAPI
 
 `app/main.py` recibe el webhook y crea un `ConversationService`.
@@ -138,6 +160,32 @@ El servicio:
 8. Guarda el mensaje saliente solamente si realmente será respondido.
 9. Actualiza contacto, intención, estado y contexto.
 10. Devuelve el resultado al puente.
+
+`ConversationService` aplica además un `asyncio.Lock` por teléfono normalizado.
+Esta segunda protección ordena solicitudes simultáneas del mismo contacto
+dentro de FastAPI.
+
+Al crear contactos, el repositorio utiliza una transacción anidada. Si dos
+solicitudes intentan crear el mismo teléfono al mismo tiempo, recupera el
+contacto existente después del conflicto de unicidad sin invalidar la
+transacción principal.
+
+### 4.3 Envío saliente iniciado por FastAPI
+
+El bridge también expone un servidor HTTP local:
+
+```text
+GET  http://127.0.0.1:3001/health
+POST http://127.0.0.1:3001/send
+```
+
+`BridgeProvider`, ubicado en `app/whatsapp/bridge_sender.py`, implementa
+`WhatsAppProvider`. Con `WHATSAPP_PROVIDER=bridge`, FastAPI y los scripts envían
+al endpoint `/send` usando la misma sesión persistente de WhatsApp Web.
+
+El servidor saliente valida la clave compartida, comprueba que WhatsApp esté
+listo, verifica el número con `getNumberId`, envía mediante `client.sendMessage`
+y devuelve el identificador del mensaje enviado.
 
 ## 5. Regla persistente `stop_bot`
 
@@ -226,7 +274,7 @@ Estos mensajes se guardan, pero devuelven:
 
 Ollama cumple dos funciones separadas:
 
-1. Clasifica mensajes que las reglas no comprenden usando `/api/generate` y
+1. Clasifica únicamente mensajes que las reglas no comprenden usando `/api/generate` y
    temperatura `0.2`.
 2. Redacta la respuesta final de todas las intenciones no triviales usando
    `/api/chat`, historial conversacional y temperatura `0.45`.
@@ -274,7 +322,8 @@ El payload conversacional contiene:
 
 - El prompt de sistema con límites y hechos institucionales.
 - La información de la carrera detectada.
-- Los últimos tres mensajes guardados.
+- Hasta los últimos tres mensajes cuando pertenecen al mismo tema o la consulta
+  actual es una continuación.
 - La plantilla controlada como guía de contenido.
 - El mensaje actual del usuario.
 
@@ -355,7 +404,8 @@ Se usan como redacción final para todas las respuestas no triviales. Las respue
 - No deben inventar costos, fechas, vacantes o requisitos.
 - Deben usar información institucional controlada.
 - Pueden incluir un cierre variado con un enlace oficial.
-- Reciben los últimos tres mensajes para continuar la conversación naturalmente.
+- Reciben hasta los últimos tres mensajes únicamente cuando son relevantes para
+  continuar el mismo tema.
 - Se truncan si superan 800 caracteres.
 - Eliminan emojis cuando el usuario no utilizó emojis.
 
@@ -432,7 +482,23 @@ Antes de enviar, se excluyen contactos con:
 - Estado `SALIR`
 - Estado `NO_INTERESADO`
 
-PyWhatKit sirve solamente para campañas iniciales. No recibe mensajes.
+El proveedor recomendado para campañas reales es `BridgeProvider`, porque
+reutiliza la sesión autenticada del bridge y no abre una pestaña por contacto.
+PyWhatKit se mantiene como alternativa heredada y no recibe mensajes.
+
+Cada envío registra su resultado en `campaign_messages`, guarda el outbound
+exitoso en `messages`, actualiza el contacto y confirma la transacción antes de
+continuar.
+
+El script espera 5 segundos entre contactos de forma predeterminada. Puede
+ajustarse con:
+
+```powershell
+python scripts/send_campaign.py --delay 10
+```
+
+FastAPI y el bridge deben permanecer activos durante campañas mediante
+`BridgeProvider`.
 
 ## 11. Endpoints principales
 
@@ -465,8 +531,13 @@ DATABASE_URL=postgresql+psycopg2://...
 INBOUND_API_KEY=una-clave-compartida
 BRIDGE_API_URL=http://127.0.0.1:8000
 
-WHATSAPP_PROVIDER=pywhatkit
+WHATSAPP_PROVIDER=bridge
 WHATSAPP_DRY_RUN=true
+BRIDGE_SEND_URL=http://127.0.0.1:3001/send
+BRIDGE_SEND_TIMEOUT=60
+BRIDGE_OUTBOUND_HOST=127.0.0.1
+BRIDGE_OUTBOUND_PORT=3001
+BRIDGE_HEADLESS=false
 
 LLM_PROVIDER=ollama
 OLLAMA_ENABLED=true
@@ -518,6 +589,17 @@ WhatsApp > Dispositivos vinculados
 
 Después, `LocalAuth` reutiliza la sesión guardada.
 
+Al iniciar correctamente, la consola debe mostrar:
+
+```text
+Sesión de WhatsApp autenticada.
+Puente listo. Esperando mensajes entrantes...
+Envío saliente disponible en http://127.0.0.1:3001/send
+```
+
+`BRIDGE_HEADLESS=false` muestra el navegador para facilitar autenticación y
+diagnóstico. Con una sesión estable puede configurarse en `true`.
+
 ## 14. Cómo verificar el funcionamiento
 
 ### Salud de FastAPI y PostgreSQL
@@ -531,6 +613,15 @@ Invoke-RestMethod http://127.0.0.1:8000/health
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8000/health/llm
 ```
+
+### Salud del envío saliente por WhatsApp
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:3001/health
+```
+
+Devuelve HTTP `200` cuando WhatsApp está listo y `503` mientras todavía no se
+ha autenticado.
 
 ### Simular un mensaje
 
@@ -585,6 +676,10 @@ Las pruebas reales contra PostgreSQL requieren una base exclusiva definida en
 - El sistema evita solicitar nombre, DNI, correo o celular durante la
   conversación.
 - Los mensajes de grupos y estados son ignorados por el puente.
+- El servidor saliente escucha por defecto solo en `127.0.0.1`.
+- La misma `INBOUND_API_KEY` protege el webhook y el endpoint saliente.
+- Colas y locks por contacto evitan procesar simultáneamente dos mensajes del
+  mismo usuario.
 - El historial se conserva para auditoría.
 
 ## 17. Limitaciones
@@ -592,6 +687,8 @@ Las pruebas reales contra PostgreSQL requieren una base exclusiva definida en
 - `whatsapp-web.js` es una integración no oficial.
 - WhatsApp puede cambiar su funcionamiento y romper la automatización.
 - La sesión depende del navegador y de la cuenta vinculada.
+- FastAPI y el bridge deben permanecer activos para campañas con
+  `BridgeProvider`.
 - Ollama debe estar ejecutándose localmente para respuestas generativas.
 - El modelo liviano puede equivocarse; por ello existen reglas y validaciones.
 - No existe todavía un panel administrativo para revisar conversaciones.
@@ -616,12 +713,16 @@ app/
   database/
     models.py                     Tablas SQLAlchemy
     repositories.py               Consultas y persistencia
+  whatsapp/
+    bridge_sender.py              Proveedor HTTP hacia la sesión persistente
+    sender.py                     Selección del proveedor configurado
+    pywhatkit_sender.py           Proveedor alternativo heredado
   data/
     institucion.json              Contexto institucional controlado
     carreras.json                 Carreras y alias
     respuestas_base.json          Plantillas y cierres
 bridge/
-  index.js                        Puente WhatsApp Web -> FastAPI
+  index.js                        Puente bidireccional WhatsApp Web <-> FastAPI
 scripts/
   init_db.py                      Inicialización de PostgreSQL
   import_contacts.py              Importación de contactos
@@ -640,6 +741,8 @@ La arquitectura es híbrida porque combina:
 - Ollama para comprensión semántica y respuestas más naturales.
 - PostgreSQL/Supabase para conservar estado y trazabilidad.
 - `whatsapp-web.js` para conectar la conversación real con la API.
+- `BridgeProvider` para reutilizar esa sesión en campañas salientes.
+- Colas y locks por contacto para preservar orden y contexto bajo concurrencia.
 
 La idea central es que la IA ayuda a comprender y orientar, pero no controla
 por sí sola acciones sensibles como detener permanentemente el bot ni inventa
