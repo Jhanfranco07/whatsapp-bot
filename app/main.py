@@ -10,11 +10,9 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.config import get_settings
 from app.database.repositories import ContactRepository, MessageRepository
-from app.schemas.advisor_schema import AdvisorRequestRead
 from app.schemas.contact_schema import ContactCreate, ContactRead
 from app.schemas.message_schema import MessageRead
 from app.schemas.webhook_schema import InboundMessage, InboundResponse
-from app.services.advisor_service import AdvisorService
 from app.services.campaign_service import CampaignService
 from app.services.conversation_service import ConversationService
 from app.services.lead_service import LeadService
@@ -145,8 +143,3 @@ def contact_messages(phone_number: str, db: Session = Depends(get_db)):
     if not contact:
         raise HTTPException(404, "Contacto no encontrado")
     return MessageRepository(db).history(contact.id)
-
-
-@app.get("/advisor-requests", response_model=list[AdvisorRequestRead])
-def advisor_requests(status: str | None = None, db: Session = Depends(get_db)):
-    return AdvisorService(db).list(status)

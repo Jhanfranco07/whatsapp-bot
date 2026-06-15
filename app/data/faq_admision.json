@@ -6,11 +6,11 @@
     },
     {
       "intent": "consulta_becas",
-      "respuesta": "Para información oficial sobre becas o beneficios, revisa el portal institucional o solicita orientación con un asesor."
+      "respuesta": "Para información oficial sobre becas o beneficios, revisa el portal institucional de USIL."
     },
     {
       "intent": "consulta_admision",
-      "respuesta": "Para información oficial sobre admisión, inscripción y próximos pasos, revisa el portal institucional de USIL o solicita orientación con un asesor."
+      "respuesta": "Para información oficial sobre admisión, inscripción y próximos pasos, revisa el portal institucional de USIL."
     }
   ]
 }

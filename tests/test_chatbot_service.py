@@ -17,10 +17,11 @@ def test_noise_is_silent():
     assert result.bot_reply == ""
 
 
-def test_advisor_request():
-    result = ChatbotService().respond("quiere_asesor", {})
-    assert result.requires_advisor is True
-    assert result.advisor_request_needed is True
+def test_contact_request_only_shares_official_channels():
+    result = ChatbotService().respond("consulta_contacto", {})
+    assert "No puedo solicitar llamadas" in result.bot_reply
+    assert "(01) 317-1050" in result.bot_reply
+    assert result.new_status == "RESPONDIO"
 
 
 def test_controlled_career_response():

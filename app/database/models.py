@@ -26,7 +26,6 @@ class Contact(Base):
     status: Mapped[str] = mapped_column(String(40), default="NUEVO", nullable=False, index=True)
     opt_out: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
     stop_bot: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
-    requires_advisor: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     last_intent: Mapped[str | None] = mapped_column(String(80))
     last_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now_utc)
@@ -80,18 +79,6 @@ class CampaignMessage(Base):
     error_message: Mapped[str | None] = mapped_column(Text)
     sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now_utc)
-
-
-class AdvisorRequest(Base):
-    __tablename__ = "advisor_requests"
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    contact_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("contacts.id"), nullable=False)
-    reason: Mapped[str | None] = mapped_column(Text)
-    status: Mapped[str] = mapped_column(String(20), default="PENDIENTE", nullable=False, index=True)
-    notes: Mapped[str | None] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now_utc)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now_utc, onupdate=now_utc)
 
 
 Index("ix_messages_contact_created", Message.contact_id, Message.created_at)

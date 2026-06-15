@@ -26,14 +26,6 @@ class FakeMessages:
         self.rows.append((direction, text, intent, entities))
 
 
-class FakeAdvisors:
-    def __init__(self):
-        self.requests = []
-
-    def request(self, contact, reason):
-        self.requests.append(reason)
-
-
 def build_service(monkeypatch, context=None):
     contact = SimpleNamespace(
         id="contact-1",
@@ -42,7 +34,6 @@ def build_service(monkeypatch, context=None):
         status="NUEVO",
         opt_out=False,
         stop_bot=False,
-        requires_advisor=False,
         last_intent=None,
         last_message_at=None,
         career_interest=None,
@@ -50,7 +41,6 @@ def build_service(monkeypatch, context=None):
     service = ConversationService(FakeDb())
     service.contacts = FakeContacts(contact)
     service.messages = FakeMessages()
-    service.advisors = FakeAdvisors()
     captured = {}
     monkeypatch.setattr(module, "get_conversation_context", lambda db, contact_id: dict(context or {}))
     monkeypatch.setattr(
@@ -72,17 +62,15 @@ def test_presentation_updates_contact_name(monkeypatch):
     assert "Fiorella" in result["bot_reply"]
 
 
-def test_advisor_uses_last_career_as_reason(monkeypatch):
+def test_human_contact_request_only_shares_official_channels(monkeypatch):
     service, contact, context = build_service(
         monkeypatch, {"last_career": "Administración"}
     )
-    service.process_inbound(
+    result = service.process_inbound(
         InboundMessage(phone_number="999999999", message="quiero hablar con un asesor")
     )
-    assert contact.requires_advisor is True
-    assert contact.status == "QUIERE_ASESOR"
-    assert service.advisors.requests == ["Interesado en Administración"]
-    assert context["advisor_requested"] is True
+    assert contact.status == "RESPONDIO"
+    assert "canales oficiales" in result["bot_reply"].lower()
 
 
 def test_opt_out_updates_contact(monkeypatch):

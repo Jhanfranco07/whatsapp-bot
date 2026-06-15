@@ -1,0 +1,34 @@
+{
+  "instrucciones": [
+    "Agrega únicamente información confirmada por USIL.",
+    "Cada entrada debe tener respuesta, palabras_clave y fuente_url.",
+    "Actualiza verificado_el cuando una persona responsable revise el contenido."
+  ],
+  "entradas": [
+    {
+      "id": "admision_pregrado",
+      "tema": "admisión",
+      "palabras_clave": [
+        "admision pregrado",
+        "como postular",
+        "proceso de admision"
+      ],
+      "respuesta": "La información actualizada sobre el proceso de admisión de pregrado se encuentra en el portal oficial de admisión.",
+      "fuente_url": "https://descubre.usil.edu.pe/landings/pregrado/admision/",
+      "verificado_el": "2026-06-15"
+    },
+    {
+      "id": "contacto_oficial",
+      "tema": "contacto",
+      "palabras_clave": [
+        "contacto oficial",
+        "hablar con una persona",
+        "quiero llamar",
+        "numero de admision"
+      ],
+      "respuesta": "Puedes comunicarte directamente con los canales oficiales de USIL: Admisión (01) 317-1050, WhatsApp de Admisión +51 998 179 223 o Atención al Alumno (01) 317-1010.",
+      "fuente_url": "https://www.usil.edu.pe/",
+      "verificado_el": "2026-06-15"
+    }
+  ]
+}

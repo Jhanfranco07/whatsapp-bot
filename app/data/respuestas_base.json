@@ -4,7 +4,7 @@
     "¡Hola{nombre}! 😊 Estoy para orientarte. Puedes preguntarme sobre carreras, admisión, becas o pedir el enlace del portal oficial."
   ],
   "presentacion_nombre": [
-    "Mucho gusto, {nombre} 😊 ¿Te gustaría recibir información sobre carreras, admisión, becas o hablar con un asesor?",
+    "Mucho gusto, {nombre} 😊 ¿Te gustaría recibir información sobre carreras, admisión, becas o los canales oficiales de contacto?",
     "Encantado de saludarte, {nombre} 😊 Puedo orientarte sobre carreras, admisión o el portal oficial de USIL."
   ],
   "consulta_carreras": [
@@ -19,7 +19,7 @@
     "Sobre admisión, lo más seguro es revisar la información actualizada en el portal oficial: https://descubre.usil.edu.pe/landings/pregrado/admision/"
   ],
   "comparacion_carrera": [
-    "Puedo orientarte de forma general, pero para comparar carreras con información oficial y actualizada te recomiendo revisar el portal de USIL o hablar con un asesor: {portal_url}"
+    "Puedo orientarte de forma general, pero para comparar carreras con información oficial y actualizada te recomiendo revisar el portal de USIL: {portal_url}"
   ],
   "consulta_campo_laboral": [
     "{campo_laboral}\n\nPuedes ampliar la información de {carrera} en: {portal_url}",
@@ -47,7 +47,7 @@
     "USIL es una universidad orientada a la formación de profesionales con visión global, innovación, emprendimiento e internacionalidad. Puedes ampliar la información en: {portal_url}"
   ],
   "consulta_becas": [
-    "Para información oficial sobre becas, beneficios o descuentos, te recomiendo revisar el portal institucional de USIL o hablar con un asesor. No quiero darte un dato desactualizado. 😊"
+    "Para información oficial sobre becas, beneficios o descuentos, revisa el portal institucional de USIL. No quiero darte un dato desactualizado: {portal_url}"
   ],
   "consulta_portal": [
     "Claro 📄 Puedes revisar la información oficial en el portal de USIL: {portal_url}",
@@ -59,28 +59,24 @@
     "Si deseas revisar información actualizada, puedes ingresar al portal oficial de USIL:\nhttps://www.usil.edu.pe/",
     "Encuentra más información sobre pregrado y admisión en:\nhttps://descubre.usil.edu.pe/landings/pregrado/admision/"
   ],
-  "asesor": [
-    "Perfecto 😊 Registraré que deseas recibir orientación de un asesor. El equipo correspondiente podrá comunicarse contigo.",
-    "Listo 😊 Dejaré registrado que quieres hablar con un asesor para recibir orientación personalizada."
-  ],
-  "llamada": [
-    "Perfecto 📞 Registraré que deseas recibir una llamada de orientación. El equipo correspondiente podrá comunicarse contigo."
+  "consulta_contacto": [
+    "No puedo solicitar llamadas ni derivarte automáticamente. Puedes comunicarte directamente mediante estos canales oficiales:\n{contacto_oficial}\n\nPortal oficial: {portal_url}"
   ],
   "baja": [
     "Entendido. Registraremos que no deseas recibir más mensajes por este medio. Gracias.",
     "De acuerdo, ya no te enviaremos más mensajes por este medio. Gracias."
   ],
   "agradecimiento": [
-    "¡De nada! 😊 Si necesitas más información, puedes escribirme sobre carreras, admisión, becas, el portal oficial o pedir hablar con un asesor.",
+    "¡De nada! 😊 Si necesitas más información, puedes escribirme sobre carreras, admisión, becas, el portal oficial o los canales oficiales de contacto.",
     "Con gusto 😊 Si tienes otra duda sobre USIL, puedes escribirme por aquí."
   ],
   "despedida": [
     "Gracias por escribirnos. Si luego necesitas orientación sobre carreras o admisión, puedes volver a contactarnos. 😊"
   ],
   "fuera_de_alcance": [
-    "Puedo ayudarte con orientación sobre carreras, admisión, malla curricular, modalidades o contacto con un asesor de USIL. 😊"
+    "Puedo ayudarte con información controlada sobre carreras, admisión, malla curricular, modalidades o canales oficiales de contacto de USIL. 😊"
   ],
   "no_entendido": [
-    "Disculpa, no logré entender bien tu consulta. Puedes escribirme con tus propias palabras si deseas información sobre carreras, admisión, becas, el portal oficial o hablar con un asesor. 😊"
+    "Disculpa, no logré entender bien tu consulta. Puedes escribirme con tus propias palabras si deseas información sobre carreras, admisión, becas, el portal oficial o canales oficiales de contacto. 😊"
   ]
 }

@@ -183,6 +183,16 @@ Las respuestas:
 - Usan fallback estático si falla una interpolación.
 - No inventan costos, fechas, vacantes ni requisitos.
 
+Antes de elegir una plantilla, `KnowledgeBase` consulta
+`app/data/conocimiento_institucional.json`. Ese archivo puede crecer con
+respuestas revisadas, palabras clave, fecha de verificación y una fuente
+oficial. Si encuentra contexto coincidente, la respuesta verificada tiene
+prioridad.
+
+El sistema no registra solicitudes humanas ni promete llamadas. Las consultas
+de contacto reciben únicamente teléfonos, correo y enlaces oficiales definidos
+en `app/data/institucion.json`.
+
 ## Persistencia
 
 ### `contacts`
@@ -201,10 +211,6 @@ Historial completo inbound y outbound con intención, entidades y payload.
 ### `campaign_messages`
 
 Resultado de cada envío de campaña.
-
-### `advisor_requests`
-
-Solicitudes de orientación humana.
 
 ## Baja persistente
 
@@ -320,6 +326,7 @@ app/
   config.py
   services/
     semantic_engine.py
+    knowledge_base.py
     intent_classifier.py
     chatbot_service.py
     conversation_service.py
@@ -332,6 +339,7 @@ app/
     sender.py
   data/
     intent_corpus.json
+    conocimiento_institucional.json
     carreras.json
     institucion.json
     respuestas_base.json

@@ -82,7 +82,7 @@
     "no_dar_costos_exactos": true,
     "no_confirmar_vacantes": true,
     "no_confirmar_horarios": true,
-    "derivar_si_no_hay_dato": true,
+    "informar_si_no_hay_dato": true,
     "responder_solo_con_fuentes_controladas": true
   }
 }

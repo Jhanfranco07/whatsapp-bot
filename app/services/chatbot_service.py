@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from app.config import get_settings
+from app.services.knowledge_base import KnowledgeBase
 from app.services.semantic_engine import SemanticEngine
 
 
@@ -16,10 +17,7 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 class ChatbotResult:
     bot_reply: str
     new_status: str
-    requires_advisor: bool = False
     opt_out: bool = False
-    advisor_request_needed: bool = False
-    advisor_reason: str | None = None
     should_reply: bool = True
 
 
@@ -37,6 +35,7 @@ class ChatbotService:
         self.institution: dict[str, Any] = json.loads(
             (DATA_DIR / "institucion.json").read_text(encoding="utf-8")
         )
+        self.knowledge = KnowledgeBase()
 
     async def generate_response(
         self,
@@ -48,9 +47,12 @@ class ChatbotService:
         contact: Any = None,
     ) -> tuple[str | None, bool]:
         """Mantiene la interfaz asíncrona y devuelve una respuesta local."""
+        verified = self.knowledge.find(user_message)
         result = self.respond(intent, entities, contact, conversation_context)
         if not result.should_reply or not entities.get("should_reply", True):
             return None, False
+        if verified:
+            return self._sanitize(self.knowledge.render(verified), user_message), True
         return self._sanitize(result.bot_reply, user_message), True
 
     def respond(
@@ -74,25 +76,6 @@ class ChatbotService:
             return ChatbotResult(
                 self._reply("presentacion_nombre", values), "RESPONDIO"
             )
-        if intent == "quiere_asesor":
-            career_name = career["nombre"] if career else context.get("last_career")
-            reason = f"Interesado en {career_name}" if career_name else "Orientación"
-            return ChatbotResult(
-                self._reply("asesor", values),
-                "QUIERE_ASESOR",
-                True,
-                advisor_request_needed=True,
-                advisor_reason=reason,
-            )
-        if intent == "quiere_llamada":
-            return ChatbotResult(
-                self._reply("llamada", values),
-                "QUIERE_LLAMADA",
-                True,
-                advisor_request_needed=True,
-                advisor_reason="Llamada",
-            )
-
         if intent == "agradecimiento" and context.get("last_career"):
             return ChatbotResult(
                 f"De nada. Puedo seguir orientándote sobre {context['last_career']}.",
@@ -147,7 +130,17 @@ class ChatbotService:
             "campus_lista": "\n".join(
                 f"- {item['nombre']}: {item['direccion']}" for item in campus
             ),
+            "contacto_oficial": self._official_contact_text(),
         }
+
+    def _official_contact_text(self) -> str:
+        contact = self.institution.get("contacto", {})
+        return (
+            f"Admisión: {contact.get('central_admision', '')}\n"
+            f"WhatsApp de Admisión: {contact.get('whatsapp_admision', '')}\n"
+            f"Atención al Alumno: {contact.get('atencion_alumno', '')}\n"
+            f"Correo: {contact.get('correo_atencion_alumno', '')}"
+        ).strip()
 
     def _reply(self, key: str, values: dict[str, str]) -> str:
         variants = self.replies.get(key) or self.replies["no_entendido"]

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 MESSAGE_TEMPLATE = (
     "¡Hola{nombre}! 😊 Somos del equipo de orientación de USIL. Vimos que te "
     "registraste para recibir información sobre nuestras carreras. Puedo ayudarte "
-    "con información sobre carreras, admisión o derivarte con un asesor. Si no "
+    "con información sobre carreras, admisión o canales oficiales de contacto. Si no "
     "deseas recibir más mensajes, responde SALIR."
 )
 

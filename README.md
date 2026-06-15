@@ -2,7 +2,7 @@
 
 Prototipo conversacional modular para registrar interesados, enviar una campaña
 inicial por WhatsApp Web, simular mensajes entrantes, clasificar intenciones,
-guardar conversaciones en PostgreSQL y derivar solicitudes a asesores.
+guardar conversaciones en PostgreSQL y responder con información controlada.
 
 Documentación técnica completa: [ARQUITECTURA.md](ARQUITECTURA.md)
 
@@ -38,9 +38,10 @@ del puente `whatsapp-web.js`.
 - Historial inbound y outbound.
 - Clasificación determinista por reglas, patrones y diccionarios.
 - Respuestas controladas mediante plantillas y datos institucionales.
+- Contexto ampliable desde `app/data/conocimiento_institucional.json`.
 - Respuestas controladas, sin inventar costos, fechas o beneficios.
 - Baja persistente mediante `stop_bot` y bloqueo de campañas a contactos dados de baja.
-- Solicitudes de asesor sin duplicados pendientes.
+- Base de conocimiento ampliable con respuestas y fuentes verificadas.
 - API FastAPI y scripts de consola.
 - Modo `WHATSAPP_DRY_RUN=true` para no abrir WhatsApp Web.
 
@@ -198,7 +199,6 @@ Endpoints principales:
 - `POST /campaigns/send`
 - `POST /webhooks/whatsapp/inbound`
 - `POST /simulate/inbound`
-- `GET /advisor-requests`
 
 ## Importar contactos
 
@@ -316,6 +316,21 @@ GET http://localhost:8000/health/llm
 El nombre del endpoint se conserva por compatibilidad, pero devuelve el estado
 del motor `tfidf_semantic`.
 
+## Agregar información real
+
+El archivo `app/data/conocimiento_institucional.json` permite agregar respuestas
+confirmadas sin modificar Python. Cada entrada debe incluir:
+
+- `palabras_clave`: formas en las que el usuario puede preguntar.
+- `respuesta`: texto revisado por una persona responsable.
+- `fuente_url`: enlace oficial que respalda la respuesta.
+- `verificado_el`: fecha de la última revisión.
+
+El bot prioriza estas entradas verificadas antes de responder con una plantilla.
+No solicita llamadas ni promete derivaciones; cuando alguien pide contacto
+humano, comparte únicamente los canales oficiales definidos en
+`app/data/institucion.json`.
+
 ## Pruebas
 
 ```powershell
@@ -341,5 +356,5 @@ python -m pytest
 
 - API oficial de WhatsApp Business.
 - Migraciones Alembic.
-- Panel para asesores y dashboard.
+- Panel administrativo y dashboard.
 - Analítica de conversiones y RAG con fuentes oficiales.

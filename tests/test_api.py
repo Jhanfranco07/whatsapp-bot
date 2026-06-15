@@ -48,6 +48,11 @@ def test_semantic_health_endpoint():
     }
 
 
+def test_advisor_requests_endpoint_does_not_exist():
+    response = TestClient(app).get("/advisor-requests")
+    assert response.status_code == 404
+
+
 def test_simulate_inbound_endpoint(monkeypatch):
     app.dependency_overrides[get_db] = fake_db
     monkeypatch.setattr(main_module, "ConversationService", FakeConversationService)

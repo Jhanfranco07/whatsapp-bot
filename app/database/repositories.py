@@ -5,7 +5,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database.models import (
-    AdvisorRequest,
     CampaignMessage,
     Contact,
     Conversation,
@@ -121,18 +120,3 @@ def create_campaign_record(db, contact, message, result, campaign_name="campaña
     )
     db.add(record)
     return record
-
-
-def get_or_create_advisor_request(db, contact, reason):
-    pending = db.scalar(
-        select(AdvisorRequest).where(
-            AdvisorRequest.contact_id == contact.id,
-            AdvisorRequest.status.in_(("PENDIENTE", "ASIGNADO")),
-        )
-    )
-    if pending:
-        return pending, False
-    item = AdvisorRequest(contact_id=contact.id, reason=reason)
-    db.add(item)
-    db.flush()
-    return item, True

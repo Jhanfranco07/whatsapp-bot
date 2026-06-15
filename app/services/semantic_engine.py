@@ -204,8 +204,8 @@ class SemanticEngine:
 
     def _classify_topic_rule(self, text: str) -> ClassificationResult | None:
         direct_rules = [
-            ("quiere_asesor", ("asesor", "orientador", "hablar con una persona", "que me contacten")),
-            ("quiere_llamada", ("llamada", "que me llamen", "pueden llamarme")),
+            ("consulta_contacto", ("asesor", "orientador", "hablar con una persona", "que me contacten")),
+            ("consulta_contacto", ("llamada", "que me llamen", "pueden llamarme", "contacto oficial")),
             ("consulta_internacionalidad", ("intercambio", "doble grado", "internacionalidad", "study abroad")),
             ("consulta_becas", ("beca", "becas", "descuento", "beneficios")),
             ("consulta_portal", ("portal", "pagina oficial", "link", "enlace")),

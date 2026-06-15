@@ -9,7 +9,6 @@ from app.database.repositories import (
     get_conversation_context,
     upsert_conversation,
 )
-from app.services.advisor_service import AdvisorService
 from app.services.chatbot_service import ChatbotService
 from app.services.intent_classifier import IntentClassifier
 from app.utils.phone_utils import normalize_phone
@@ -28,7 +27,6 @@ class ConversationService:
         self.messages = MessageRepository(db)
         self.classifier = IntentClassifier()
         self.chatbot = ChatbotService()
-        self.advisors = AdvisorService(db)
         self.provider = provider or get_whatsapp_provider()
 
     def process_inbound(self, payload):
@@ -98,7 +96,6 @@ class ConversationService:
             or entities.get("stop_bot", False)
             or intent == "detener_conversacion"
         )
-        contact.requires_advisor = result.requires_advisor or contact.requires_advisor
         contact.last_intent = intent
         contact.last_message_at = payload.timestamp or datetime.now(timezone.utc)
         if entities.get("career"):
@@ -123,17 +120,12 @@ class ConversationService:
             context["last_topic"] = "becas"
         if intent == "consulta_portal":
             context["portal_shared"] = True
-        if result.requires_advisor:
-            context["advisor_requested"] = True
         context["last_intent"] = intent
         history = list(context.get("historial", []))
         history.append({"role": "user", "content": payload.message})
         if should_reply and result.bot_reply:
             history.append({"role": "assistant", "content": result.bot_reply})
         context["historial"] = history[-3:]
-        if result.advisor_request_needed:
-            self.advisors.request(contact, result.advisor_reason)
-
         upsert_conversation(
             self.db,
             contact,
