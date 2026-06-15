@@ -13,6 +13,6 @@ if __name__ == "__main__":
     except Exception as error:
         print(
             "No se pudo conectar a PostgreSQL. Revisa DATABASE_URL en .env "
-            "y confirma que la base orientador_usil exista."
+            "y confirma que la base usil_db exista."
         )
         raise SystemExit(1) from error
