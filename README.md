@@ -91,11 +91,13 @@ Ejecuta estos comandos desde la raíz del proyecto:
 ```powershell
 .\.venv\Scripts\Activate.ps1
 python scripts/init_db.py
-python scripts/import_contacts.py --file dataAlumnos.xlsx
 ```
 
-El Excel debe estar dentro del proyecto. El importador reconoce `COMPLETO` como
-nombre y `CELULAR` como teléfono.
+Se ha añadido un archivo de ejemplo `dataAlumnos.example.csv`. Renómbralo a `dataAlumnos.csv` (o guárdalo como `.xlsx`) y llénalo con los datos de tus contactos. El importador reconoce las columnas `COMPLETO` como nombre y `CELULAR` como teléfono.
+
+```powershell
+python scripts/import_contacts.py --file dataAlumnos.csv
+```
 
 ### 2. Enviar la campaña inicial por WhatsApp
 
