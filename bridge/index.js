@@ -159,7 +159,7 @@ async function processMessage(message) {
           whatsapp_source_id: message.author || message.from,
           source: "whatsapp-web.js",
         },
-        send_reply: false,
+        send_reply: true,
       }),
     });
 
@@ -169,9 +169,8 @@ async function processMessage(message) {
 
     const result = await response.json();
     if (result.should_reply && result.bot_reply) {
-      await message.reply(result.bot_reply);
       console.log(
-        `Respuesta enviada a ${phoneNumber}. Intent: ${result.intent}. Clasificador: ${result.classification_source}`
+        `Respuesta procesada para ${phoneNumber}. Intent: ${result.intent}. Clasificador: ${result.classification_source}. Enviada: ${result.reply_sent}`
       );
     } else {
       console.log(`Mensaje guardado sin respuesta para ${phoneNumber}. Intent: ${result.intent}`);

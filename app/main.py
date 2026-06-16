@@ -17,6 +17,7 @@ from app.schemas.webhook_schema import InboundMessage, InboundResponse
 from app.services.campaign_service import CampaignService
 from app.services.conversation_service import ConversationService
 from app.services.lead_service import LeadService
+from app.services.outbound_queue_service import OutboundQueueService
 from app.services.semantic_engine import get_semantic_engine
 from app.utils.logger import configure_logging
 
@@ -106,6 +107,17 @@ def send_campaign(
     db: Session = Depends(get_db),
 ):
     return CampaignService(db).send_initial(limit, phone_number)
+
+
+@app.post("/outbound/dispatch")
+def dispatch_outbound(
+    limit: int = Query(default=20, ge=1, le=200),
+    db: Session = Depends(get_db),
+    x_admin_api_key: str | None = Header(default=None),
+):
+    if settings.admin_api_key and x_admin_api_key != settings.admin_api_key:
+        raise HTTPException(401, "Clave admin inválida")
+    return OutboundQueueService(db).dispatch_pending(limit)
 
 
 @app.get("/contacts", response_model=list[ContactRead])

@@ -6,6 +6,12 @@ from app.services.conversation_service import ConversationService
 
 
 class FakeDb:
+    def add(self, item):
+        pass
+
+    def flush(self):
+        pass
+
     def commit(self):
         pass
 

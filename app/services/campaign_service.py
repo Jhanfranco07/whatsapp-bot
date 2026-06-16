@@ -3,6 +3,7 @@ import time
 
 from app.database.repositories import ContactRepository, MessageRepository, create_campaign_record
 from app.services.contact_states import CAMPAIGN_EXCLUDED_STATES, ContactState
+from app.services.outbound_queue_service import OutboundQueueService
 from app.whatsapp.sender import get_whatsapp_provider
 
 
@@ -22,8 +23,9 @@ class CampaignService:
         self.provider = provider or get_whatsapp_provider()
         self.contacts = ContactRepository(db)
         self.messages = MessageRepository(db)
+        self.outbound_queue = OutboundQueueService(db, self.provider)
 
-    def send_initial(self, limit=None, phone_number=None, delay_seconds=0):
+    def send_initial(self, limit=None, phone_number=None, delay_seconds=0, dispatch_now=True):
         if phone_number:
             contact = self.contacts.get_by_phone(phone_number)
             contacts = (
@@ -38,17 +40,28 @@ class CampaignService:
             contacts = self.contacts.campaign_candidates()
         if limit:
             contacts = contacts[:limit]
-        summary = {"sent": 0, "failed": 0, "skipped": 0}
+        summary = {"queued": 0, "sent": 0, "failed": 0, "skipped": 0}
         for position, contact in enumerate(contacts):
             name = f", {contact.full_name}" if contact.full_name else ""
             message = MESSAGE_TEMPLATE.format(nombre=name)
-            result = self.provider.send_message(contact.phone_number, message)
-            create_campaign_record(self.db, contact, message, result)
-            if result.success:
+            queued = self.outbound_queue.enqueue(
+                contact,
+                message,
+                source="campaign",
+                source_id="campaña_inicial",
+            )
+            summary["queued"] += 1
+            self.db.commit()
+            if dispatch_now:
+                result = self.outbound_queue.dispatch(queued)
+                create_campaign_record(self.db, contact, message, result)
+            else:
+                result = None
+            if result and result.success:
                 self.messages.create(contact, "outbound", message)
                 contact.status = ContactState.CONTACTADO
                 summary["sent"] += 1
-            else:
+            elif result:
                 contact.status = ContactState.ERROR_ENVIO
                 summary["failed"] += 1
             self.db.commit()

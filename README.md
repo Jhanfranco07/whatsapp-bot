@@ -242,6 +242,17 @@ python scripts/send_campaign.py --phone 51984738899
 El proveedor antiguo `pywhatkit` sigue disponible configurando
 `WHATSAPP_PROVIDER=pywhatkit`, pero abre WhatsApp Web para cada envío.
 
+Cada mensaje saliente queda registrado primero en PostgreSQL en
+`outbound_messages`. Si el bridge no está disponible, el mensaje queda con
+estado `retrying` o `failed` según los intentos. Para procesar pendientes:
+
+```powershell
+python scripts/process_outbound.py --limit 20
+```
+
+También puedes despachar por API con `POST /outbound/dispatch?limit=20` usando
+`X-Admin-Api-Key` cuando `ADMIN_API_KEY` está configurada.
+
 ## Probar sin WhatsApp Web
 
 Estos comandos solo simulan una conversación contra el backend. No vinculan

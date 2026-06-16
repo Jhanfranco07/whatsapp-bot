@@ -12,6 +12,7 @@ from app.database.repositories import (
 from app.services.chatbot_service import ChatbotService
 from app.services.contact_states import ContactState
 from app.services.intent_classifier import IntentClassifier
+from app.services.outbound_queue_service import OutboundQueueService
 from app.services.rate_limiter import InMemoryRateLimiter
 from app.utils.phone_utils import normalize_phone
 from app.whatsapp.sender import get_whatsapp_provider
@@ -36,6 +37,7 @@ class ConversationService:
         self.classifier = IntentClassifier()
         self.chatbot = ChatbotService()
         self.provider = provider or get_whatsapp_provider()
+        self.outbound_queue = OutboundQueueService(db, self.provider)
 
     def process_inbound(self, payload):
         """Entrada síncrona conservada para scripts y compatibilidad."""
@@ -122,8 +124,15 @@ class ConversationService:
 
         self.messages.create(contact, "inbound", payload.message, intent, entities, payload.raw_payload)
         should_reply = result.should_reply and entities.get("should_reply", True)
+        queued_outbound = None
         if should_reply:
             self.messages.create(contact, "outbound", result.bot_reply, intent, entities)
+            queued_outbound = self.outbound_queue.enqueue(
+                contact,
+                result.bot_reply,
+                source="conversation",
+                source_id=str(contact.id),
+            )
 
         contact.status = result.new_status
         contact.opt_out = result.opt_out or contact.opt_out
@@ -172,8 +181,9 @@ class ConversationService:
         )
 
         reply_sent = False
-        if payload.send_reply and should_reply:
-            send_result = self.provider.send_message(contact.phone_number, result.bot_reply)
+        if payload.send_reply and should_reply and queued_outbound:
+            self.db.commit()
+            send_result = self.outbound_queue.dispatch(queued_outbound)
             reply_sent = send_result.success
 
         self.db.commit()

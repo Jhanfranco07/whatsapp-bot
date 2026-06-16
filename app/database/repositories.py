@@ -9,6 +9,7 @@ from app.database.models import (
     Contact,
     Conversation,
     Message,
+    OutboundMessage,
 )
 from app.schemas.contact_schema import ContactCreate
 from app.services.contact_states import CAMPAIGN_EXCLUDED_STATES
@@ -86,6 +87,51 @@ class MessageRepository:
                 select(Message)
                 .where(Message.contact_id == contact_id)
                 .order_by(Message.created_at.asc())
+            )
+        )
+
+
+class OutboundMessageRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def create(
+        self,
+        contact,
+        text,
+        source=None,
+        source_id=None,
+        max_attempts=3,
+    ):
+        queued = OutboundMessage(
+            contact_id=contact.id,
+            phone_number=contact.phone_number,
+            message_text=text,
+            status="pending",
+            source=source,
+            source_id=source_id,
+            attempts=0,
+            max_attempts=max_attempts,
+            next_attempt_at=datetime.now(timezone.utc),
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+        )
+        self.db.add(queued)
+        self.db.flush()
+        return queued
+
+    def pending(self, limit=20):
+        now = datetime.now(timezone.utc)
+        return list(
+            self.db.scalars(
+                select(OutboundMessage)
+                .where(
+                    OutboundMessage.status.in_(("pending", "retrying")),
+                    OutboundMessage.next_attempt_at <= now,
+                    OutboundMessage.attempts < OutboundMessage.max_attempts,
+                )
+                .order_by(OutboundMessage.created_at.asc())
+                .limit(limit)
             )
         )
 
