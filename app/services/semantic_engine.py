@@ -47,6 +47,9 @@ class SemanticEngine:
         self.careers: list[dict[str, Any]] = json.loads(
             careers_path.read_text(encoding="utf-8-sig")
         )["carreras"]
+        self.faculties: list[dict[str, Any]] = json.loads(
+            careers_path.read_text(encoding="utf-8-sig")
+        ).get("facultades", [])
         self.corpus: dict[str, list[str]] = json.loads(
             corpus_path.read_text(encoding="utf-8-sig")
         )
@@ -72,8 +75,18 @@ class SemanticEngine:
         if exact:
             return exact
 
+        institutional = self._classify_institutional_rule(normalized)
+        if institutional:
+            return institutional
+        admission = self._classify_admission_rule(normalized)
+        if admission:
+            return admission
         careers = self._find_careers(normalized)
         topic = self._detect_topic(normalized)
+        faculty = self._find_faculty(normalized)
+        academic = self._classify_academic_rule(normalized, careers, faculty)
+        if academic:
+            return academic
         if careers:
             intent = (
                 "consulta_carrera_especifica"
@@ -84,6 +97,8 @@ class SemanticEngine:
                 "carrera": careers[0]["nombre"],
                 "career": careers[0]["nombre"],
                 "area": careers[0].get("area"),
+                "facultad": careers[0].get("facultad"),
+                "faculty_slug": careers[0].get("facultad_slug"),
             }
             if len(careers) > 1:
                 entities["carreras"] = [item["nombre"] for item in careers]
@@ -93,12 +108,6 @@ class SemanticEngine:
                 entities["secondary_intents"] = ["consulta_admision"]
             return ClassificationResult(intent, 0.98, entities, True, "rules")
 
-        institutional = self._classify_institutional_rule(normalized)
-        if institutional:
-            return institutional
-        admission = self._classify_admission_rule(normalized)
-        if admission:
-            return admission
         topic_rule = self._classify_topic_rule(normalized)
         if topic_rule:
             return topic_rule
@@ -204,6 +213,129 @@ class SemanticEngine:
                     break
         matches.sort(key=lambda item: item[0], reverse=True)
         return [item[1] for item in matches]
+
+    def _find_faculty(self, text: str) -> dict[str, Any] | None:
+        matches: list[tuple[int, dict[str, Any]]] = []
+        for faculty in self.faculties:
+            aliases = [faculty.get("nombre", ""), faculty.get("slug", ""), *faculty.get("keywords", [])]
+            for alias in aliases:
+                normalized_alias = self.normalize(alias)
+                if normalized_alias and re.search(rf"\b{re.escape(normalized_alias)}\b", text):
+                    matches.append((len(normalized_alias), faculty))
+                    break
+        matches.sort(key=lambda item: item[0], reverse=True)
+        return matches[0][1] if matches else None
+
+    def _classify_academic_rule(
+        self,
+        text: str,
+        careers: list[dict[str, Any]],
+        faculty: dict[str, Any] | None,
+    ) -> ClassificationResult | None:
+        padded = f" {text} "
+        asks_careers = any(
+            phrase in padded
+            for phrase in (
+                "que carreras",
+                "cuales son las carreras",
+                "lista de carreras",
+                "carreras disponibles",
+                "carreras de",
+                "carreras en",
+                "que puedo estudiar",
+                "opciones de carreras",
+            )
+        )
+        asks_faculties = any(
+            phrase in padded
+            for phrase in (
+                "que facultades",
+                "cuales son las facultades",
+                "lista de facultades",
+                "facultades disponibles",
+                "areas academicas",
+                "facultad de",
+            )
+        )
+        asks_faculty_of_career = any(
+            phrase in padded
+            for phrase in (
+                "a que facultad",
+                "en que facultad",
+                "pertenece a que facultad",
+                "que facultad tiene",
+                "pertenece a",
+            )
+        )
+        compares = any(
+            phrase in padded
+            for phrase in (
+                "similar",
+                "se parece",
+                "diferencia",
+                "comparar",
+                " versus ",
+                " vs ",
+                " o ",
+            )
+        )
+        if asks_faculties:
+            return ClassificationResult(
+                "consulta_facultades",
+                0.98,
+                {"tema": "facultad"},
+                True,
+                "rules",
+            )
+        if asks_careers and faculty:
+            return ClassificationResult(
+                "consulta_carreras_por_facultad",
+                0.98,
+                {
+                    "tema": "facultad",
+                    "facultad": faculty["nombre"],
+                    "faculty_slug": faculty.get("slug"),
+                },
+                True,
+                "rules",
+            )
+        if asks_careers:
+            return ClassificationResult(
+                "consulta_carreras",
+                0.96,
+                {"tema": "carrera"},
+                True,
+                "rules",
+            )
+        if asks_faculty_of_career and careers:
+            career = careers[0]
+            return ClassificationResult(
+                "consulta_facultad_de_carrera",
+                0.98,
+                {
+                    "tema": "carrera",
+                    "carrera": career["nombre"],
+                    "career": career["nombre"],
+                    "facultad": career.get("facultad"),
+                    "faculty_slug": career.get("facultad_slug"),
+                },
+                True,
+                "rules",
+            )
+        if compares and len(careers) >= 2:
+            return ClassificationResult(
+                "comparacion_carrera",
+                0.97,
+                {
+                    "tema": "comparacion",
+                    "carrera": careers[0]["nombre"],
+                    "career": careers[0]["nombre"],
+                    "carrera_comparada": careers[1]["nombre"],
+                },
+                True,
+                "rules",
+            )
+        return None
 
     @staticmethod
     def _detect_topic(text: str) -> str | None:

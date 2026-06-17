@@ -9,15 +9,18 @@ from app.services.semantic_engine import SemanticEngine
 
 
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "conocimiento_institucional.json"
+CAREERS_PATH = Path(__file__).resolve().parents[1] / "data" / "carreras.json"
 
 
 class KnowledgeBase:
     """Busca respuestas verificadas que pueden ampliarse sin modificar Python."""
 
-    def __init__(self, path: Path | None = None) -> None:
+    def __init__(self, path: Path | None = None, careers_path: Path | None = None) -> None:
         self.path = path or DATA_PATH
         data = json.loads(self.path.read_text(encoding="utf-8-sig"))
         self.entries: list[dict[str, Any]] = data.get("entradas", [])
+        self.careers_path = careers_path or CAREERS_PATH
+        self.careers_data = self._read_careers()
         self._documents = [self._entry_document(entry) for entry in self._active_entries()]
         self._semantic_entries = self._active_entries()
         self._vectorizer = None
@@ -146,3 +149,98 @@ class KnowledgeBase:
     @staticmethod
     def _keywords(entry: dict[str, Any]) -> list[str]:
         return list(entry.get("palabras_clave") or entry.get("keywords") or [])
+
+    def get_all_faculties(self) -> list[dict[str, Any]]:
+        return list(self.careers_data.get("facultades", []))
+
+    def get_all_careers(self) -> list[dict[str, Any]]:
+        careers = self.careers_data.get("carreras")
+        if careers:
+            return list(careers)
+        flat = []
+        for faculty in self.get_all_faculties():
+            for career in faculty.get("carreras", []):
+                flat.append({**career, "facultad": faculty.get("nombre"), "facultad_slug": faculty.get("slug")})
+        return flat
+
+    def get_careers_by_faculty(self, faculty_slug_or_name: str) -> list[dict[str, Any]]:
+        faculty = self.find_faculty(faculty_slug_or_name)
+        return list(faculty.get("carreras", [])) if faculty else []
+
+    def find_faculty(self, text: str) -> dict[str, Any] | None:
+        normalized = SemanticEngine.normalize(text)
+        best: tuple[int, dict[str, Any]] | None = None
+        for faculty in self.get_all_faculties():
+            aliases = [faculty.get("nombre", ""), faculty.get("slug", ""), *faculty.get("keywords", [])]
+            for alias in aliases:
+                normalized_alias = SemanticEngine.normalize(alias)
+                if not normalized_alias:
+                    continue
+                if normalized == normalized_alias or normalized_alias in normalized:
+                    score = len(normalized_alias)
+                    if best is None or score > best[0]:
+                        best = (score, faculty)
+        return best[1] if best else None
+
+    def find_career(self, text: str) -> dict[str, Any] | None:
+        normalized = SemanticEngine.normalize(text)
+        best: tuple[int, dict[str, Any]] | None = None
+        for career in self.get_all_careers():
+            aliases = [
+                career.get("nombre", ""),
+                career.get("slug", ""),
+                *career.get("aliases", []),
+                *career.get("keywords", []),
+            ]
+            for alias in aliases:
+                normalized_alias = SemanticEngine.normalize(alias)
+                if not normalized_alias:
+                    continue
+                if normalized == normalized_alias or normalized_alias in normalized:
+                    score = len(normalized_alias)
+                    if best is None or score > best[0]:
+                        best = (score, career)
+        return best[1] if best else None
+
+    def get_career_detail(self, career_slug_or_name: str) -> dict[str, Any] | None:
+        return self.find_career(career_slug_or_name)
+
+    def get_faculty_of_career(self, career_slug_or_name: str) -> dict[str, Any] | None:
+        career = self.find_career(career_slug_or_name)
+        if not career:
+            return None
+        faculty_slug = career.get("facultad_slug")
+        faculty_name = career.get("facultad")
+        return self.find_faculty(faculty_slug or faculty_name or "")
+
+    def get_related_careers(self, career_slug_or_name: str) -> list[dict[str, Any]]:
+        career = self.find_career(career_slug_or_name)
+        if not career:
+            return []
+        return [
+            item
+            for item in self.get_careers_by_faculty(career.get("facultad_slug") or "")
+            if item.get("nombre") != career.get("nombre")
+        ]
+
+    def get_career_aliases(self) -> dict[str, str]:
+        aliases = {}
+        for career in self.get_all_careers():
+            for alias in [career.get("nombre", ""), *career.get("aliases", [])]:
+                if alias:
+                    aliases[SemanticEngine.normalize(alias)] = career.get("nombre", "")
+        return aliases
+
+    def get_faculty_aliases(self) -> dict[str, str]:
+        aliases = {}
+        for faculty in self.get_all_faculties():
+            for alias in [faculty.get("nombre", ""), faculty.get("slug", ""), *faculty.get("keywords", [])]:
+                if alias:
+                    aliases[SemanticEngine.normalize(alias)] = faculty.get("nombre", "")
+        return aliases
+
+    def _read_careers(self) -> dict[str, Any]:
+        try:
+            return json.loads(self.careers_path.read_text(encoding="utf-8-sig"))
+        except (OSError, json.JSONDecodeError):
+            return {"facultades": [], "carreras": []}

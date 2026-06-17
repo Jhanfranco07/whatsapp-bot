@@ -57,7 +57,7 @@ def test_name_presentation(classifier, message, name):
     ("message", "career"),
     [
         ("adminsitracion", "Administración"),
-        ("sitemas", "Ingeniería de Sistemas"),
+        ("sitemas", "Ingeniería de Sistemas de Información"),
         ("derehco", "Derecho"),
         ("qué es Big Data", "Ciencia de Datos"),
         ("me interesa cyberseguridad", "Ingeniería en Ciberseguridad"),

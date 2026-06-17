@@ -375,6 +375,47 @@ activa en `conocimiento_institucional.json`, agrega ejemplos al
 costos, vacantes u horarios. Si no hay información suficiente, el bot dirige al
 portal oficial.
 
+### Facultades y carreras
+
+`app/data/carreras.json` es la fuente controlada para la oferta académica. Tiene
+dos niveles:
+
+- `facultades`: lista de facultades con `nombre`, `slug`, `keywords` y sus
+  `carreras`.
+- `carreras`: lista plana derivada para compatibilidad con el motor semántico y
+  servicios existentes.
+
+Cada carrera incluye `nombre`, `slug`, `aliases`, `keywords`,
+`descripcion_corta`, `campo_laboral`, `facultad`, `facultad_slug` y
+`portal_oficial`. Las facultades cargadas son:
+
+- Administración Hotelera, Turismo y Gastronomía.
+- Artes y Humanidades.
+- Arquitectura.
+- Ciencias Empresariales.
+- Ingeniería e Inteligencia Artificial.
+- Ciencias de la Salud.
+- Comunicación.
+- Educación.
+- Derecho.
+
+El bot detecta carreras y facultades por nombre, alias, keywords y errores
+frecuentes como `adminsitracion`, `sitemas`, `derehco`, `sicologia`,
+`mecatronica` o `comunicacion`. Puede responder:
+
+- Qué facultades tiene USIL.
+- Qué carreras tiene USIL.
+- Qué carreras pertenecen a una facultad.
+- A qué facultad pertenece una carrera.
+- Información básica y campo laboral general de una carrera.
+
+Para agregar una nueva facultad, añade un objeto en `facultades` con `slug`,
+`keywords` y carreras. Para agregar una nueva carrera, inclúyela dentro de su
+facultad y también en la lista plana `carreras` si necesitas compatibilidad
+manual inmediata. Luego refuerza `intent_corpus.json` con ejemplos naturales.
+No agregues costos, duración, horarios, vacantes ni mallas si no están
+verificados en una fuente oficial.
+
 Verifica el motor con:
 
 ```text

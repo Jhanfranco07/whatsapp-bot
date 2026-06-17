@@ -28,8 +28,8 @@ def test_controlled_career_response():
     result = ChatbotService().respond(
         "consulta_carrera_especifica", {"career": "Ingeniería de Sistemas"}
     )
-    assert "desarrollo de software" in result.bot_reply
-    assert "portal de USIL" in result.bot_reply
+    assert "soluciones digitales" in result.bot_reply
+    assert "https://www.usil.edu.pe/" in result.bot_reply
 
 
 def test_compound_response_mentions_admission_once():
@@ -53,7 +53,7 @@ def test_official_career_without_local_description_is_safe():
         "consulta_carrera_especifica", {"career": "Ingeniería Biomédica"}
     ).bot_reply
     assert "Ingeniería Biomédica" in reply
-    assert "portal" in reply
+    assert "https://www.usil.edu.pe/" in reply
 
 
 @pytest.mark.parametrize(

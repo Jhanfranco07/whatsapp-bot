@@ -61,6 +61,9 @@ class ChatbotService:
         self.careers: list[dict[str, Any]] = json.loads(
             (DATA_DIR / "carreras.json").read_text(encoding="utf-8-sig")
         )["carreras"]
+        self.faculties: list[dict[str, Any]] = json.loads(
+            (DATA_DIR / "carreras.json").read_text(encoding="utf-8-sig")
+        ).get("facultades", [])
         self.institution: dict[str, Any] = json.loads(
             (DATA_DIR / "institucion.json").read_text(encoding="utf-8")
         )
@@ -111,6 +114,9 @@ class ChatbotService:
                 f"De nada. Puedo seguir orientándote sobre {context['last_career']}.",
                 ContactState.RESPONDIO,
             )
+        career_response = self._career_response(intent, entities)
+        if career_response:
+            return ChatbotResult(career_response, self._status_for(intent))
         if intent == "consulta_carrera_especifica" and not career:
             requested = entities.get("carrera") or entities.get("career")
             if requested in self.institution.get("carreras_oficiales", []):
@@ -272,6 +278,100 @@ class ChatbotService:
         if isinstance(items, list):
             return "\n".join(f"- {str(item).strip()}" for item in items if str(item).strip())
         return str(items or "").strip()
+
+    def _career_response(self, intent: str, entities: dict[str, Any]) -> str | None:
+        if intent == "consulta_facultades":
+            names = [faculty["nombre"].removeprefix("Facultad de ") for faculty in self.faculties]
+            return self._with_career_closure(
+                f"USIL cuenta con facultades como {self._join_items(names)}."
+            )
+        if intent == "consulta_carreras":
+            return self._with_career_closure(
+                "USIL ofrece carreras en áreas como negocios, ingeniería, salud, derecho, "
+                "educación, comunicación, arquitectura, artes, hotelería, turismo y "
+                "gastronomía. Si deseas, puedes preguntarme por una facultad específica, "
+                "por ejemplo: carreras de Ingeniería o carreras de Ciencias Empresariales."
+            )
+        if intent == "consulta_carreras_por_facultad":
+            faculty = self._find_faculty(entities.get("faculty_slug") or entities.get("facultad"))
+            if not faculty:
+                return None
+            careers = [career["nombre"] for career in faculty.get("carreras", [])]
+            return self._with_career_closure(
+                f"{faculty['nombre']} cuenta con carreras como {self._join_items(careers)}."
+            )
+        if intent == "consulta_facultad_de_carrera":
+            career = self._find_career(entities.get("career") or entities.get("carrera"))
+            if not career:
+                return self._with_career_closure(
+                    self._reply("carrera_no_encontrada", self._format_values(None, None))
+                )
+            faculty = self._find_faculty(career.get("facultad_slug") or career.get("facultad"))
+            related = [
+                item["nombre"]
+                for item in (faculty or {}).get("carreras", [])
+                if item.get("nombre") != career.get("nombre")
+            ]
+            extra = (
+                f"Esta facultad también incluye la carrera de {self._join_items(related)}."
+                if related
+                else "Es la carrera principal registrada para esa facultad en la fuente controlada."
+            )
+            return self._with_career_closure(
+                f"{career['nombre']} pertenece a {career.get('facultad')}. {extra}"
+            )
+        if intent == "consulta_carrera_especifica":
+            career = self._find_career(entities.get("career") or entities.get("carrera"))
+            if not career:
+                return None
+            reply = (
+                f"{career['nombre']} pertenece a {career.get('facultad')}. "
+                f"Esta carrera está relacionada con {career.get('descripcion_corta', 'su área de formación profesional')}."
+            )
+            if "consulta_admision" in entities.get("secondary_intents", []):
+                reply = f"{reply}\n\nAdmisión: https://descubre.usil.edu.pe/landings/pregrado/admision/"
+            return self._with_career_closure(reply)
+        if intent == "consulta_campo_laboral":
+            career = self._find_career(entities.get("career") or entities.get("carrera"))
+            if not career:
+                return None
+            field = career.get("campo_laboral") or career.get("keywords") or []
+            field_text = self._join_items(field) if isinstance(field, list) else str(field)
+            return self._with_career_closure(
+                f"Sobre el campo laboral de {career['nombre']}: puede relacionarse con {field_text}."
+            )
+        if intent == "comparacion_carrera":
+            first = self._find_career(entities.get("career") or entities.get("carrera"))
+            second = self._find_career(entities.get("carrera_comparada"))
+            if first and second:
+                return self._with_career_closure(
+                    f"{first['nombre']} y {second['nombre']} pertenecen a "
+                    f"{first.get('facultad')} y se diferencian por su enfoque. "
+                    "Para comparar mallas, cursos o duración, revisa la información oficial."
+                )
+        return None
+
+    def _find_faculty(self, name: str | None) -> dict[str, Any] | None:
+        if not name:
+            return None
+        target = SemanticEngine.normalize(name)
+        for faculty in self.faculties:
+            aliases = [faculty.get("nombre", ""), faculty.get("slug", ""), *faculty.get("keywords", [])]
+            if target in {SemanticEngine.normalize(alias) for alias in aliases}:
+                return faculty
+        return None
+
+    def _with_career_closure(self, text: str) -> str:
+        variants = self.replies.get("cierres_carreras") or []
+        closure = random.choice(variants) if variants else self.settings.portal_oficial_url
+        return self._sanitize(f"{text}\n\n{closure}", "")
+
+    @staticmethod
+    def _join_items(items: list[str]) -> str:
+        values = [str(item).strip() for item in items if str(item).strip()]
+        if len(values) <= 1:
+            return "".join(values)
+        return f"{', '.join(values[:-1])} y {values[-1]}"
 
     def _find_career(self, name: str | None) -> dict[str, Any] | None:
         if not name:

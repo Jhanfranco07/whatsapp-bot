@@ -1,285 +1,2711 @@
 {
-    "carreras":  [
-                     {
-                         "nombre":  "Ingeniería de Sistemas",
-                         "aliases":  [
-                                         "ingenieria de sistemas",
-                                         "ingeniería de sistemas",
-                                         "ing sistemas",
-                                         "sitemas",
-                                         "sistemas",
-                                         "software",
-                                         "computacion",
-                                         "computación",
-                                         "tecnologia",
-                                         "tecnología"
-                                     ],
-                         "area":  "Tecnología",
-                         "descripcion_corta":  "Carrera orientada al desarrollo de software, tecnología, datos e innovación digital.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Administración",
-                         "aliases":  [
-                                         "administracion",
-                                         "administración",
-                                         "adminsitracion",
-                                         "admisnitracion",
-                                         "adminstracion",
-                                         "admin",
-                                         "gestion de empresas",
-                                         "gestión de empresas",
-                                         "negocios",
-                                         "empresa",
-                                         "gestión"
-                                     ],
-                         "area":  "Negocios",
-                         "descripcion_corta":  "Carrera orientada a la gestión de empresas, emprendimiento y toma de decisiones.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Marketing",
-                         "aliases":  [
-                                         "marketing",
-                                         "mercadotecnia"
-                                     ],
-                         "area":  "Negocios",
-                         "descripcion_corta":  "Carrera orientada al conocimiento del consumidor, estrategia comercial y comunicación de marcas.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Arquitectura",
-                         "aliases":  [
-                                         "arquitectura"
-                                     ],
-                         "area":  "Diseño",
-                         "descripcion_corta":  "Carrera orientada al diseño responsable de espacios y proyectos arquitectónicos.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Comunicaciones",
-                         "aliases":  [
-                                         "comunicaciones",
-                                         "comunicación"
-                                     ],
-                         "area":  "Comunicaciones",
-                         "descripcion_corta":  "Carrera orientada a la creación y gestión estratégica de contenidos y medios.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Derecho",
-                         "aliases":  [
-                                         "derecho",
-                                         "derehco",
-                                         "leyes"
-                                     ],
-                         "area":  "Derecho",
-                         "descripcion_corta":  "Carrera orientada al análisis jurídico y la solución responsable de conflictos.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Gastronomía",
-                         "aliases":  [
-                                         "gastronomía",
-                                         "cocina"
-                                     ],
-                         "area":  "Hospitalidad",
-                         "descripcion_corta":  "Carrera orientada a la gestión y creación gastronómica.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Psicología",
-                         "aliases":  [
-                                         "psicología"
-                                     ],
-                         "area":  "Ciencias Humanas",
-                         "descripcion_corta":  "Carrera orientada al estudio del comportamiento y bienestar de las personas.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Medicina Veterinaria",
-                         "aliases":  [
-                                         "veterinaria",
-                                         "medicina veterinaria"
-                                     ],
-                         "area":  "Salud",
-                         "descripcion_corta":  "Carrera orientada a la salud y bienestar animal.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Diseño Gráfico",
-                         "aliases":  [
-                                         "diseño grafico",
-                                         "diseño gráfico",
-                                         "diseno grafico",
-                                         "diseno gráfico",
-                                         "diseño",
-                                         "diseño visual"
-                                     ],
-                         "area":  "Diseño",
-                         "descripcion_corta":  "Carrera orientada a la creación de soluciones visuales y experiencias de comunicación.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Negocios Internacionales",
-                         "aliases":  [
-                                         "negocios internacionales",
-                                         "comercio internacional"
-                                     ],
-                         "area":  "Negocios",
-                         "descripcion_corta":  "Carrera orientada a la gestión de negocios en entornos internacionales.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Ingeniería en Ciberseguridad",
-                         "aliases":  [
-                                         "ingenieria en ciberseguridad",
-                                         "ingeniería en ciberseguridad",
-                                         "ciberseguridad",
-                                         "cyberseguridad",
-                                         "seguridad informatica",
-                                         "seguridad informática"
-                                     ],
-                         "area":  "Tecnología",
-                         "descripcion_corta":  "Carrera orientada a proteger sistemas, redes, datos e infraestructura digital.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Ciencia de Datos",
-                         "aliases":  [
-                                         "ciencia de datos",
-                                         "analisis de datos",
-                                         "análisis de datos",
-                                         "data science",
-                                         "big data",
-                                         "datos"
-                                     ],
-                         "area":  "Tecnología",
-                         "descripcion_corta":  "Carrera orientada al análisis de datos, estadística, programación e inteligencia artificial.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Economía",
-                         "aliases":  [
-                                         "economía"
-                                     ],
-                         "area":  "Negocios",
-                         "descripcion_corta":  "Carrera orientada al análisis económico y la toma de decisiones.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     },
-                     {
-                         "nombre":  "Contabilidad",
-                         "aliases":  [
-                                         "contabilidad"
-                                     ],
-                         "area":  "Negocios",
-                         "descripcion_corta":  "Carrera orientada a la gestión contable, financiera y tributaria.",
-                         "url":  "",
-                         "temas":  [
-                                       "descripcion",
-                                       "campo_laboral",
-                                       "malla",
-                                       "costos",
-                                       "modalidad"
-                                   ]
-                     }
-                 ]
+  "facultades": [
+    {
+      "nombre": "Facultad de Administración Hotelera, Turismo y Gastronomía",
+      "slug": "facultad_administracion_hotelera_turismo_gastronomia",
+      "keywords": [
+        "hoteleria",
+        "hotelería",
+        "turismo",
+        "gastronomia",
+        "gastronomía",
+        "cocina",
+        "restaurantes",
+        "administracion hotelera",
+        "administración hotelera"
+      ],
+      "carreras": [
+        {
+          "nombre": "Administración Hotelera",
+          "slug": "administracion_hotelera",
+          "aliases": [
+            "administracion hotelera",
+            "administración hotelera",
+            "hoteleria",
+            "hotelería",
+            "hoteles",
+            "gestion hotelera",
+            "gestión hotelera"
+          ],
+          "keywords": [
+            "hotelería",
+            "turismo",
+            "gestión hotelera",
+            "servicio",
+            "hospitalidad"
+          ],
+          "descripcion_corta": "gestión hotelera, turismo, servicios y hospitalidad",
+          "campo_laboral": [
+            "hotelería",
+            "turismo",
+            "gestión hotelera",
+            "servicio",
+            "hospitalidad"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Arte Culinario",
+          "slug": "arte_culinario",
+          "aliases": [
+            "arte culinario",
+            "cocina",
+            "chef",
+            "gastronomia",
+            "gastronomía",
+            "cocina profesional"
+          ],
+          "keywords": [
+            "cocina",
+            "gastronomía",
+            "chef",
+            "técnicas culinarias"
+          ],
+          "descripcion_corta": "cocina profesional, técnicas culinarias y creación gastronómica",
+          "campo_laboral": [
+            "cocina",
+            "gastronomía",
+            "chef",
+            "técnicas culinarias"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Gestión e Innovación en Gastronomía",
+          "slug": "gestion_innovacion_gastronomia",
+          "aliases": [
+            "gestion e innovacion en gastronomia",
+            "gestión e innovación en gastronomía",
+            "innovacion gastronomica",
+            "innovación gastronómica",
+            "gestion gastronomica",
+            "gestión gastronómica",
+            "restaurantes"
+          ],
+          "keywords": [
+            "gastronomía",
+            "innovación",
+            "restaurantes",
+            "gestión gastronómica"
+          ],
+          "descripcion_corta": "gestión gastronómica, innovación y operación de restaurantes",
+          "campo_laboral": [
+            "gastronomía",
+            "innovación",
+            "restaurantes",
+            "gestión gastronómica"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        }
+      ]
+    },
+    {
+      "nombre": "Facultad de Artes y Humanidades",
+      "slug": "facultad_artes_humanidades",
+      "keywords": [
+        "artes",
+        "humanidades",
+        "diseño",
+        "música",
+        "musica",
+        "creatividad"
+      ],
+      "carreras": [
+        {
+          "nombre": "Arte y Diseño Empresarial",
+          "slug": "arte_diseno_empresarial",
+          "aliases": [
+            "arte y diseño empresarial",
+            "arte y diseno empresarial",
+            "diseño empresarial",
+            "diseno empresarial",
+            "diseño grafico",
+            "diseño gráfico",
+            "diseno grafico",
+            "creatividad",
+            "diseño",
+            "diseno"
+          ],
+          "keywords": [
+            "diseño",
+            "creatividad",
+            "empresa",
+            "comunicación visual"
+          ],
+          "descripcion_corta": "creatividad, diseño, comunicación visual y soluciones para empresas",
+          "campo_laboral": [
+            "diseño",
+            "creatividad",
+            "empresa",
+            "comunicación visual"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Música",
+          "slug": "musica",
+          "aliases": [
+            "musica",
+            "música",
+            "canto",
+            "produccion musical",
+            "producción musical",
+            "instrumentos",
+            "carrera de musica",
+            "carrera de música"
+          ],
+          "keywords": [
+            "música",
+            "producción musical",
+            "interpretación",
+            "creatividad"
+          ],
+          "descripcion_corta": "creación, interpretación y producción musical",
+          "campo_laboral": [
+            "música",
+            "producción musical",
+            "interpretación",
+            "creatividad"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        }
+      ]
+    },
+    {
+      "nombre": "Facultad de Arquitectura",
+      "slug": "facultad_arquitectura",
+      "keywords": [
+        "arquitectura",
+        "urbanismo",
+        "territorio",
+        "diseño urbano",
+        "planos",
+        "construccion",
+        "construcción"
+      ],
+      "carreras": [
+        {
+          "nombre": "Arquitectura, Urbanismo y Territorio",
+          "slug": "arquitectura_urbanismo_territorio",
+          "aliases": [
+            "arquitectura",
+            "arquitectura urbanismo y territorio",
+            "urbanismo",
+            "territorio",
+            "diseño urbano",
+            "diseno urbano",
+            "planos",
+            "construccion",
+            "construcción"
+          ],
+          "keywords": [
+            "arquitectura",
+            "urbanismo",
+            "territorio",
+            "diseño urbano",
+            "planos"
+          ],
+          "descripcion_corta": "diseño de espacios, urbanismo, territorio y proyectos arquitectónicos",
+          "campo_laboral": [
+            "arquitectura",
+            "urbanismo",
+            "territorio",
+            "diseño urbano",
+            "planos"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        }
+      ]
+    },
+    {
+      "nombre": "Facultad de Ciencias Empresariales",
+      "slug": "facultad_ciencias_empresariales",
+      "keywords": [
+        "ciencias empresariales",
+        "negocios",
+        "empresa",
+        "administracion",
+        "administración",
+        "economia",
+        "economía",
+        "finanzas",
+        "marketing",
+        "emprendimiento",
+        "business",
+        "internacional"
+      ],
+      "carreras": [
+        {
+          "nombre": "Administración",
+          "slug": "administracion",
+          "aliases": [
+            "administracion",
+            "administración",
+            "adminsitracion",
+            "admisnitracion",
+            "adminstracion",
+            "admin",
+            "gestion",
+            "gestión",
+            "empresas",
+            "negocios",
+            "carrera de administracion",
+            "carrera de administración"
+          ],
+          "keywords": [
+            "gestión",
+            "empresas",
+            "negocios",
+            "emprendimiento",
+            "decisiones"
+          ],
+          "descripcion_corta": "gestión de empresas, emprendimiento y toma de decisiones",
+          "campo_laboral": [
+            "gestión",
+            "empresas",
+            "negocios",
+            "emprendimiento",
+            "decisiones"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Administración y Emprendimiento",
+          "slug": "administracion_emprendimiento",
+          "aliases": [
+            "administracion y emprendimiento",
+            "administración y emprendimiento",
+            "emprendimiento",
+            "emprender",
+            "startup",
+            "negocio propio",
+            "crear empresa"
+          ],
+          "keywords": [
+            "emprendimiento",
+            "startups",
+            "negocios",
+            "gestión"
+          ],
+          "descripcion_corta": "creación, gestión y desarrollo de negocios propios",
+          "campo_laboral": [
+            "emprendimiento",
+            "startups",
+            "negocios",
+            "gestión"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Administración y Finanzas Corporativas",
+          "slug": "administracion_finanzas_corporativas",
+          "aliases": [
+            "administracion y finanzas corporativas",
+            "administración y finanzas corporativas",
+            "finanzas corporativas",
+            "administracion y finanzas",
+            "administración y finanzas",
+            "banca",
+            "inversiones",
+            "finanzas"
+          ],
+          "keywords": [
+            "finanzas",
+            "banca",
+            "inversiones",
+            "gestión financiera"
+          ],
+          "descripcion_corta": "finanzas corporativas, banca, inversiones y gestión empresarial",
+          "campo_laboral": [
+            "finanzas",
+            "banca",
+            "inversiones",
+            "gestión financiera"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Digital Business Management",
+          "slug": "digital_business_management",
+          "aliases": [
+            "digital business management",
+            "digital business",
+            "negocios digitales",
+            "gestion digital",
+            "gestión digital",
+            "transformacion digital",
+            "transformación digital",
+            "empresa digital"
+          ],
+          "keywords": [
+            "negocios digitales",
+            "transformación digital",
+            "gestión",
+            "empresa digital"
+          ],
+          "descripcion_corta": "gestión de negocios digitales y transformación digital",
+          "campo_laboral": [
+            "negocios digitales",
+            "transformación digital",
+            "gestión",
+            "empresa digital"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Economía y Finanzas",
+          "slug": "economia_finanzas",
+          "aliases": [
+            "economia y finanzas",
+            "economía y finanzas",
+            "economia",
+            "economía",
+            "finanzas",
+            "mercados",
+            "inversiones",
+            "analisis economico",
+            "análisis económico"
+          ],
+          "keywords": [
+            "economía",
+            "finanzas",
+            "mercados",
+            "inversiones"
+          ],
+          "descripcion_corta": "análisis económico, mercados, finanzas e inversiones",
+          "campo_laboral": [
+            "economía",
+            "finanzas",
+            "mercados",
+            "inversiones"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Economía y Negocios Internacionales",
+          "slug": "economia_negocios_internacionales",
+          "aliases": [
+            "economia y negocios internacionales",
+            "economía y negocios internacionales",
+            "negocios internacionales",
+            "comercio exterior",
+            "economia internacional",
+            "economía internacional",
+            "internacional"
+          ],
+          "keywords": [
+            "economía",
+            "negocios internacionales",
+            "comercio exterior"
+          ],
+          "descripcion_corta": "economía, comercio exterior y negocios internacionales",
+          "campo_laboral": [
+            "economía",
+            "negocios internacionales",
+            "comercio exterior"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "International Business",
+          "slug": "international_business",
+          "aliases": [
+            "international business",
+            "business",
+            "negocios globales",
+            "negocios internacionales en ingles",
+            "carrera en ingles",
+            "carrera en inglés",
+            "comercio internacional"
+          ],
+          "keywords": [
+            "business",
+            "negocios globales",
+            "comercio internacional"
+          ],
+          "descripcion_corta": "negocios globales y comercio internacional",
+          "campo_laboral": [
+            "business",
+            "negocios globales",
+            "comercio internacional"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Marketing",
+          "slug": "marketing",
+          "aliases": [
+            "marketing",
+            "maketing",
+            "mercadotecnia",
+            "publicidad",
+            "ventas",
+            "marca",
+            "branding",
+            "redes sociales",
+            "investigacion de mercados",
+            "investigación de mercados"
+          ],
+          "keywords": [
+            "marketing",
+            "publicidad",
+            "ventas",
+            "marca",
+            "investigación de mercados"
+          ],
+          "descripcion_corta": "consumidor, estrategia comercial, marca y comunicación de productos o servicios",
+          "campo_laboral": [
+            "marketing",
+            "publicidad",
+            "ventas",
+            "marca",
+            "investigación de mercados"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        }
+      ]
+    },
+    {
+      "nombre": "Facultad de Ingeniería e Inteligencia Artificial",
+      "slug": "facultad_ingenieria_inteligencia_artificial",
+      "keywords": [
+        "ingenieria",
+        "ingeniería",
+        "inteligencia artificial",
+        "tecnologia",
+        "tecnología",
+        "sistemas",
+        "software",
+        "datos",
+        "ciberseguridad",
+        "industrial",
+        "civil",
+        "mecatronica",
+        "mecatrónica"
+      ],
+      "carreras": [
+        {
+          "nombre": "Ciencia de Datos",
+          "slug": "ciencia_datos",
+          "aliases": [
+            "ciencia de datos",
+            "datos",
+            "data",
+            "big data",
+            "analitica",
+            "analítica",
+            "inteligencia artificial",
+            "ia",
+            "machine learning",
+            "data science"
+          ],
+          "keywords": [
+            "datos",
+            "analítica",
+            "inteligencia artificial",
+            "programación"
+          ],
+          "descripcion_corta": "análisis de datos, estadística, programación e inteligencia artificial",
+          "campo_laboral": [
+            "datos",
+            "analítica",
+            "inteligencia artificial",
+            "programación"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería Agroindustrial",
+          "slug": "ingenieria_agroindustrial",
+          "aliases": [
+            "ingenieria agroindustrial",
+            "ingeniería agroindustrial",
+            "agroindustrial",
+            "agroindustria",
+            "industria agricola",
+            "industria agrícola",
+            "alimentos agroindustriales"
+          ],
+          "keywords": [
+            "agroindustria",
+            "alimentos",
+            "procesos productivos"
+          ],
+          "descripcion_corta": "procesos agroindustriales, alimentos y producción agrícola",
+          "campo_laboral": [
+            "agroindustria",
+            "alimentos",
+            "procesos productivos"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería Ambiental",
+          "slug": "ingenieria_ambiental",
+          "aliases": [
+            "ingenieria ambiental",
+            "ingeniería ambiental",
+            "ambiental",
+            "medio ambiente",
+            "sostenibilidad",
+            "ecologia",
+            "ecología",
+            "gestion ambiental",
+            "gestión ambiental"
+          ],
+          "keywords": [
+            "medio ambiente",
+            "sostenibilidad",
+            "gestión ambiental"
+          ],
+          "descripcion_corta": "medio ambiente, sostenibilidad y gestión ambiental",
+          "campo_laboral": [
+            "medio ambiente",
+            "sostenibilidad",
+            "gestión ambiental"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería Biomédica",
+          "slug": "ingenieria_biomedica",
+          "aliases": [
+            "ingenieria biomedica",
+            "ingeniería biomédica",
+            "biomedica",
+            "biomédica",
+            "equipos medicos",
+            "equipos médicos",
+            "tecnologia medica",
+            "tecnología médica",
+            "salud tecnologia",
+            "salud tecnología"
+          ],
+          "keywords": [
+            "salud",
+            "tecnología médica",
+            "equipos médicos"
+          ],
+          "descripcion_corta": "tecnología aplicada a salud, equipos médicos y soluciones biomédicas",
+          "campo_laboral": [
+            "salud",
+            "tecnología médica",
+            "equipos médicos"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería en Ciberseguridad",
+          "slug": "ingenieria_ciberseguridad",
+          "aliases": [
+            "ingenieria en ciberseguridad",
+            "ingeniería en ciberseguridad",
+            "ciberseguridad",
+            "cyberseguridad",
+            "seguridad informatica",
+            "seguridad informática",
+            "hackers",
+            "redes",
+            "seguridad digital"
+          ],
+          "keywords": [
+            "ciberseguridad",
+            "redes",
+            "seguridad informática",
+            "protección digital"
+          ],
+          "descripcion_corta": "protección de sistemas, redes, datos e infraestructura digital",
+          "campo_laboral": [
+            "ciberseguridad",
+            "redes",
+            "seguridad informática",
+            "protección digital"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería Civil",
+          "slug": "ingenieria_civil",
+          "aliases": [
+            "ingenieria civil",
+            "ingeniería civil",
+            "civil",
+            "construccion",
+            "construcción",
+            "obras",
+            "estructuras",
+            "edificaciones"
+          ],
+          "keywords": [
+            "construcción",
+            "obras",
+            "estructuras",
+            "edificaciones"
+          ],
+          "descripcion_corta": "obras, construcción, estructuras y proyectos de infraestructura",
+          "campo_laboral": [
+            "construcción",
+            "obras",
+            "estructuras",
+            "edificaciones"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería de Sistemas de Información",
+          "slug": "ingenieria_sistemas_informacion",
+          "aliases": [
+            "ingenieria de sistemas de informacion",
+            "ingeniería de sistemas de información",
+            "ingenieria de sistemas",
+            "ingeniería de sistemas",
+            "sistemas de informacion",
+            "sistemas de información",
+            "sistemas",
+            "sitemas",
+            "ing sistemas",
+            "tecnologia",
+            "tecnología",
+            "base de datos",
+            "programacion",
+            "programación"
+          ],
+          "keywords": [
+            "tecnología",
+            "sistemas",
+            "bases de datos",
+            "programación",
+            "soluciones digitales"
+          ],
+          "descripcion_corta": "tecnología, sistemas, bases de datos, programación y soluciones digitales",
+          "campo_laboral": [
+            "tecnología",
+            "sistemas",
+            "bases de datos",
+            "programación",
+            "soluciones digitales"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería de Software",
+          "slug": "ingenieria_software",
+          "aliases": [
+            "ingenieria de software",
+            "ingeniería de software",
+            "software",
+            "desarrollo de software",
+            "programacion",
+            "programación",
+            "apps",
+            "aplicaciones",
+            "desarrollo web",
+            "desarrollo movil",
+            "desarrollo móvil"
+          ],
+          "keywords": [
+            "software",
+            "programación",
+            "apps",
+            "desarrollo web",
+            "desarrollo móvil"
+          ],
+          "descripcion_corta": "desarrollo de software, aplicaciones y soluciones digitales",
+          "campo_laboral": [
+            "software",
+            "programación",
+            "apps",
+            "desarrollo web",
+            "desarrollo móvil"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería Empresarial",
+          "slug": "ingenieria_empresarial",
+          "aliases": [
+            "ingenieria empresarial",
+            "ingeniería empresarial",
+            "empresarial",
+            "procesos empresariales",
+            "gestion empresarial",
+            "gestión empresarial",
+            "mejora de procesos",
+            "negocios y tecnologia",
+            "negocios y tecnología"
+          ],
+          "keywords": [
+            "procesos empresariales",
+            "gestión",
+            "mejora de procesos",
+            "tecnología"
+          ],
+          "descripcion_corta": "procesos empresariales, gestión y mejora organizacional con tecnología",
+          "campo_laboral": [
+            "procesos empresariales",
+            "gestión",
+            "mejora de procesos",
+            "tecnología"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería en Industrias Alimentarias",
+          "slug": "ingenieria_industrias_alimentarias",
+          "aliases": [
+            "ingenieria en industrias alimentarias",
+            "ingeniería en industrias alimentarias",
+            "industrias alimentarias",
+            "alimentos",
+            "industria alimentaria",
+            "produccion de alimentos",
+            "producción de alimentos",
+            "calidad alimentaria"
+          ],
+          "keywords": [
+            "alimentos",
+            "producción",
+            "calidad alimentaria"
+          ],
+          "descripcion_corta": "producción, control y calidad de alimentos",
+          "campo_laboral": [
+            "alimentos",
+            "producción",
+            "calidad alimentaria"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería Industrial y Comercial",
+          "slug": "ingenieria_industrial_comercial",
+          "aliases": [
+            "ingenieria industrial y comercial",
+            "ingeniería industrial y comercial",
+            "industrial y comercial",
+            "industrial",
+            "procesos",
+            "operaciones",
+            "logistica",
+            "logística",
+            "produccion",
+            "producción",
+            "cadena de suministro"
+          ],
+          "keywords": [
+            "procesos",
+            "operaciones",
+            "logística",
+            "producción",
+            "cadena de suministro"
+          ],
+          "descripcion_corta": "procesos, operaciones, logística, producción y gestión comercial",
+          "campo_laboral": [
+            "procesos",
+            "operaciones",
+            "logística",
+            "producción",
+            "cadena de suministro"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Ingeniería Mecatrónica",
+          "slug": "ingenieria_mecatronica",
+          "aliases": [
+            "ingenieria mecatronica",
+            "ingeniería mecatrónica",
+            "mecatronica",
+            "mecatrónica",
+            "robotica",
+            "robótica",
+            "automatizacion",
+            "automatización",
+            "sensores",
+            "electronica",
+            "electrónica"
+          ],
+          "keywords": [
+            "robótica",
+            "automatización",
+            "sensores",
+            "electrónica"
+          ],
+          "descripcion_corta": "robótica, automatización, sensores, electrónica y sistemas inteligentes",
+          "campo_laboral": [
+            "robótica",
+            "automatización",
+            "sensores",
+            "electrónica"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        }
+      ]
+    },
+    {
+      "nombre": "Facultad de Ciencias de la Salud",
+      "slug": "facultad_ciencias_salud",
+      "keywords": [
+        "salud",
+        "medicina",
+        "enfermeria",
+        "enfermería",
+        "psicologia",
+        "psicología",
+        "nutricion",
+        "nutrición",
+        "terapia fisica",
+        "terapia física",
+        "deporte"
+      ],
+      "carreras": [
+        {
+          "nombre": "Ciencias de la Actividad Física y del Deporte",
+          "slug": "actividad_fisica_deporte",
+          "aliases": [
+            "ciencias de la actividad fisica y del deporte",
+            "ciencias de la actividad física y del deporte",
+            "actividad fisica",
+            "actividad física",
+            "deporte",
+            "entrenamiento",
+            "educacion fisica",
+            "educación física",
+            "preparacion fisica",
+            "preparación física"
+          ],
+          "keywords": [
+            "actividad física",
+            "deporte",
+            "entrenamiento",
+            "educación física"
+          ],
+          "descripcion_corta": "actividad física, deporte, entrenamiento y preparación física",
+          "campo_laboral": [
+            "actividad física",
+            "deporte",
+            "entrenamiento",
+            "educación física"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Enfermería",
+          "slug": "enfermeria",
+          "aliases": [
+            "enfermeria",
+            "enfermería",
+            "enfermero",
+            "enfermera",
+            "salud",
+            "pacientes",
+            "cuidados de salud"
+          ],
+          "keywords": [
+            "salud",
+            "pacientes",
+            "cuidados"
+          ],
+          "descripcion_corta": "cuidado de pacientes, promoción de salud y atención sanitaria",
+          "campo_laboral": [
+            "salud",
+            "pacientes",
+            "cuidados"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Medicina Humana",
+          "slug": "medicina_humana",
+          "aliases": [
+            "medicina humana",
+            "medicina",
+            "medico",
+            "médico",
+            "doctor",
+            "doctora",
+            "salud",
+            "carrera de medicina"
+          ],
+          "keywords": [
+            "medicina",
+            "salud",
+            "atención médica"
+          ],
+          "descripcion_corta": "salud, atención médica y bienestar de las personas",
+          "campo_laboral": [
+            "medicina",
+            "salud",
+            "atención médica"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Nutrición y Dietética",
+          "slug": "nutricion_dietetica",
+          "aliases": [
+            "nutricion y dietetica",
+            "nutrición y dietética",
+            "nutricion",
+            "nutrición",
+            "dietetica",
+            "dietética",
+            "alimentacion",
+            "alimentación",
+            "dietas",
+            "nutricionista"
+          ],
+          "keywords": [
+            "nutrición",
+            "alimentación",
+            "dietética",
+            "salud"
+          ],
+          "descripcion_corta": "nutrición, alimentación, dietética y salud",
+          "campo_laboral": [
+            "nutrición",
+            "alimentación",
+            "dietética",
+            "salud"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Psicología",
+          "slug": "psicologia",
+          "aliases": [
+            "psicologia",
+            "psicología",
+            "psicologiia",
+            "sicologia",
+            "sicología",
+            "mente",
+            "conducta",
+            "terapia",
+            "personas",
+            "salud mental"
+          ],
+          "keywords": [
+            "conducta",
+            "mente",
+            "salud mental",
+            "personas"
+          ],
+          "descripcion_corta": "comportamiento, bienestar emocional, conducta y salud mental",
+          "campo_laboral": [
+            "conducta",
+            "mente",
+            "salud mental",
+            "personas"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Tecnología Médica en Terapia Física y Rehabilitación",
+          "slug": "tecnologia_medica_terapia_fisica",
+          "aliases": [
+            "tecnologia medica en terapia fisica y rehabilitacion",
+            "tecnología médica en terapia física y rehabilitación",
+            "terapia fisica",
+            "terapia física",
+            "rehabilitacion",
+            "rehabilitación",
+            "fisioterapia",
+            "terapia",
+            "tecnologo medico",
+            "tecnólogo médico"
+          ],
+          "keywords": [
+            "terapia física",
+            "rehabilitación",
+            "fisioterapia",
+            "tecnología médica"
+          ],
+          "descripcion_corta": "terapia física, rehabilitación y recuperación funcional",
+          "campo_laboral": [
+            "terapia física",
+            "rehabilitación",
+            "fisioterapia",
+            "tecnología médica"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        }
+      ]
+    },
+    {
+      "nombre": "Facultad de Comunicación",
+      "slug": "facultad_comunicacion",
+      "keywords": [
+        "comunicacion",
+        "comunicación",
+        "comunicaciones",
+        "medios",
+        "periodismo",
+        "audiovisual",
+        "television",
+        "televisión",
+        "radio"
+      ],
+      "carreras": [
+        {
+          "nombre": "Comunicaciones",
+          "slug": "comunicaciones",
+          "aliases": [
+            "comunicaciones",
+            "comunicacion",
+            "comunicación",
+            "periodismo",
+            "medios",
+            "audiovisual",
+            "radio",
+            "television",
+            "televisión",
+            "redes",
+            "contenidos"
+          ],
+          "keywords": [
+            "comunicación",
+            "medios",
+            "contenidos",
+            "audiovisual",
+            "redes"
+          ],
+          "descripcion_corta": "medios, contenidos, comunicación estratégica y producción audiovisual",
+          "campo_laboral": [
+            "comunicación",
+            "medios",
+            "contenidos",
+            "audiovisual",
+            "redes"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        }
+      ]
+    },
+    {
+      "nombre": "Facultad de Educación",
+      "slug": "facultad_educacion",
+      "keywords": [
+        "educacion",
+        "educación",
+        "docencia",
+        "profesor",
+        "profesora",
+        "enseñanza",
+        "inicial",
+        "secundaria",
+        "ingles",
+        "inglés"
+      ],
+      "carreras": [
+        {
+          "nombre": "Educación Secundaria con especialidad en Inglés",
+          "slug": "educacion_secundaria_ingles",
+          "aliases": [
+            "educacion secundaria con especialidad en ingles",
+            "educación secundaria con especialidad en inglés",
+            "educacion secundaria",
+            "educación secundaria",
+            "ingles",
+            "inglés",
+            "docente de ingles",
+            "docente de inglés",
+            "profesor de ingles",
+            "profesor de inglés"
+          ],
+          "keywords": [
+            "educación secundaria",
+            "inglés",
+            "docencia",
+            "enseñanza"
+          ],
+          "descripcion_corta": "docencia en educación secundaria y enseñanza del inglés",
+          "campo_laboral": [
+            "educación secundaria",
+            "inglés",
+            "docencia",
+            "enseñanza"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Educación Inicial",
+          "slug": "educacion_inicial",
+          "aliases": [
+            "educacion inicial",
+            "educación inicial",
+            "inicial",
+            "niños",
+            "niñas",
+            "docencia inicial",
+            "profesora inicial",
+            "profesor inicial",
+            "enseñanza inicial"
+          ],
+          "keywords": [
+            "educación inicial",
+            "niñez",
+            "docencia",
+            "enseñanza"
+          ],
+          "descripcion_corta": "educación inicial, niñez y docencia en primeros años",
+          "campo_laboral": [
+            "educación inicial",
+            "niñez",
+            "docencia",
+            "enseñanza"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        }
+      ]
+    },
+    {
+      "nombre": "Facultad de Derecho",
+      "slug": "facultad_derecho",
+      "keywords": [
+        "derecho",
+        "leyes",
+        "legal",
+        "relaciones internacionales",
+        "politica internacional",
+        "política internacional",
+        "diplomacia"
+      ],
+      "carreras": [
+        {
+          "nombre": "Derecho",
+          "slug": "derecho",
+          "aliases": [
+            "derecho",
+            "derehco",
+            "leyes",
+            "abogado",
+            "abogada",
+            "legal",
+            "juridico",
+            "jurídico",
+            "carrera de derecho"
+          ],
+          "keywords": [
+            "derecho",
+            "leyes",
+            "jurídico",
+            "legal"
+          ],
+          "descripcion_corta": "leyes, análisis jurídico y solución responsable de conflictos",
+          "campo_laboral": [
+            "derecho",
+            "leyes",
+            "jurídico",
+            "legal"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        },
+        {
+          "nombre": "Relaciones Internacionales",
+          "slug": "relaciones_internacionales",
+          "aliases": [
+            "relaciones internacionales",
+            "diplomacia",
+            "politica internacional",
+            "política internacional",
+            "internacional",
+            "organismos internacionales",
+            "relaciones exteriores"
+          ],
+          "keywords": [
+            "diplomacia",
+            "política internacional",
+            "organismos internacionales"
+          ],
+          "descripcion_corta": "diplomacia, política internacional y relaciones exteriores",
+          "campo_laboral": [
+            "diplomacia",
+            "política internacional",
+            "organismos internacionales"
+          ],
+          "portal_oficial": "https://www.usil.edu.pe/"
+        }
+      ]
+    }
+  ],
+  "carreras": [
+    {
+      "nombre": "Administración Hotelera",
+      "slug": "administracion_hotelera",
+      "aliases": [
+        "administracion hotelera",
+        "administración hotelera",
+        "hoteleria",
+        "hotelería",
+        "hoteles",
+        "gestion hotelera",
+        "gestión hotelera"
+      ],
+      "keywords": [
+        "hotelería",
+        "turismo",
+        "gestión hotelera",
+        "servicio",
+        "hospitalidad"
+      ],
+      "descripcion_corta": "gestión hotelera, turismo, servicios y hospitalidad",
+      "campo_laboral": [
+        "hotelería",
+        "turismo",
+        "gestión hotelera",
+        "servicio",
+        "hospitalidad"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Administración Hotelera, Turismo y Gastronomía",
+      "facultad_slug": "facultad_administracion_hotelera_turismo_gastronomia",
+      "area": "Administración Hotelera, Turismo y Gastronomía",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Arte Culinario",
+      "slug": "arte_culinario",
+      "aliases": [
+        "arte culinario",
+        "cocina",
+        "chef",
+        "gastronomia",
+        "gastronomía",
+        "cocina profesional"
+      ],
+      "keywords": [
+        "cocina",
+        "gastronomía",
+        "chef",
+        "técnicas culinarias"
+      ],
+      "descripcion_corta": "cocina profesional, técnicas culinarias y creación gastronómica",
+      "campo_laboral": [
+        "cocina",
+        "gastronomía",
+        "chef",
+        "técnicas culinarias"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Administración Hotelera, Turismo y Gastronomía",
+      "facultad_slug": "facultad_administracion_hotelera_turismo_gastronomia",
+      "area": "Administración Hotelera, Turismo y Gastronomía",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Gestión e Innovación en Gastronomía",
+      "slug": "gestion_innovacion_gastronomia",
+      "aliases": [
+        "gestion e innovacion en gastronomia",
+        "gestión e innovación en gastronomía",
+        "innovacion gastronomica",
+        "innovación gastronómica",
+        "gestion gastronomica",
+        "gestión gastronómica",
+        "restaurantes"
+      ],
+      "keywords": [
+        "gastronomía",
+        "innovación",
+        "restaurantes",
+        "gestión gastronómica"
+      ],
+      "descripcion_corta": "gestión gastronómica, innovación y operación de restaurantes",
+      "campo_laboral": [
+        "gastronomía",
+        "innovación",
+        "restaurantes",
+        "gestión gastronómica"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Administración Hotelera, Turismo y Gastronomía",
+      "facultad_slug": "facultad_administracion_hotelera_turismo_gastronomia",
+      "area": "Administración Hotelera, Turismo y Gastronomía",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Arte y Diseño Empresarial",
+      "slug": "arte_diseno_empresarial",
+      "aliases": [
+        "arte y diseño empresarial",
+        "arte y diseno empresarial",
+        "diseño empresarial",
+        "diseno empresarial",
+        "diseño grafico",
+        "diseño gráfico",
+        "diseno grafico",
+        "creatividad",
+        "diseño",
+        "diseno"
+      ],
+      "keywords": [
+        "diseño",
+        "creatividad",
+        "empresa",
+        "comunicación visual"
+      ],
+      "descripcion_corta": "creatividad, diseño, comunicación visual y soluciones para empresas",
+      "campo_laboral": [
+        "diseño",
+        "creatividad",
+        "empresa",
+        "comunicación visual"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Artes y Humanidades",
+      "facultad_slug": "facultad_artes_humanidades",
+      "area": "Artes y Humanidades",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Música",
+      "slug": "musica",
+      "aliases": [
+        "musica",
+        "música",
+        "canto",
+        "produccion musical",
+        "producción musical",
+        "instrumentos",
+        "carrera de musica",
+        "carrera de música"
+      ],
+      "keywords": [
+        "música",
+        "producción musical",
+        "interpretación",
+        "creatividad"
+      ],
+      "descripcion_corta": "creación, interpretación y producción musical",
+      "campo_laboral": [
+        "música",
+        "producción musical",
+        "interpretación",
+        "creatividad"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Artes y Humanidades",
+      "facultad_slug": "facultad_artes_humanidades",
+      "area": "Artes y Humanidades",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Arquitectura, Urbanismo y Territorio",
+      "slug": "arquitectura_urbanismo_territorio",
+      "aliases": [
+        "arquitectura",
+        "arquitectura urbanismo y territorio",
+        "urbanismo",
+        "territorio",
+        "diseño urbano",
+        "diseno urbano",
+        "planos",
+        "construccion",
+        "construcción"
+      ],
+      "keywords": [
+        "arquitectura",
+        "urbanismo",
+        "territorio",
+        "diseño urbano",
+        "planos"
+      ],
+      "descripcion_corta": "diseño de espacios, urbanismo, territorio y proyectos arquitectónicos",
+      "campo_laboral": [
+        "arquitectura",
+        "urbanismo",
+        "territorio",
+        "diseño urbano",
+        "planos"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Arquitectura",
+      "facultad_slug": "facultad_arquitectura",
+      "area": "Arquitectura",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Administración",
+      "slug": "administracion",
+      "aliases": [
+        "administracion",
+        "administración",
+        "adminsitracion",
+        "admisnitracion",
+        "adminstracion",
+        "admin",
+        "gestion",
+        "gestión",
+        "empresas",
+        "negocios",
+        "carrera de administracion",
+        "carrera de administración"
+      ],
+      "keywords": [
+        "gestión",
+        "empresas",
+        "negocios",
+        "emprendimiento",
+        "decisiones"
+      ],
+      "descripcion_corta": "gestión de empresas, emprendimiento y toma de decisiones",
+      "campo_laboral": [
+        "gestión",
+        "empresas",
+        "negocios",
+        "emprendimiento",
+        "decisiones"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias Empresariales",
+      "facultad_slug": "facultad_ciencias_empresariales",
+      "area": "Ciencias Empresariales",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Administración y Emprendimiento",
+      "slug": "administracion_emprendimiento",
+      "aliases": [
+        "administracion y emprendimiento",
+        "administración y emprendimiento",
+        "emprendimiento",
+        "emprender",
+        "startup",
+        "negocio propio",
+        "crear empresa"
+      ],
+      "keywords": [
+        "emprendimiento",
+        "startups",
+        "negocios",
+        "gestión"
+      ],
+      "descripcion_corta": "creación, gestión y desarrollo de negocios propios",
+      "campo_laboral": [
+        "emprendimiento",
+        "startups",
+        "negocios",
+        "gestión"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias Empresariales",
+      "facultad_slug": "facultad_ciencias_empresariales",
+      "area": "Ciencias Empresariales",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Administración y Finanzas Corporativas",
+      "slug": "administracion_finanzas_corporativas",
+      "aliases": [
+        "administracion y finanzas corporativas",
+        "administración y finanzas corporativas",
+        "finanzas corporativas",
+        "administracion y finanzas",
+        "administración y finanzas",
+        "banca",
+        "inversiones",
+        "finanzas"
+      ],
+      "keywords": [
+        "finanzas",
+        "banca",
+        "inversiones",
+        "gestión financiera"
+      ],
+      "descripcion_corta": "finanzas corporativas, banca, inversiones y gestión empresarial",
+      "campo_laboral": [
+        "finanzas",
+        "banca",
+        "inversiones",
+        "gestión financiera"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias Empresariales",
+      "facultad_slug": "facultad_ciencias_empresariales",
+      "area": "Ciencias Empresariales",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Digital Business Management",
+      "slug": "digital_business_management",
+      "aliases": [
+        "digital business management",
+        "digital business",
+        "negocios digitales",
+        "gestion digital",
+        "gestión digital",
+        "transformacion digital",
+        "transformación digital",
+        "empresa digital"
+      ],
+      "keywords": [
+        "negocios digitales",
+        "transformación digital",
+        "gestión",
+        "empresa digital"
+      ],
+      "descripcion_corta": "gestión de negocios digitales y transformación digital",
+      "campo_laboral": [
+        "negocios digitales",
+        "transformación digital",
+        "gestión",
+        "empresa digital"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias Empresariales",
+      "facultad_slug": "facultad_ciencias_empresariales",
+      "area": "Ciencias Empresariales",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Economía y Finanzas",
+      "slug": "economia_finanzas",
+      "aliases": [
+        "economia y finanzas",
+        "economía y finanzas",
+        "economia",
+        "economía",
+        "finanzas",
+        "mercados",
+        "inversiones",
+        "analisis economico",
+        "análisis económico"
+      ],
+      "keywords": [
+        "economía",
+        "finanzas",
+        "mercados",
+        "inversiones"
+      ],
+      "descripcion_corta": "análisis económico, mercados, finanzas e inversiones",
+      "campo_laboral": [
+        "economía",
+        "finanzas",
+        "mercados",
+        "inversiones"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias Empresariales",
+      "facultad_slug": "facultad_ciencias_empresariales",
+      "area": "Ciencias Empresariales",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Economía y Negocios Internacionales",
+      "slug": "economia_negocios_internacionales",
+      "aliases": [
+        "economia y negocios internacionales",
+        "economía y negocios internacionales",
+        "negocios internacionales",
+        "comercio exterior",
+        "economia internacional",
+        "economía internacional",
+        "internacional"
+      ],
+      "keywords": [
+        "economía",
+        "negocios internacionales",
+        "comercio exterior"
+      ],
+      "descripcion_corta": "economía, comercio exterior y negocios internacionales",
+      "campo_laboral": [
+        "economía",
+        "negocios internacionales",
+        "comercio exterior"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias Empresariales",
+      "facultad_slug": "facultad_ciencias_empresariales",
+      "area": "Ciencias Empresariales",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "International Business",
+      "slug": "international_business",
+      "aliases": [
+        "international business",
+        "business",
+        "negocios globales",
+        "negocios internacionales en ingles",
+        "carrera en ingles",
+        "carrera en inglés",
+        "comercio internacional"
+      ],
+      "keywords": [
+        "business",
+        "negocios globales",
+        "comercio internacional"
+      ],
+      "descripcion_corta": "negocios globales y comercio internacional",
+      "campo_laboral": [
+        "business",
+        "negocios globales",
+        "comercio internacional"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias Empresariales",
+      "facultad_slug": "facultad_ciencias_empresariales",
+      "area": "Ciencias Empresariales",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Marketing",
+      "slug": "marketing",
+      "aliases": [
+        "marketing",
+        "maketing",
+        "mercadotecnia",
+        "publicidad",
+        "ventas",
+        "marca",
+        "branding",
+        "redes sociales",
+        "investigacion de mercados",
+        "investigación de mercados"
+      ],
+      "keywords": [
+        "marketing",
+        "publicidad",
+        "ventas",
+        "marca",
+        "investigación de mercados"
+      ],
+      "descripcion_corta": "consumidor, estrategia comercial, marca y comunicación de productos o servicios",
+      "campo_laboral": [
+        "marketing",
+        "publicidad",
+        "ventas",
+        "marca",
+        "investigación de mercados"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias Empresariales",
+      "facultad_slug": "facultad_ciencias_empresariales",
+      "area": "Ciencias Empresariales",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ciencia de Datos",
+      "slug": "ciencia_datos",
+      "aliases": [
+        "ciencia de datos",
+        "datos",
+        "data",
+        "big data",
+        "analitica",
+        "analítica",
+        "inteligencia artificial",
+        "ia",
+        "machine learning",
+        "data science"
+      ],
+      "keywords": [
+        "datos",
+        "analítica",
+        "inteligencia artificial",
+        "programación"
+      ],
+      "descripcion_corta": "análisis de datos, estadística, programación e inteligencia artificial",
+      "campo_laboral": [
+        "datos",
+        "analítica",
+        "inteligencia artificial",
+        "programación"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería Agroindustrial",
+      "slug": "ingenieria_agroindustrial",
+      "aliases": [
+        "ingenieria agroindustrial",
+        "ingeniería agroindustrial",
+        "agroindustrial",
+        "agroindustria",
+        "industria agricola",
+        "industria agrícola",
+        "alimentos agroindustriales"
+      ],
+      "keywords": [
+        "agroindustria",
+        "alimentos",
+        "procesos productivos"
+      ],
+      "descripcion_corta": "procesos agroindustriales, alimentos y producción agrícola",
+      "campo_laboral": [
+        "agroindustria",
+        "alimentos",
+        "procesos productivos"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería Ambiental",
+      "slug": "ingenieria_ambiental",
+      "aliases": [
+        "ingenieria ambiental",
+        "ingeniería ambiental",
+        "ambiental",
+        "medio ambiente",
+        "sostenibilidad",
+        "ecologia",
+        "ecología",
+        "gestion ambiental",
+        "gestión ambiental"
+      ],
+      "keywords": [
+        "medio ambiente",
+        "sostenibilidad",
+        "gestión ambiental"
+      ],
+      "descripcion_corta": "medio ambiente, sostenibilidad y gestión ambiental",
+      "campo_laboral": [
+        "medio ambiente",
+        "sostenibilidad",
+        "gestión ambiental"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería Biomédica",
+      "slug": "ingenieria_biomedica",
+      "aliases": [
+        "ingenieria biomedica",
+        "ingeniería biomédica",
+        "biomedica",
+        "biomédica",
+        "equipos medicos",
+        "equipos médicos",
+        "tecnologia medica",
+        "tecnología médica",
+        "salud tecnologia",
+        "salud tecnología"
+      ],
+      "keywords": [
+        "salud",
+        "tecnología médica",
+        "equipos médicos"
+      ],
+      "descripcion_corta": "tecnología aplicada a salud, equipos médicos y soluciones biomédicas",
+      "campo_laboral": [
+        "salud",
+        "tecnología médica",
+        "equipos médicos"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería en Ciberseguridad",
+      "slug": "ingenieria_ciberseguridad",
+      "aliases": [
+        "ingenieria en ciberseguridad",
+        "ingeniería en ciberseguridad",
+        "ciberseguridad",
+        "cyberseguridad",
+        "seguridad informatica",
+        "seguridad informática",
+        "hackers",
+        "redes",
+        "seguridad digital"
+      ],
+      "keywords": [
+        "ciberseguridad",
+        "redes",
+        "seguridad informática",
+        "protección digital"
+      ],
+      "descripcion_corta": "protección de sistemas, redes, datos e infraestructura digital",
+      "campo_laboral": [
+        "ciberseguridad",
+        "redes",
+        "seguridad informática",
+        "protección digital"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería Civil",
+      "slug": "ingenieria_civil",
+      "aliases": [
+        "ingenieria civil",
+        "ingeniería civil",
+        "civil",
+        "construccion",
+        "construcción",
+        "obras",
+        "estructuras",
+        "edificaciones"
+      ],
+      "keywords": [
+        "construcción",
+        "obras",
+        "estructuras",
+        "edificaciones"
+      ],
+      "descripcion_corta": "obras, construcción, estructuras y proyectos de infraestructura",
+      "campo_laboral": [
+        "construcción",
+        "obras",
+        "estructuras",
+        "edificaciones"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería de Sistemas de Información",
+      "slug": "ingenieria_sistemas_informacion",
+      "aliases": [
+        "ingenieria de sistemas de informacion",
+        "ingeniería de sistemas de información",
+        "ingenieria de sistemas",
+        "ingeniería de sistemas",
+        "sistemas de informacion",
+        "sistemas de información",
+        "sistemas",
+        "sitemas",
+        "ing sistemas",
+        "tecnologia",
+        "tecnología",
+        "base de datos",
+        "programacion",
+        "programación"
+      ],
+      "keywords": [
+        "tecnología",
+        "sistemas",
+        "bases de datos",
+        "programación",
+        "soluciones digitales"
+      ],
+      "descripcion_corta": "tecnología, sistemas, bases de datos, programación y soluciones digitales",
+      "campo_laboral": [
+        "tecnología",
+        "sistemas",
+        "bases de datos",
+        "programación",
+        "soluciones digitales"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería de Software",
+      "slug": "ingenieria_software",
+      "aliases": [
+        "ingenieria de software",
+        "ingeniería de software",
+        "software",
+        "desarrollo de software",
+        "programacion",
+        "programación",
+        "apps",
+        "aplicaciones",
+        "desarrollo web",
+        "desarrollo movil",
+        "desarrollo móvil"
+      ],
+      "keywords": [
+        "software",
+        "programación",
+        "apps",
+        "desarrollo web",
+        "desarrollo móvil"
+      ],
+      "descripcion_corta": "desarrollo de software, aplicaciones y soluciones digitales",
+      "campo_laboral": [
+        "software",
+        "programación",
+        "apps",
+        "desarrollo web",
+        "desarrollo móvil"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería Empresarial",
+      "slug": "ingenieria_empresarial",
+      "aliases": [
+        "ingenieria empresarial",
+        "ingeniería empresarial",
+        "empresarial",
+        "procesos empresariales",
+        "gestion empresarial",
+        "gestión empresarial",
+        "mejora de procesos",
+        "negocios y tecnologia",
+        "negocios y tecnología"
+      ],
+      "keywords": [
+        "procesos empresariales",
+        "gestión",
+        "mejora de procesos",
+        "tecnología"
+      ],
+      "descripcion_corta": "procesos empresariales, gestión y mejora organizacional con tecnología",
+      "campo_laboral": [
+        "procesos empresariales",
+        "gestión",
+        "mejora de procesos",
+        "tecnología"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería en Industrias Alimentarias",
+      "slug": "ingenieria_industrias_alimentarias",
+      "aliases": [
+        "ingenieria en industrias alimentarias",
+        "ingeniería en industrias alimentarias",
+        "industrias alimentarias",
+        "alimentos",
+        "industria alimentaria",
+        "produccion de alimentos",
+        "producción de alimentos",
+        "calidad alimentaria"
+      ],
+      "keywords": [
+        "alimentos",
+        "producción",
+        "calidad alimentaria"
+      ],
+      "descripcion_corta": "producción, control y calidad de alimentos",
+      "campo_laboral": [
+        "alimentos",
+        "producción",
+        "calidad alimentaria"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería Industrial y Comercial",
+      "slug": "ingenieria_industrial_comercial",
+      "aliases": [
+        "ingenieria industrial y comercial",
+        "ingeniería industrial y comercial",
+        "industrial y comercial",
+        "industrial",
+        "procesos",
+        "operaciones",
+        "logistica",
+        "logística",
+        "produccion",
+        "producción",
+        "cadena de suministro"
+      ],
+      "keywords": [
+        "procesos",
+        "operaciones",
+        "logística",
+        "producción",
+        "cadena de suministro"
+      ],
+      "descripcion_corta": "procesos, operaciones, logística, producción y gestión comercial",
+      "campo_laboral": [
+        "procesos",
+        "operaciones",
+        "logística",
+        "producción",
+        "cadena de suministro"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ingeniería Mecatrónica",
+      "slug": "ingenieria_mecatronica",
+      "aliases": [
+        "ingenieria mecatronica",
+        "ingeniería mecatrónica",
+        "mecatronica",
+        "mecatrónica",
+        "robotica",
+        "robótica",
+        "automatizacion",
+        "automatización",
+        "sensores",
+        "electronica",
+        "electrónica"
+      ],
+      "keywords": [
+        "robótica",
+        "automatización",
+        "sensores",
+        "electrónica"
+      ],
+      "descripcion_corta": "robótica, automatización, sensores, electrónica y sistemas inteligentes",
+      "campo_laboral": [
+        "robótica",
+        "automatización",
+        "sensores",
+        "electrónica"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ingeniería e Inteligencia Artificial",
+      "facultad_slug": "facultad_ingenieria_inteligencia_artificial",
+      "area": "Ingeniería e Inteligencia Artificial",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Ciencias de la Actividad Física y del Deporte",
+      "slug": "actividad_fisica_deporte",
+      "aliases": [
+        "ciencias de la actividad fisica y del deporte",
+        "ciencias de la actividad física y del deporte",
+        "actividad fisica",
+        "actividad física",
+        "deporte",
+        "entrenamiento",
+        "educacion fisica",
+        "educación física",
+        "preparacion fisica",
+        "preparación física"
+      ],
+      "keywords": [
+        "actividad física",
+        "deporte",
+        "entrenamiento",
+        "educación física"
+      ],
+      "descripcion_corta": "actividad física, deporte, entrenamiento y preparación física",
+      "campo_laboral": [
+        "actividad física",
+        "deporte",
+        "entrenamiento",
+        "educación física"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias de la Salud",
+      "facultad_slug": "facultad_ciencias_salud",
+      "area": "Ciencias de la Salud",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Enfermería",
+      "slug": "enfermeria",
+      "aliases": [
+        "enfermeria",
+        "enfermería",
+        "enfermero",
+        "enfermera",
+        "salud",
+        "pacientes",
+        "cuidados de salud"
+      ],
+      "keywords": [
+        "salud",
+        "pacientes",
+        "cuidados"
+      ],
+      "descripcion_corta": "cuidado de pacientes, promoción de salud y atención sanitaria",
+      "campo_laboral": [
+        "salud",
+        "pacientes",
+        "cuidados"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias de la Salud",
+      "facultad_slug": "facultad_ciencias_salud",
+      "area": "Ciencias de la Salud",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Medicina Humana",
+      "slug": "medicina_humana",
+      "aliases": [
+        "medicina humana",
+        "medicina",
+        "medico",
+        "médico",
+        "doctor",
+        "doctora",
+        "salud",
+        "carrera de medicina"
+      ],
+      "keywords": [
+        "medicina",
+        "salud",
+        "atención médica"
+      ],
+      "descripcion_corta": "salud, atención médica y bienestar de las personas",
+      "campo_laboral": [
+        "medicina",
+        "salud",
+        "atención médica"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias de la Salud",
+      "facultad_slug": "facultad_ciencias_salud",
+      "area": "Ciencias de la Salud",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Nutrición y Dietética",
+      "slug": "nutricion_dietetica",
+      "aliases": [
+        "nutricion y dietetica",
+        "nutrición y dietética",
+        "nutricion",
+        "nutrición",
+        "dietetica",
+        "dietética",
+        "alimentacion",
+        "alimentación",
+        "dietas",
+        "nutricionista"
+      ],
+      "keywords": [
+        "nutrición",
+        "alimentación",
+        "dietética",
+        "salud"
+      ],
+      "descripcion_corta": "nutrición, alimentación, dietética y salud",
+      "campo_laboral": [
+        "nutrición",
+        "alimentación",
+        "dietética",
+        "salud"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias de la Salud",
+      "facultad_slug": "facultad_ciencias_salud",
+      "area": "Ciencias de la Salud",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Psicología",
+      "slug": "psicologia",
+      "aliases": [
+        "psicologia",
+        "psicología",
+        "psicologiia",
+        "sicologia",
+        "sicología",
+        "mente",
+        "conducta",
+        "terapia",
+        "personas",
+        "salud mental"
+      ],
+      "keywords": [
+        "conducta",
+        "mente",
+        "salud mental",
+        "personas"
+      ],
+      "descripcion_corta": "comportamiento, bienestar emocional, conducta y salud mental",
+      "campo_laboral": [
+        "conducta",
+        "mente",
+        "salud mental",
+        "personas"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias de la Salud",
+      "facultad_slug": "facultad_ciencias_salud",
+      "area": "Ciencias de la Salud",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Tecnología Médica en Terapia Física y Rehabilitación",
+      "slug": "tecnologia_medica_terapia_fisica",
+      "aliases": [
+        "tecnologia medica en terapia fisica y rehabilitacion",
+        "tecnología médica en terapia física y rehabilitación",
+        "terapia fisica",
+        "terapia física",
+        "rehabilitacion",
+        "rehabilitación",
+        "fisioterapia",
+        "terapia",
+        "tecnologo medico",
+        "tecnólogo médico"
+      ],
+      "keywords": [
+        "terapia física",
+        "rehabilitación",
+        "fisioterapia",
+        "tecnología médica"
+      ],
+      "descripcion_corta": "terapia física, rehabilitación y recuperación funcional",
+      "campo_laboral": [
+        "terapia física",
+        "rehabilitación",
+        "fisioterapia",
+        "tecnología médica"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Ciencias de la Salud",
+      "facultad_slug": "facultad_ciencias_salud",
+      "area": "Ciencias de la Salud",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Comunicaciones",
+      "slug": "comunicaciones",
+      "aliases": [
+        "comunicaciones",
+        "comunicacion",
+        "comunicación",
+        "periodismo",
+        "medios",
+        "audiovisual",
+        "radio",
+        "television",
+        "televisión",
+        "redes",
+        "contenidos"
+      ],
+      "keywords": [
+        "comunicación",
+        "medios",
+        "contenidos",
+        "audiovisual",
+        "redes"
+      ],
+      "descripcion_corta": "medios, contenidos, comunicación estratégica y producción audiovisual",
+      "campo_laboral": [
+        "comunicación",
+        "medios",
+        "contenidos",
+        "audiovisual",
+        "redes"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Comunicación",
+      "facultad_slug": "facultad_comunicacion",
+      "area": "Comunicación",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Educación Secundaria con especialidad en Inglés",
+      "slug": "educacion_secundaria_ingles",
+      "aliases": [
+        "educacion secundaria con especialidad en ingles",
+        "educación secundaria con especialidad en inglés",
+        "educacion secundaria",
+        "educación secundaria",
+        "ingles",
+        "inglés",
+        "docente de ingles",
+        "docente de inglés",
+        "profesor de ingles",
+        "profesor de inglés"
+      ],
+      "keywords": [
+        "educación secundaria",
+        "inglés",
+        "docencia",
+        "enseñanza"
+      ],
+      "descripcion_corta": "docencia en educación secundaria y enseñanza del inglés",
+      "campo_laboral": [
+        "educación secundaria",
+        "inglés",
+        "docencia",
+        "enseñanza"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Educación",
+      "facultad_slug": "facultad_educacion",
+      "area": "Educación",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Educación Inicial",
+      "slug": "educacion_inicial",
+      "aliases": [
+        "educacion inicial",
+        "educación inicial",
+        "inicial",
+        "niños",
+        "niñas",
+        "docencia inicial",
+        "profesora inicial",
+        "profesor inicial",
+        "enseñanza inicial"
+      ],
+      "keywords": [
+        "educación inicial",
+        "niñez",
+        "docencia",
+        "enseñanza"
+      ],
+      "descripcion_corta": "educación inicial, niñez y docencia en primeros años",
+      "campo_laboral": [
+        "educación inicial",
+        "niñez",
+        "docencia",
+        "enseñanza"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Educación",
+      "facultad_slug": "facultad_educacion",
+      "area": "Educación",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Derecho",
+      "slug": "derecho",
+      "aliases": [
+        "derecho",
+        "derehco",
+        "leyes",
+        "abogado",
+        "abogada",
+        "legal",
+        "juridico",
+        "jurídico",
+        "carrera de derecho"
+      ],
+      "keywords": [
+        "derecho",
+        "leyes",
+        "jurídico",
+        "legal"
+      ],
+      "descripcion_corta": "leyes, análisis jurídico y solución responsable de conflictos",
+      "campo_laboral": [
+        "derecho",
+        "leyes",
+        "jurídico",
+        "legal"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Derecho",
+      "facultad_slug": "facultad_derecho",
+      "area": "Derecho",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    },
+    {
+      "nombre": "Relaciones Internacionales",
+      "slug": "relaciones_internacionales",
+      "aliases": [
+        "relaciones internacionales",
+        "diplomacia",
+        "politica internacional",
+        "política internacional",
+        "internacional",
+        "organismos internacionales",
+        "relaciones exteriores"
+      ],
+      "keywords": [
+        "diplomacia",
+        "política internacional",
+        "organismos internacionales"
+      ],
+      "descripcion_corta": "diplomacia, política internacional y relaciones exteriores",
+      "campo_laboral": [
+        "diplomacia",
+        "política internacional",
+        "organismos internacionales"
+      ],
+      "portal_oficial": "https://www.usil.edu.pe/",
+      "facultad": "Facultad de Derecho",
+      "facultad_slug": "facultad_derecho",
+      "area": "Derecho",
+      "url": "https://www.usil.edu.pe/",
+      "temas": [
+        "descripcion",
+        "campo_laboral",
+        "malla",
+        "costos",
+        "modalidad"
+      ]
+    }
+  ]
 }

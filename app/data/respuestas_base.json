@@ -112,5 +112,32 @@
   ],
   "becas_estado_pronabec": [
     "{respuesta_verificada}"
+  ],
+  "lista_facultades": [
+    "USIL cuenta con facultades como {facultades}."
+  ],
+  "lista_carreras_general": [
+    "USIL ofrece carreras en áreas como negocios, ingeniería, salud, derecho, educación, comunicación, arquitectura, artes, hotelería, turismo y gastronomía. Si deseas, puedes preguntarme por una facultad específica, por ejemplo: carreras de Ingeniería o carreras de Ciencias Empresariales."
+  ],
+  "carreras_por_facultad": [
+    "{facultad} cuenta con carreras como {carreras}."
+  ],
+  "facultad_de_carrera": [
+    "{carrera} pertenece a {facultad}. {otras_carreras}"
+  ],
+  "carrera_detalle": [
+    "{carrera} pertenece a {facultad}. Esta carrera está relacionada con {descripcion_carrera}."
+  ],
+  "carrera_no_encontrada": [
+    "No tengo esa carrera en la fuente controlada. Puedes revisar la oferta académica oficial de USIL: {portal_url}"
+  ],
+  "campo_laboral": [
+    "Sobre el campo laboral de {carrera}: puede relacionarse con {campo_laboral}."
+  ],
+  "cierres_carreras": [
+    "Puedes revisar más información en el portal oficial de USIL: https://www.usil.edu.pe/",
+    "Para conocer más detalles, visita el portal oficial de USIL: https://www.usil.edu.pe/",
+    "Encuentra información actualizada sobre carreras en el portal oficial de USIL: https://www.usil.edu.pe/",
+    "Puedes ampliar la información en la página oficial de USIL: https://www.usil.edu.pe/"
   ]
 }
