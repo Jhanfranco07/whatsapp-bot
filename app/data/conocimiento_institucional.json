@@ -1,8 +1,9 @@
 {
   "instrucciones": [
-    "Agrega únicamente información confirmada por USIL.",
-    "Cada entrada debe tener respuesta, palabras_clave y fuente_url.",
-    "Actualiza verificado_el cuando una persona responsable revise el contenido."
+    "Usa únicamente información confirmada por USIL.",
+    "Cada entrada puede usar formato legado o enriquecido con intent, keywords y respuesta_corta.",
+    "No inventar fechas, costos, vacantes ni requisitos fuera de esta fuente controlada.",
+    "Actualiza fecha_verificacion cuando una persona responsable revise el contenido."
   ],
   "entradas": [
     {
@@ -29,6 +30,576 @@
       "respuesta": "Puedes comunicarte directamente con los canales oficiales de USIL: Admisión (01) 317-1050, WhatsApp de Admisión +51 998 179 223 o Atención al Alumno (01) 317-1010.",
       "fuente_url": "https://www.usil.edu.pe/",
       "verificado_el": "2026-06-15"
+    },
+    {
+      "id": "proposito_institucional",
+      "intent": "consulta_proposito",
+      "titulo": "Propósito institucional",
+      "keywords": [
+        "proposito usil",
+        "propósito usil",
+        "cual es el proposito de usil",
+        "cuál es el propósito de usil",
+        "para que forma usil",
+        "huella en el mundo",
+        "personas con valores"
+      ],
+      "contenido": "Nuestro propósito es formar personas con valores para que dejen su huella en el mundo.",
+      "respuesta_corta": "El propósito de USIL es formar personas con valores para que dejen su huella en el mundo. Esta idea guía su propuesta educativa y su enfoque en formar profesionales con impacto positivo.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "mision_usil",
+      "intent": "consulta_mision",
+      "titulo": "Misión",
+      "keywords": [
+        "mision usil",
+        "misión usil",
+        "cual es la mision",
+        "cuál es la misión",
+        "que busca usil",
+        "espíritu emprendedor",
+        "vision global y humanista",
+        "bien común"
+      ],
+      "contenido": "Formar profesionales con espíritu emprendedor, siguiendo el Modelo Formativo Onlife, híbrido y a distancia, para que sean capaces de gestionar, accionar y desarrollar sus ideas con una visión global y humanista, y contribuyan con el desarrollo de la sociedad y el bien común.",
+      "respuesta_corta": "La misión de USIL es formar profesionales con espíritu emprendedor bajo el Modelo Formativo Onlife, con visión global y humanista, capaces de desarrollar ideas y contribuir al desarrollo de la sociedad y el bien común.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "vision_usil",
+      "intent": "consulta_vision",
+      "titulo": "Visión",
+      "keywords": [
+        "vision usil",
+        "visión usil",
+        "cual es la vision",
+        "cuál es la visión",
+        "agentes de cambio",
+        "excelencia academica",
+        "excelencia académica",
+        "valor digital",
+        "investigacion cientifica",
+        "investigación científica",
+        "desarrollo sostenible"
+      ],
+      "contenido": "Somos líderes en la formación de agentes de cambio, reconocida internacionalmente por la excelencia académica y propuesta de valor digital, con una base sólida en la investigación científica y referentes en el desarrollo sostenible.",
+      "respuesta_corta": "La visión de USIL es ser líder en la formación de agentes de cambio, reconocida internacionalmente por su excelencia académica, propuesta de valor digital, investigación científica y enfoque en desarrollo sostenible.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "valores_usil",
+      "intent": "consulta_valores",
+      "titulo": "Valores",
+      "keywords": [
+        "valores usil",
+        "cuales son los valores de usil",
+        "cuáles son los valores de usil",
+        "lealtad",
+        "pasion",
+        "pasión",
+        "compromiso",
+        "eficacia",
+        "servicio",
+        "respeto"
+      ],
+      "contenido": "Valores USIL: Lealtad, Pasión, Compromiso, Eficacia, Servicio y Respeto.",
+      "respuesta_corta": "Los valores de USIL son lealtad, pasión, compromiso, eficacia, servicio y respeto. Estos valores orientan su formación académica y humana.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "ideario_usil",
+      "intent": "consulta_ideario",
+      "titulo": "Ideario",
+      "keywords": [
+        "ideario usil",
+        "principios usil",
+        "funciones usil",
+        "enseñanza universitaria",
+        "investigacion cientifica",
+        "investigación científica",
+        "valores humanistas",
+        "alumni",
+        "graduados usil"
+      ],
+      "contenido": "El ideario USIL reúne funciones como impartir enseñanza universitaria, conferir grados académicos, facilitar recursos para la formación, promover investigación científica, generar impacto positivo, formar personas con solidez académica y valores humanistas, y mantener vínculo con graduados.",
+      "respuesta_corta": "El ideario de USIL reúne principios orientados a impartir enseñanza universitaria, promover investigación científica, formar personas con solidez académica y valores humanistas, y mantener vínculo con sus graduados.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "modelo_educativo_usil",
+      "intent": "consulta_modelo_educativo",
+      "titulo": "Modelo Educativo USIL",
+      "keywords": [
+        "modelo educativo usil",
+        "modelo de enseñanza",
+        "como enseñan en usil",
+        "cómo enseñan en usil",
+        "aprendizaje basado en competencias",
+        "proyecto etico de vida",
+        "proyecto ético de vida",
+        "pregrado",
+        "postgrado"
+      ],
+      "contenido": "El modelo educativo USIL está centrado en el proyecto ético de vida de los estudiantes y en el aprendizaje basado en competencias en pregrado y postgrado. Está compuesto por Modelo Formativo Onlife, Modo USIL y pilares institucionales.",
+      "respuesta_corta": "El modelo educativo USIL está centrado en el proyecto ético de vida del estudiante y en el aprendizaje basado en competencias. Se compone del Modelo Formativo Onlife, el Modo USIL y sus pilares institucionales.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "modelo_formativo_onlife",
+      "intent": "consulta_onlife",
+      "titulo": "Modelo Formativo Onlife",
+      "keywords": [
+        "onlife",
+        "modelo onlife",
+        "modelo formativo onlife",
+        "aulas hyflex",
+        "hyflex",
+        "evaluacion por competencias",
+        "evaluación por competencias",
+        "tic",
+        "tutoria universitaria",
+        "tutoría universitaria",
+        "cultura digital"
+      ],
+      "contenido": "La formación del estudiante se desarrolla en un ecosistema de aprendizaje con cultura digital, hiperconectividad, inteligencia artificial, realidad aumentada, desarrollo tecnológico e información disponible en diferentes medios para convertirla en conocimiento. Comprende evaluación por competencias, integración de TIC, aulas HyFlex y Tutoría Universitaria.",
+      "respuesta_corta": "El Modelo Formativo Onlife de USIL integra cultura digital, tecnología, hiperconectividad y aprendizaje basado en competencias. Incluye evaluación por competencias, integración de TIC, aulas HyFlex y tutoría universitaria.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "modo_usil",
+      "intent": "consulta_modo_usil",
+      "titulo": "Modo USIL",
+      "keywords": [
+        "modo usil",
+        "servicios universitarios",
+        "programas de estudios",
+        "alimentacion saludable",
+        "alimentación saludable",
+        "actividad fisica",
+        "actividad física",
+        "capellania",
+        "capellanía",
+        "arte y cultura",
+        "alerta usil",
+        "psicologia",
+        "psicología",
+        "bienestar estudiantil"
+      ],
+      "contenido": "El Modo USIL comprende programas de estudios y servicios universitarios como alimentación saludable, actividad física para la salud, capellanía, arte y cultura, Alerta USIL, psicología y bienestar estudiantil.",
+      "respuesta_corta": "El Modo USIL comprende los programas de estudios y servicios universitarios que acompañan la vida académica, como bienestar estudiantil, psicología, arte y cultura, actividad física, capellanía y otros servicios.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "competencias_sello_usil",
+      "intent": "consulta_competencias_sello",
+      "titulo": "Competencias sello USIL",
+      "keywords": [
+        "competencias sello",
+        "competencias usil",
+        "comunicacion bilingue",
+        "comunicación bilingüe",
+        "desarrollo humano sostenible",
+        "comunicacion integral",
+        "comunicación integral",
+        "competencia digital",
+        "investigacion",
+        "investigación",
+        "emprendimiento"
+      ],
+      "contenido": "Las competencias sello USIL son comunicación bilingüe, desarrollo humano y sostenible, comunicación integral, digital, investigación y emprendimiento.",
+      "respuesta_corta": "Las competencias sello USIL son comunicación bilingüe, desarrollo humano y sostenible, comunicación integral, competencia digital, investigación y emprendimiento.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "aprendizaje_competencias_usil",
+      "intent": "consulta_aprendizaje_competencias",
+      "titulo": "Aprendizaje basado en competencias",
+      "keywords": [
+        "aprendizaje basado en competencias",
+        "que son competencias",
+        "qué son competencias",
+        "competencias profesionales",
+        "retos profesionales",
+        "mundo globalizado",
+        "movilizar saberes"
+      ],
+      "contenido": "Las competencias son actuaciones integrales que permiten movilizar saberes hacia la solución de retos y problemas del contexto profesional y del mundo globalizado.",
+      "respuesta_corta": "El aprendizaje basado en competencias busca que el estudiante movilice conocimientos, habilidades y actitudes para resolver retos del contexto profesional y del mundo globalizado.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "perfil_egreso_sello_usil",
+      "intent": "consulta_perfil_egreso",
+      "titulo": "Perfil de egreso sello USIL",
+      "keywords": [
+        "perfil de egreso",
+        "egresado usil",
+        "que logra un egresado",
+        "qué logra un egresado",
+        "pensamiento computacional",
+        "tecnologias digitales",
+        "tecnologías digitales",
+        "cultura emprendedora",
+        "ciudadania responsable",
+        "ciudadanía responsable",
+        "impacto sostenible"
+      ],
+      "contenido": "Al egresar de USIL, el estudiante será capaz de investigar e innovar, aplicar pensamiento computacional y tecnologías digitales, asumir cultura emprendedora y ejercer ciudadanía responsable, empática y ética.",
+      "respuesta_corta": "El perfil de egreso USIL busca que el estudiante investigue, innove, aplique tecnologías digitales, asuma una cultura emprendedora y ejerza una ciudadanía responsable, ética y orientada al bienestar social y ambiental.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "pilares_institucionales_usil",
+      "intent": "consulta_pilares",
+      "titulo": "Pilares institucionales",
+      "keywords": [
+        "pilares usil",
+        "pilares institucionales",
+        "emprendimiento",
+        "sostenibilidad",
+        "investigacion",
+        "investigación",
+        "internacional",
+        "internacionalidad"
+      ],
+      "contenido": "Los pilares institucionales USIL son emprendimiento, sostenibilidad, investigación e internacionalidad.",
+      "respuesta_corta": "Los pilares institucionales de USIL son emprendimiento, sostenibilidad, investigación e internacionalidad. Estos orientan su propuesta educativa y la formación de profesionales con visión global.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "sostenibilidad_rsu_usil",
+      "intent": "consulta_sostenibilidad",
+      "titulo": "Responsabilidad Social Universitaria y Sostenibilidad",
+      "keywords": [
+        "responsabilidad social",
+        "rsu",
+        "sostenibilidad",
+        "gestion ambiental",
+        "gestión ambiental",
+        "impacto social",
+        "responsabilidad social universitaria",
+        "proyectos sociales",
+        "publicaciones",
+        "desarrollo sostenible"
+      ],
+      "contenido": "USIL desarrolla un Modelo de Gestión Integral de Responsabilidad Social Universitaria y Sostenibilidad basado en gestión académica y de investigación, impacto social, gestión ambiental y responsabilidad social corporativa.",
+      "respuesta_corta": "USIL trabaja la responsabilidad social universitaria y sostenibilidad mediante gestión académica e investigación, impacto social, gestión ambiental y responsabilidad social corporativa.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "campus_usil",
+      "intent": "consulta_campus",
+      "titulo": "Campus",
+      "keywords": [
+        "campus usil",
+        "sedes usil",
+        "donde queda usil",
+        "dónde queda usil",
+        "la molina",
+        "lima norte",
+        "magdalena",
+        "pachacamac",
+        "pachacámac"
+      ],
+      "contenido": "USIL cuenta con cuatro campus: Campus La Molina, Campus Lima Norte, Campus Magdalena y Campus Pachacámac.",
+      "respuesta_corta": "USIL cuenta con campus en La Molina, Lima Norte, Magdalena y Pachacámac. Estos espacios están orientados a brindar ambientes académicos para la formación profesional.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "laboratorios_instalaciones_usil",
+      "intent": "consulta_laboratorios",
+      "titulo": "Laboratorios e instalaciones",
+      "keywords": [
+        "laboratorios usil",
+        "instalaciones usil",
+        "ambientes usil",
+        "infraestructura",
+        "laboratorios especializados",
+        "exigencias del mercado",
+        "formacion profesional",
+        "formación profesional"
+      ],
+      "contenido": "USIL cuenta con laboratorios especializados para los requerimientos de sus carreras universitarias y las exigencias del mercado. También cuenta con instalaciones orientadas a potenciar las capacidades de los estudiantes.",
+      "respuesta_corta": "USIL cuenta con laboratorios especializados e instalaciones orientadas a fortalecer la formación profesional de sus estudiantes, según los requerimientos de sus carreras y las exigencias del mercado.",
+      "fuente_oficial": "https://www.usil.edu.pe/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "modalidades_admision_usil",
+      "intent": "consulta_modalidades_admision",
+      "titulo": "Modalidades de admisión",
+      "modalidad_key": "general",
+      "keywords": [
+        "modalidades de admision",
+        "modalidades de admisión",
+        "formas de ingreso usil",
+        "como puedo ingresar a usil",
+        "cómo puedo ingresar a usil",
+        "modalidades para postular"
+      ],
+      "contenido": "USIL admisión cuenta con diversas modalidades: Regular, Admisión Destacada, Traslado Externo de Institutos o Universidades, Deportistas Destacado y de Alta Competencia, Bachillerato Internacional y Becas del Estado/PRONABEC.",
+      "beneficios": [],
+      "documentos": [],
+      "procedimiento": [
+        "Revisar el portal oficial de admisión para información actualizada."
+      ],
+      "convalidacion": "Depende de la modalidad y evaluación oficial.",
+      "respuesta_corta": "USIL cuenta con diversas modalidades de admisión: Regular, Admisión Destacada, Traslado Externo de Institutos o Universidades, Deportistas Destacado y de Alta Competencia, Bachillerato Internacional y Becas del Estado/PRONABEC. Cada modalidad está dirigida a un perfil distinto de postulante.",
+      "fuente_oficial": "https://descubre.usil.edu.pe/landings/pregrado/admision/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "admision_regular_usil",
+      "intent": "consulta_regular",
+      "titulo": "Modalidad Regular",
+      "modalidad_key": "regular",
+      "keywords": [
+        "modalidad regular",
+        "regular usil",
+        "quinto de secundaria",
+        "5 de secundaria",
+        "terminé el colegio",
+        "termine el colegio",
+        "egresado del colegio"
+      ],
+      "contenido": "Modalidad dirigida a postulantes que terminaron el colegio o están cursando 5.° de secundaria.",
+      "beneficios": [
+        "10% de descuento en las cuotas del primer ciclo, sujeto a términos y condiciones."
+      ],
+      "documentos": [
+        "Ficha de datos personales llenada online.",
+        "Certificado oficial de notas de secundaria o constancia de logro de aprendizaje.",
+        "Compromiso de documentos pendientes si corresponde.",
+        "Copia simple del DNI.",
+        "Foto JPG con fondo blanco."
+      ],
+      "procedimiento": [
+        "Enviar documentos a documentosadmision@usil.edu.pe indicando carrera de interés.",
+        "Esperar conformidad y carta de bienvenida al proceso de admisión.",
+        "Revisar fecha de evaluación de conocimientos indicada oficialmente."
+      ],
+      "convalidacion": "No aplica como beneficio principal de esta modalidad.",
+      "respuesta_corta": "La modalidad Regular está dirigida a quienes terminaron el colegio o están cursando 5.° de secundaria. Puede incluir 10% de descuento en las cuotas del primer ciclo, sujeto a términos y condiciones.",
+      "fuente_oficial": "https://descubre.usil.edu.pe/landings/pregrado/admision/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "admision_destacada_usil",
+      "intent": "consulta_admision_destacada",
+      "titulo": "Admisión Destacada",
+      "modalidad_key": "admision_destacada",
+      "keywords": [
+        "admision destacada",
+        "admisión destacada",
+        "tercio superior",
+        "quinto superior",
+        "primer puesto",
+        "buen promedio",
+        "rendimiento academico",
+        "rendimiento académico"
+      ],
+      "contenido": "Modalidad que reconoce el buen desempeño académico del postulante, como primeros puestos, tercio superior, quinto superior o criterios equivalentes.",
+      "beneficios": [
+        "30% de descuento en la pensión desde el primer ciclo, sujeto a términos, condiciones y renovación."
+      ],
+      "documentos": [
+        "Ficha de datos personales llenada online.",
+        "Constancia de tercio superior, quinto superior o rendimiento académico.",
+        "Constancia de primer o segundo puesto si corresponde.",
+        "Certificado oficial de notas de secundaria.",
+        "Copia simple del DNI.",
+        "Foto JPG con fondo blanco."
+      ],
+      "procedimiento": [
+        "Completar la ficha de datos en www.usil.edu.pe/fichadedatos.",
+        "Enviar o regularizar documentos solicitados.",
+        "Pagar inscripción según indicaciones oficiales.",
+        "Esperar confirmación del proceso de admisión."
+      ],
+      "convalidacion": "No aplica como beneficio principal de esta modalidad.",
+      "respuesta_corta": "La Admisión Destacada reconoce el buen desempeño académico del postulante, como primeros puestos, tercio superior o quinto superior. Puede incluir 30% de descuento en la pensión desde el primer ciclo, sujeto a términos y condiciones.",
+      "fuente_oficial": "https://descubre.usil.edu.pe/landings/pregrado/admision/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "traslado_externo_usil",
+      "intent": "consulta_traslado_externo",
+      "titulo": "Traslado Externo",
+      "modalidad_key": "traslado_externo",
+      "keywords": [
+        "traslado externo",
+        "otra universidad",
+        "vengo de otra universidad",
+        "instituto",
+        "vengo de instituto",
+        "convalidar cursos",
+        "convalidacion traslado",
+        "convalidación traslado"
+      ],
+      "contenido": "Modalidad dirigida a estudiantes que vienen de otra institución, instituto o universidad, y desean continuar sus estudios en USIL.",
+      "beneficios": [
+        "Convalidación de hasta el 50% de cursos de forma automática, según evaluación y condiciones oficiales.",
+        "20% de descuento en la pensión desde el primer ciclo, sujeto a términos y condiciones."
+      ],
+      "documentos": [
+        "Ficha de datos personales llenada online.",
+        "Copia simple del DNI.",
+        "Certificado oficial de notas.",
+        "Sílabos sellados y visados cuando corresponda.",
+        "Constancia de primera matrícula cuando corresponda.",
+        "Solicitud de convalidación en formato USIL."
+      ],
+      "procedimiento": [
+        "Enviar documentos a documentosadmision@usil.edu.pe indicando carrera de interés.",
+        "Esperar conformidad y carta de bienvenida al proceso de admisión.",
+        "Revisar si corresponde entrevista o evaluación personal."
+      ],
+      "convalidacion": "La convalidación depende de evaluación académica. Puede requerir sílabos, certificados oficiales y solicitud de convalidación; no se debe prometer porcentaje final ni cursos específicos.",
+      "respuesta_corta": "La modalidad de Traslado Externo está dirigida a estudiantes que vienen de institutos o universidades y desean continuar sus estudios en USIL. Puede incluir convalidación de hasta el 50% de cursos y 20% de descuento en la pensión desde el primer ciclo, sujeto a evaluación, términos y condiciones.",
+      "fuente_oficial": "https://descubre.usil.edu.pe/landings/pregrado/admision/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "deportista_destacado_usil",
+      "intent": "consulta_deportista_destacado",
+      "titulo": "Deportistas Destacado y de Alta Competencia",
+      "modalidad_key": "deportista_destacado_alta_competencia",
+      "keywords": [
+        "deportista destacado",
+        "deportista de alta competencia",
+        "alta competencia",
+        "ipd",
+        "prodac",
+        "seleccion deportiva",
+        "selección deportiva"
+      ],
+      "contenido": "Modalidad que reconoce el desempeño deportivo de postulantes destacados o de alta competencia acreditados por entidades correspondientes.",
+      "beneficios": [
+        "30% de descuento en la pensión desde el primer ciclo, sujeto a términos, condiciones y renovación."
+      ],
+      "documentos": [
+        "Ficha de datos personales llenada online.",
+        "Certificado oficial de notas de secundaria.",
+        "Copia simple del DNI.",
+        "Foto JPG con fondo blanco.",
+        "Constancia vigente que acredite condición deportiva."
+      ],
+      "procedimiento": [
+        "Presentar documentos de inscripción.",
+        "Acreditar condición deportiva mediante constancia vigente.",
+        "Revisar proceso oficial en el portal de admisión."
+      ],
+      "convalidacion": "No aplica como beneficio principal de esta modalidad.",
+      "respuesta_corta": "USIL cuenta con una modalidad para Deportistas Destacado y de Alta Competencia. Está dirigida a postulantes con desempeño deportivo acreditado por entidades como IPD, PRODAC o selecciones deportivas. Puede incluir 30% de descuento en la pensión desde el primer ciclo, sujeto a términos y condiciones.",
+      "fuente_oficial": "https://descubre.usil.edu.pe/landings/pregrado/admision/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "bachillerato_internacional_usil",
+      "intent": "consulta_bachillerato_internacional",
+      "titulo": "Bachillerato Internacional",
+      "modalidad_key": "bachillerato_internacional",
+      "keywords": [
+        "bachillerato internacional",
+        "diploma ib",
+        "ib",
+        "abitur",
+        "bachillerato alemán",
+        "bachillerato aleman",
+        "bachillerato francés",
+        "bachillerato frances",
+        "bachillerato italiano",
+        "bachillerato britanico",
+        "bachillerato británico"
+      ],
+      "contenido": "Modalidad dirigida a postulantes que completaron con éxito el Bachillerato Internacional o programas equivalentes reconocidos.",
+      "beneficios": [
+        "30% de descuento en la pensión desde el primer ciclo.",
+        "Posible exoneración del examen de admisión según condición oficial.",
+        "Convalidación de hasta 54 créditos, según evaluación. La convalidación no aplica para Medicina Humana."
+      ],
+      "documentos": [
+        "Ficha de datos personales llenada online.",
+        "Certificado oficial de notas de secundaria.",
+        "Certificado de estudios del bachillerato con calificaciones.",
+        "Diploma de bachillerato.",
+        "Traducción al español si corresponde.",
+        "Copia simple del DNI."
+      ],
+      "procedimiento": [
+        "Enviar documentos a documentosadmision@usil.edu.pe indicando carrera de interés.",
+        "Esperar conformidad y carta de bienvenida.",
+        "Evaluación y convalidación según tabla de equivalencias y plan de estudios."
+      ],
+      "convalidacion": "Puede llegar hasta 54 créditos según evaluación. No aplica para Medicina Humana y no debe prometerse una cantidad exacta sin validar el caso.",
+      "respuesta_corta": "Si cuentas con Bachillerato Internacional o programas equivalentes, USIL tiene una modalidad que puede incluir 30% de descuento en la pensión desde el primer ciclo y convalidación de hasta 54 créditos, según evaluación. La convalidación no aplica para Medicina Humana.",
+      "fuente_oficial": "https://descubre.usil.edu.pe/landings/pregrado/admision/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
+    },
+    {
+      "id": "becas_estado_pronabec_usil",
+      "intent": "consulta_becas_estado_pronabec",
+      "titulo": "Becas del Estado / PRONABEC",
+      "modalidad_key": "becas_estado_pronabec",
+      "keywords": [
+        "becas del estado",
+        "pronabec",
+        "beca 18",
+        "concurso pronabec",
+        "beca del estado en usil"
+      ],
+      "contenido": "Modalidad relacionada con la participación de USIL dentro del concurso de Becas del Estado, como PRONABEC.",
+      "beneficios": [
+        "Sujeto a condiciones del concurso PRONABEC. No implica beca automática ni confirma cobertura, vacantes o fechas."
+      ],
+      "documentos": [
+        "Dependen de las condiciones del concurso PRONABEC y del proceso oficial."
+      ],
+      "procedimiento": [
+        "Revisar bases y condiciones oficiales del concurso PRONABEC.",
+        "Consultar información actualizada en portal de admisión y canales oficiales."
+      ],
+      "convalidacion": "No aplica como beneficio principal de esta modalidad.",
+      "respuesta_corta": "USIL participa dentro del concurso de Becas del Estado/PRONABEC. Esta modalidad está sujeta a las condiciones oficiales del concurso, por lo que no debe asumirse como una beca automática.",
+      "fuente_oficial": "https://descubre.usil.edu.pe/landings/pregrado/admision/",
+      "fecha_verificacion": "2026-06-17",
+      "activo": true
     }
   ]
 }

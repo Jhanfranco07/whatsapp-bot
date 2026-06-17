@@ -78,5 +78,39 @@
   ],
   "no_entendido": [
     "Disculpa, no logré entender bien tu consulta. Puedes escribirme con tus propias palabras si deseas información sobre carreras, admisión, becas, el portal oficial o canales oficiales de contacto. 😊"
+  ],
+  "cierres_institucionales": [
+    "Puedes ampliar la información en el portal oficial de USIL: https://www.usil.edu.pe/",
+    "Para revisar información actualizada, visita el portal oficial de USIL: https://www.usil.edu.pe/",
+    "Encuentra más detalles sobre USIL aquí: https://www.usil.edu.pe/",
+    "Puedes conocer más sobre la propuesta educativa de USIL en: https://www.usil.edu.pe/"
+  ],
+  "cierres_admision": [
+    "Puedes revisar la información oficial y actualizada aquí: https://descubre.usil.edu.pe/landings/pregrado/admision/",
+    "Para conocer requisitos completos, visita el portal oficial de admisión: https://descubre.usil.edu.pe/landings/pregrado/admision/",
+    "Encuentra más información sobre admisión de pregrado aquí: https://descubre.usil.edu.pe/landings/pregrado/admision/",
+    "Te recomiendo revisar el detalle actualizado en el portal oficial de USIL: https://descubre.usil.edu.pe/landings/pregrado/admision/",
+    "Puedes consultar más información en el portal de admisión USIL: https://descubre.usil.edu.pe/landings/pregrado/admision/"
+  ],
+  "modalidades_admision_general": [
+    "{respuesta_verificada}"
+  ],
+  "modalidad_detalle": [
+    "{respuesta_verificada}"
+  ],
+  "modalidad_documentos": [
+    "Documentos principales para {modalidad_titulo}:\n{documentos_modalidad}"
+  ],
+  "modalidad_procedimiento": [
+    "Procedimiento para {modalidad_titulo}:\n{procedimiento_modalidad}"
+  ],
+  "modalidad_beneficios": [
+    "Beneficios de {modalidad_titulo}:\n{beneficios_modalidad}"
+  ],
+  "convalidacion": [
+    "Sobre convalidación: {convalidacion_modalidad}"
+  ],
+  "becas_estado_pronabec": [
+    "{respuesta_verificada}"
   ]
 }

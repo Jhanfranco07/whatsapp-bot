@@ -25,6 +25,34 @@ class ChatbotResult:
 class ChatbotService:
     """Genera respuestas controladas exclusivamente desde datos y plantillas."""
 
+    CONTROLLED_KNOWLEDGE_INTENTS = {
+        "consulta_proposito",
+        "consulta_mision",
+        "consulta_vision",
+        "consulta_valores",
+        "consulta_ideario",
+        "consulta_modelo_educativo",
+        "consulta_onlife",
+        "consulta_modo_usil",
+        "consulta_competencias_sello",
+        "consulta_aprendizaje_competencias",
+        "consulta_perfil_egreso",
+        "consulta_pilares",
+        "consulta_sostenibilidad",
+        "consulta_laboratorios",
+        "consulta_modalidades_admision",
+        "consulta_regular",
+        "consulta_admision_destacada",
+        "consulta_traslado_externo",
+        "consulta_deportista_destacado",
+        "consulta_bachillerato_internacional",
+        "consulta_becas_estado_pronabec",
+        "consulta_documentos_modalidad",
+        "consulta_procedimiento_modalidad",
+        "consulta_beneficios_modalidad",
+        "consulta_convalidacion",
+    }
+
     def __init__(self) -> None:
         self.settings = get_settings()
         self.replies: dict[str, list[str] | str] = json.loads(
@@ -48,12 +76,13 @@ class ChatbotService:
         contact: Any = None,
     ) -> tuple[str | None, bool]:
         """Mantiene la interfaz asíncrona y devuelve una respuesta local."""
-        verified = self.knowledge.find(user_message)
         result = self.respond(intent, entities, contact, conversation_context)
         if not result.should_reply or not entities.get("should_reply", True):
             return None, False
+        verified = self.knowledge.find(user_message, intent=intent, entities=entities)
         if verified:
-            return self._sanitize(self.knowledge.render(verified), user_message), True
+            reply = self._render_verified_response(intent, verified, user_message)
+            return self._sanitize(reply, user_message), True
         return self._sanitize(result.bot_reply, user_message), True
 
     def respond(
@@ -184,7 +213,65 @@ class ChatbotService:
             return ContactState.PIDIO_PORTAL
         if intent == "consulta_contacto":
             return ContactState.PIDIO_CONTACTO
+        if intent in ChatbotService.CONTROLLED_KNOWLEDGE_INTENTS:
+            admission_intents = {
+                "consulta_modalidades_admision",
+                "consulta_regular",
+                "consulta_admision_destacada",
+                "consulta_traslado_externo",
+                "consulta_deportista_destacado",
+                "consulta_bachillerato_internacional",
+                "consulta_becas_estado_pronabec",
+                "consulta_documentos_modalidad",
+                "consulta_procedimiento_modalidad",
+                "consulta_beneficios_modalidad",
+                "consulta_convalidacion",
+            }
+            return (
+                ContactState.INTERESADO_ADMISION
+                if intent in admission_intents
+                else ContactState.RESPONDIO
+            )
         return ContactState.RESPONDIO
+
+    def _render_verified_response(
+        self, intent: str, entry: dict[str, Any], user_message: str
+    ) -> str:
+        title = str(entry.get("titulo") or "esta modalidad").strip()
+        if intent == "consulta_documentos_modalidad":
+            body = self._bullet_list(entry.get("documentos")) or str(entry.get("respuesta_corta", ""))
+            reply = f"Documentos principales para {title}:\n{body}"
+        elif intent == "consulta_procedimiento_modalidad":
+            body = self._bullet_list(entry.get("procedimiento")) or str(entry.get("respuesta_corta", ""))
+            reply = f"Procedimiento para {title}:\n{body}"
+        elif intent == "consulta_beneficios_modalidad":
+            body = self._bullet_list(entry.get("beneficios")) or str(entry.get("respuesta_corta", ""))
+            reply = f"Beneficios de {title}:\n{body}"
+        elif intent == "consulta_convalidacion":
+            reply = f"Sobre convalidación: {entry.get('convalidacion') or entry.get('respuesta_corta', '')}"
+            if "según evaluación" not in reply.lower():
+                reply = f"{reply} La convalidación se confirma según evaluación."
+        else:
+            reply = str(entry.get("respuesta_corta") or entry.get("respuesta") or "").strip()
+        closure = self._controlled_closure(entry)
+        if closure and closure not in reply:
+            reply = f"{reply}\n\n{closure}"
+        return reply
+
+    def _controlled_closure(self, entry: dict[str, Any]) -> str:
+        key = (
+            "cierres_admision"
+            if entry.get("modalidad_key") or str(entry.get("intent", "")).startswith("consulta_") and "admision" in str(entry.get("intent", ""))
+            else "cierres_institucionales"
+        )
+        variants = self.replies.get(key) or []
+        return random.choice(variants) if variants else ""
+
+    @staticmethod
+    def _bullet_list(items: Any) -> str:
+        if isinstance(items, list):
+            return "\n".join(f"- {str(item).strip()}" for item in items if str(item).strip())
+        return str(items or "").strip()
 
     def _find_career(self, name: str | None) -> dict[str, Any] | None:
         if not name:

@@ -18,23 +18,30 @@ class KnowledgeBase:
         self.path = path or DATA_PATH
         data = json.loads(self.path.read_text(encoding="utf-8-sig"))
         self.entries: list[dict[str, Any]] = data.get("entradas", [])
-        self._documents = [self._entry_document(entry) for entry in self.entries]
+        self._documents = [self._entry_document(entry) for entry in self._active_entries()]
+        self._semantic_entries = self._active_entries()
         self._vectorizer = None
         self._vectors = None
         if self._documents:
             self._vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(2, 4))
             self._vectors = self._vectorizer.fit_transform(self._documents)
 
-    def find(self, message: str) -> dict[str, Any] | None:
+    def find(
+        self,
+        message: str,
+        intent: str | None = None,
+        entities: dict[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
+        if intent:
+            entry = self.find_by_intent(intent, entities)
+            if entry:
+                return entry
         normalized = SemanticEngine.normalize(message)
         message_tokens = set(normalized.split())
         best_entry = None
         best_score = 0.0
-        for entry in self.entries:
-            keywords = {
-                SemanticEngine.normalize(keyword)
-                for keyword in entry.get("palabras_clave", [])
-            }
+        for entry in self._active_entries():
+            keywords = {SemanticEngine.normalize(keyword) for keyword in self._keywords(entry)}
             score = sum(
                 1.0 if keyword in normalized else 0.0
                 for keyword in keywords
@@ -52,10 +59,40 @@ class KnowledgeBase:
             best_score = semantic_score
         return best_entry if best_score >= 0.32 else None
 
-    @staticmethod
-    def render(entry: dict[str, Any]) -> str:
-        response = str(entry["respuesta"]).strip()
-        source = str(entry.get("fuente_url") or "").strip()
+    def find_by_intent(
+        self, intent: str, entities: dict[str, Any] | None = None
+    ) -> dict[str, Any] | None:
+        entities = entities or {}
+        modalidad = entities.get("modalidad")
+        for entry in self._active_entries():
+            if entry.get("intent") != intent:
+                continue
+            if modalidad and entry.get("modalidad_key") not in {None, modalidad, "general"}:
+                continue
+            return entry
+        if intent in {
+            "consulta_documentos_modalidad",
+            "consulta_procedimiento_modalidad",
+            "consulta_beneficios_modalidad",
+            "consulta_convalidacion",
+        }:
+            return self.find_by_modalidad(modalidad)
+        return None
+
+    def find_by_modalidad(self, modalidad: str | None) -> dict[str, Any] | None:
+        if not modalidad:
+            return None
+        for entry in self._active_entries():
+            if entry.get("modalidad_key") == modalidad:
+                return entry
+        return None
+
+    @classmethod
+    def render(cls, entry: dict[str, Any]) -> str:
+        response = str(
+            entry.get("respuesta_corta") or entry.get("respuesta") or ""
+        ).strip()
+        source = str(entry.get("fuente_oficial") or entry.get("fuente_url") or "").strip()
         return f"{response}\n\nFuente oficial: {source}" if source else response
 
     @classmethod
@@ -89,13 +126,23 @@ class KnowledgeBase:
         similarities = cosine_similarity(query, self._vectors)[0]
         index = int(similarities.argmax())
         score = float(similarities[index])
-        return self.entries[index], score
+        return self._semantic_entries[index], score
 
     @staticmethod
     def _entry_document(entry: dict[str, Any]) -> str:
         parts = [
             entry.get("tema", ""),
-            " ".join(entry.get("palabras_clave", [])),
+            entry.get("intent", ""),
+            " ".join(KnowledgeBase._keywords(entry)),
             entry.get("respuesta", ""),
+            entry.get("respuesta_corta", ""),
+            entry.get("contenido", ""),
         ]
         return SemanticEngine.normalize(" ".join(parts))
+
+    def _active_entries(self) -> list[dict[str, Any]]:
+        return [entry for entry in self.entries if entry.get("activo", True)]
+
+    @staticmethod
+    def _keywords(entry: dict[str, Any]) -> list[str]:
+        return list(entry.get("palabras_clave") or entry.get("keywords") or [])

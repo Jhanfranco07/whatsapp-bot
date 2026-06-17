@@ -108,6 +108,12 @@ class ConversationService:
             }
         intent, entities = self.classifier.classify(payload.message, context)
         classification_source = entities.pop("classification_source", "rules")
+        if intent == "fuera_de_alcance":
+            fallback_count = int(context.get("fallback_count", 0))
+            entities["should_reply"] = fallback_count < 2
+            context["fallback_count"] = fallback_count + 1
+        elif intent not in {"ruido_conversacional", "rate_limited"}:
+            context["fallback_count"] = 0
         if entities.get("name"):
             contact.full_name = entities["name"]
         result = self.chatbot.respond(intent, entities, contact, context)

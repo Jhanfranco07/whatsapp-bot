@@ -329,6 +329,52 @@ cascada mediante reglas exactas, alias de carreras, TF-IDF por caracteres y
 Levenshtein para consultas de baja confianza. El índice se construye una sola
 vez al iniciar FastAPI usando `app/data/intent_corpus.json`.
 
+El proyecto no usa IA generativa, Ollama, embeddings ni APIs LLM externas. Las
+respuestas se generan únicamente con reglas, TF-IDF, Levenshtein y JSON
+controlado.
+
+### Conocimiento institucional y admisión
+
+`app/data/conocimiento_institucional.json` contiene entradas verificadas en dos
+formatos compatibles:
+
+- Formato legado: `palabras_clave`, `respuesta`, `fuente_url`.
+- Formato enriquecido: `intent`, `titulo`, `keywords`, `contenido`,
+  `respuesta_corta`, `fuente_oficial`, `fecha_verificacion`, `activo`.
+
+Para modalidades de admisión también puede incluir `modalidad_key`,
+`beneficios`, `documentos`, `procedimiento` y `convalidacion`.
+
+Intenciones institucionales agregadas:
+
+- `consulta_proposito`, `consulta_mision`, `consulta_vision`,
+  `consulta_valores`, `consulta_ideario`, `consulta_modelo_educativo`,
+  `consulta_onlife`, `consulta_modo_usil`, `consulta_competencias_sello`,
+  `consulta_aprendizaje_competencias`, `consulta_perfil_egreso`,
+  `consulta_pilares`, `consulta_sostenibilidad`, `consulta_laboratorios`.
+
+Intenciones de admisión agregadas:
+
+- `consulta_modalidades_admision`, `consulta_regular`,
+  `consulta_admision_destacada`, `consulta_traslado_externo`,
+  `consulta_deportista_destacado`, `consulta_bachillerato_internacional`,
+  `consulta_becas_estado_pronabec`, `consulta_documentos_modalidad`,
+  `consulta_procedimiento_modalidad`, `consulta_beneficios_modalidad`,
+  `consulta_convalidacion`.
+
+La clasificación prioriza baja explícita y ruido conversacional, luego reglas de
+carreras, reglas institucionales y de admisión, TF-IDF, Levenshtein y finalmente
+`fuera_de_alcance`. `ChatbotService` consulta `KnowledgeBase` antes de usar
+plantillas genéricas; si encuentra una entrada activa por intención, usa
+`respuesta_corta` o los campos controlados de modalidad y agrega un cierre
+variado con enlace oficial.
+
+Para agregar nueva información institucional sin usar IA, crea una entrada
+activa en `conocimiento_institucional.json`, agrega ejemplos al
+`intent_corpus.json`, y evita datos variables no verificados como fechas,
+costos, vacantes u horarios. Si no hay información suficiente, el bot dirige al
+portal oficial.
+
 Verifica el motor con:
 
 ```text

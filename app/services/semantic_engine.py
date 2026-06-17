@@ -93,6 +93,12 @@ class SemanticEngine:
                 entities["secondary_intents"] = ["consulta_admision"]
             return ClassificationResult(intent, 0.98, entities, True, "rules")
 
+        institutional = self._classify_institutional_rule(normalized)
+        if institutional:
+            return institutional
+        admission = self._classify_admission_rule(normalized)
+        if admission:
+            return admission
         topic_rule = self._classify_topic_rule(normalized)
         if topic_rule:
             return topic_rule
@@ -154,6 +160,17 @@ class SemanticEngine:
 
     @staticmethod
     def _extract_name(text: str) -> str | None:
+        non_name_markers = {
+            "tercio",
+            "quinto",
+            "superior",
+            "deportista",
+            "competencia",
+            "regular",
+            "egresado",
+            "instituto",
+            "pronabec",
+        }
         for pattern in (
             r"^(?:hola\s+)?me llamo\s+(.+)$",
             r"^(?:hola\s+)?mi nombre es\s+(.+)$",
@@ -161,7 +178,10 @@ class SemanticEngine:
         ):
             match = re.match(pattern, text)
             if match and 1 <= len(match.group(1).split()) <= 4:
-                return " ".join(word.capitalize() for word in match.group(1).split())
+                words = match.group(1).split()
+                if any(word in non_name_markers for word in words):
+                    return None
+                return " ".join(word.capitalize() for word in words)
         return None
 
     @staticmethod
@@ -227,6 +247,108 @@ class SemanticEngine:
         topic = self._detect_topic(text)
         if topic:
             return ClassificationResult(topic, 0.9, {}, True, "rules")
+        return None
+
+    def _classify_institutional_rule(self, text: str) -> ClassificationResult | None:
+        rules = [
+            ("consulta_proposito", "proposito", ("proposito usil", "cual es el proposito", "para que forma", "huella en el mundo", "personas con valores")),
+            ("consulta_mision", "mision", ("mision usil", "cual es la mision", "que busca usil", "espiritu emprendedor", "bien comun")),
+            ("consulta_vision", "vision", ("vision usil", "cual es la vision", "agentes de cambio", "excelencia academica", "valor digital")),
+            ("consulta_valores", "valores", ("valores usil", "valores institucionales", "que valores", "lealtad", "pasion", "compromiso", "eficacia", "servicio", "respeto")),
+            ("consulta_ideario", "ideario", ("ideario usil", "principios usil", "funciones usil", "valores humanistas", "alumni")),
+            ("consulta_modelo_educativo", "modelo_educativo", ("modelo educativo", "modelo de ensenanza", "como ensenan", "proyecto etico de vida")),
+            ("consulta_onlife", "onlife", ("onlife", "hyflex", "aulas hyflex", "tutoria universitaria", "cultura digital")),
+            ("consulta_modo_usil", "modo_usil", ("modo usil", "servicios universitarios", "bienestar estudiantil", "capellania", "arte y cultura", "alerta usil")),
+            ("consulta_competencias_sello", "competencias_sello", ("competencias sello", "competencias usil", "comunicacion bilingue", "competencia digital")),
+            ("consulta_aprendizaje_competencias", "aprendizaje_competencias", ("aprendizaje basado en competencias", "que son competencias", "movilizar saberes")),
+            ("consulta_perfil_egreso", "perfil_egreso", ("perfil de egreso", "egresado usil", "pensamiento computacional", "cultura emprendedora")),
+            ("consulta_pilares", "pilares", ("pilares usil", "pilares institucionales", "emprendimiento sostenibilidad", "internacionalidad")),
+            ("consulta_sostenibilidad", "sostenibilidad", ("responsabilidad social", "rsu", "sostenibilidad", "gestion ambiental", "impacto social")),
+            ("consulta_laboratorios", "laboratorios", ("laboratorios usil", "instalaciones usil", "infraestructura", "laboratorios especializados")),
+        ]
+        padded = f" {text} "
+        for intent, tema, phrases in rules:
+            if any(phrase in padded for phrase in phrases):
+                return ClassificationResult(
+                    intent,
+                    0.96,
+                    {"tema": tema, "source": "conocimiento_institucional"},
+                    True,
+                    "rules",
+                )
+        return None
+
+    def _classify_admission_rule(self, text: str) -> ClassificationResult | None:
+        modalidad = self._detect_admission_modality(text)
+        detail_intent = self._detect_admission_detail_intent(text, modalidad)
+        if detail_intent:
+            entities = {
+                "tema": "modalidades_admision",
+                "tipo_consulta": detail_intent.removeprefix("consulta_").removesuffix("_modalidad"),
+                "source": "conocimiento_institucional",
+            }
+            if modalidad:
+                entities["modalidad"] = modalidad
+            return ClassificationResult(detail_intent, 0.97, entities, True, "rules")
+        if modalidad:
+            intent_by_modality = {
+                "regular": "consulta_regular",
+                "admision_destacada": "consulta_admision_destacada",
+                "traslado_externo": "consulta_traslado_externo",
+                "deportista_destacado_alta_competencia": "consulta_deportista_destacado",
+                "bachillerato_internacional": "consulta_bachillerato_internacional",
+                "becas_estado_pronabec": "consulta_becas_estado_pronabec",
+            }
+            return ClassificationResult(
+                intent_by_modality[modalidad],
+                0.97,
+                {
+                    "tema": "modalidades_admision",
+                    "modalidad": modalidad,
+                    "tipo_consulta": "detalle",
+                    "source": "conocimiento_institucional",
+                },
+                True,
+                "rules",
+            )
+        general = ("modalidades de admision", "formas de ingreso", "como puedo ingresar", "modalidades para postular", "tipos de admision")
+        if any(phrase in f" {text} " for phrase in general):
+            return ClassificationResult(
+                "consulta_modalidades_admision",
+                0.96,
+                {"tema": "modalidades_admision", "tipo_consulta": "general", "source": "conocimiento_institucional"},
+                True,
+                "rules",
+            )
+        return None
+
+    @staticmethod
+    def _detect_admission_modality(text: str) -> str | None:
+        padded = f" {text} "
+        rules = [
+            ("admision_destacada", ("admision destacada", "tercio superior", "quinto superior", "primer puesto", "buen promedio")),
+            ("traslado_externo", ("traslado externo", "otra universidad", "vengo de otra universidad", "instituto", "convalidar cursos")),
+            ("deportista_destacado_alta_competencia", ("deportista", "ipd", "prodac", "alta competencia", "seleccion deportiva")),
+            ("bachillerato_internacional", ("bachillerato internacional", "diploma ib", " ib ", "abitur", "bachillerato britanico")),
+            ("becas_estado_pronabec", ("pronabec", "beca 18", "becas del estado", "beca del estado")),
+            ("regular", ("modalidad regular", " quinto de secundaria", " 5 de secundaria", "termine el colegio", "termine secundaria", "egresado del colegio")),
+        ]
+        for modalidad, phrases in rules:
+            if any(phrase in padded for phrase in phrases):
+                return modalidad
+        return None
+
+    @staticmethod
+    def _detect_admission_detail_intent(text: str, modalidad: str | None) -> str | None:
+        padded = f" {text} "
+        if any(phrase in padded for phrase in ("convalidacion", "convalidar", "silabos", "creditos")):
+            return "consulta_convalidacion"
+        if modalidad and any(phrase in padded for phrase in ("documentos", "requisitos", "que necesito", "papeles")):
+            return "consulta_documentos_modalidad"
+        if modalidad and any(phrase in padded for phrase in ("pasos", "procedimiento", "como postulo", "inscripcion", "como me inscribo")):
+            return "consulta_procedimiento_modalidad"
+        if modalidad and any(phrase in padded for phrase in ("beneficio", "beneficios", "descuento", "10%", "20%", "30%", "pension")):
+            return "consulta_beneficios_modalidad"
         return None
 
     def _classify_tfidf(self, text: str) -> ClassificationResult:

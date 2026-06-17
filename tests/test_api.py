@@ -48,15 +48,14 @@ def test_semantic_health_endpoint():
     response = TestClient(app).get("/health/llm")
 
     assert response.status_code == 200
-    assert response.json() == {
-        "status": "ok",
-        "engine": "tfidf_semantic",
-        "intents_loaded": 8,
-        "probe": {
-            "text": "hola",
-            "intent": "saludo",
-            "confidence": 1.0,
-        },
+    payload = response.json()
+    assert payload["status"] == "ok"
+    assert payload["engine"] == "tfidf_semantic"
+    assert payload["intents_loaded"] >= 33
+    assert payload["probe"] == {
+        "text": "hola",
+        "intent": "saludo",
+        "confidence": 1.0,
     }
 
 
