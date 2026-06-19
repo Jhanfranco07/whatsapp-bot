@@ -104,14 +104,15 @@ async def inbound(
 def send_campaign(
     limit: int | None = Query(default=None, ge=1),
     phone_number: str | None = Query(default=None),
+    delay_seconds: float = Query(default=60, ge=1, le=3600),
     db: Session = Depends(get_db),
 ):
-    return CampaignService(db).send_initial(limit, phone_number)
+    return CampaignService(db).send_initial(limit, phone_number, delay_seconds)
 
 
 @app.post("/outbound/dispatch")
 def dispatch_outbound(
-    limit: int = Query(default=20, ge=1, le=200),
+    limit: int = Query(default=1, ge=1, le=20),
     db: Session = Depends(get_db),
     x_admin_api_key: str | None = Header(default=None),
 ):

@@ -15,8 +15,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--delay",
         type=float,
-        default=5,
-        help="Segundos de espera entre contactos (predeterminado: 5)",
+        default=60,
+        help="Segundos programados entre contactos (predeterminado: 60)",
     )
     args = parser.parse_args()
     with SessionLocal() as db:

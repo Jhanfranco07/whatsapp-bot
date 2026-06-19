@@ -26,6 +26,14 @@ class FakeDb:
         pass
 
 
+class FakeQueue:
+    def __init__(self):
+        self.rows = []
+
+    def enqueue(self, contact, message, **kwargs):
+        self.rows.append((contact, message, kwargs))
+
+
 def test_dry_run_does_not_import_or_send(monkeypatch):
     provider = PyWhatKitProvider()
     monkeypatch.setattr(provider.settings, "whatsapp_dry_run", True)
@@ -63,14 +71,15 @@ def test_campaign_only_uses_filtered_candidates():
     )
     provider = FakeProvider()
     service = CampaignService(FakeDb(), provider)
-    service.contacts = SimpleNamespace(campaign_candidates=lambda: [allowed])
-    service.messages = SimpleNamespace(create=lambda *args, **kwargs: None)
+    service.contacts = SimpleNamespace(campaign_candidates=lambda campaign_name: [allowed])
+    service.outbound_queue = FakeQueue()
 
     result = service.send_initial()
 
-    assert result["sent"] == 1
-    assert provider.sent[0][0] == "51999999999"
-    assert allowed.status == "CONTACTADO"
+    assert result["queued"] == 1
+    assert result["sent"] == 0
+    assert provider.sent == []
+    assert service.outbound_queue.rows[0][2]["priority"] == 10
 
 
 def test_campaign_can_target_phone():
@@ -84,13 +93,17 @@ def test_campaign_can_target_phone():
     )
     provider = FakeProvider()
     service = CampaignService(FakeDb(), provider)
-    service.contacts = SimpleNamespace(get_by_phone=lambda phone: target)
-    service.messages = SimpleNamespace(create=lambda *args, **kwargs: None)
+    service.contacts = SimpleNamespace(
+        get_by_phone=lambda phone: target,
+        has_campaign_record=lambda contact_id, campaign_name: False,
+    )
+    service.outbound_queue = FakeQueue()
 
     result = service.send_initial(phone_number="984738899")
 
-    assert result["sent"] == 1
-    assert provider.sent[0][0] == "51984738899"
+    assert result["queued"] == 1
+    assert provider.sent == []
+    assert service.outbound_queue.rows[0][0].phone_number == "51984738899"
 
 
 def test_campaign_does_not_target_stopped_contact():
@@ -105,7 +118,7 @@ def test_campaign_does_not_target_stopped_contact():
     provider = FakeProvider()
     service = CampaignService(FakeDb(), provider)
     service.contacts = SimpleNamespace(get_by_phone=lambda phone: target)
-    service.messages = SimpleNamespace(create=lambda *args, **kwargs: None)
+    service.outbound_queue = FakeQueue()
 
     result = service.send_initial(phone_number=target.phone_number)
 

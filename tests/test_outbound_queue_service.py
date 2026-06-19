@@ -8,6 +8,9 @@ class FakeDb:
     def flush(self):
         pass
 
+    def get(self, model, item_id):
+        return None
+
 
 class FakeProvider:
     def __init__(self, result):
@@ -21,8 +24,12 @@ class FakeProvider:
 
 def queued_message(attempts=0, max_attempts=3):
     return SimpleNamespace(
+        id="outbound-1",
+        contact_id="contact-1",
         phone_number="51999999999",
         message_text="hola",
+        source=None,
+        source_id=None,
         attempts=attempts,
         max_attempts=max_attempts,
         provider=None,
@@ -31,6 +38,7 @@ def queued_message(attempts=0, max_attempts=3):
         status=OutboundStatus.PENDING,
         sent_at=None,
         error_message=None,
+        locked_at=None,
         next_attempt_at=None,
     )
 

@@ -152,7 +152,7 @@ para reducir el riesgo de restricciones de WhatsApp.
 
 ### 3. Iniciar el chatbot que responde mensajes reales
 
-Mantén abiertas dos terminales.
+Mantén abiertas tres terminales.
 
 Terminal 1, desde la raíz del proyecto:
 
@@ -168,6 +168,12 @@ cd bridge
 npm start
 ```
 
+Terminal 3, desde la raíz del proyecto:
+
+```powershell
+python scripts/process_outbound.py --watch --poll 1 --sent-delay 2
+```
+
 La primera vez aparecerá un QR. Escanéalo desde WhatsApp en
 `Dispositivos vinculados > Vincular dispositivo`. Cuando aparezca
 `Puente listo. Esperando mensajes entrantes...`, el chatbot ya está activo.
@@ -177,7 +183,7 @@ siguientes inicios normalmente solo debes volver a ejecutar las dos terminales;
 no borres esa carpeta si quieres conservar la sesión. Si WhatsApp cierra o
 invalida la sesión, aparecerá un nuevo QR.
 
-Para detener el chatbot, presiona `Ctrl+C` en ambas terminales.
+Para detener el chatbot, presiona `Ctrl+C` en las tres terminales.
 
 
 ### PostgreSQL local con Docker
@@ -229,31 +235,45 @@ La campaña siempre consulta PostgreSQL para poder respetar las bajas.
 
 ## Enviar campaña
 
-Con `WHATSAPP_PROVIDER=bridge`, inicia primero FastAPI y el puente. Después:
+Con `WHATSAPP_PROVIDER=bridge`, inicia FastAPI, el puente y el worker saliente.
+Después encola la campaña:
 
 ```powershell
-python scripts/send_campaign.py --limit 1
+python scripts/send_campaign.py --limit 1 --delay 60
 ```
 
 Para probar primero con una sola persona:
 
 ```powershell
-python scripts/send_campaign.py --phone 51984738899
+python scripts/send_campaign.py --phone 51984738899 --delay 60
 ```
 
-El proveedor antiguo `pywhatkit` sigue disponible configurando
-`WHATSAPP_PROVIDER=pywhatkit`, pero abre WhatsApp Web para cada envío.
+`send_campaign.py` no envía directamente: crea registros `pending` y programa
+cada contacto con el intervalo indicado por `--delay`. El worker es el único
+proceso autorizado para llamar al bridge.
 
 Cada mensaje saliente queda registrado primero en PostgreSQL en
 `outbound_messages`. Si el bridge no está disponible, el mensaje queda con
 estado `retrying` o `failed` según los intentos. Para procesar pendientes:
 
 ```powershell
-python scripts/process_outbound.py --limit 20
+python scripts/process_outbound.py --watch --poll 1 --sent-delay 2
 ```
 
-También puedes despachar por API con `POST /outbound/dispatch?limit=20` usando
+También puedes despachar un mensaje manualmente con
+`POST /outbound/dispatch?limit=1` usando
 `X-Admin-Api-Key` cuando `ADMIN_API_KEY` está configurada.
+
+Las prioridades salientes son `100` para confirmaciones de baja, `90` para
+respuestas del chatbot y `10` para campañas. El worker reclama un solo mensaje
+con bloqueo transaccional. Si llegan cinco respuestas mientras la campaña
+espera el contacto 51, se envían primero las cinco respuestas, una por una, y
+luego continúa la campaña. PostgreSQL evita que dos workers envíen
+simultáneamente aunque se inicien por error.
+
+`CAMPAIGN_MINIMUM_GAP_SECONDS=60` mantiene un intervalo real entre dos mensajes
+de campaña, incluso si varios quedaron vencidos mientras el worker atendía
+respuestas prioritarias.
 
 ## Probar sin WhatsApp Web
 

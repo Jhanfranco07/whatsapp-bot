@@ -94,6 +94,9 @@ class OutboundMessage(Base):
     provider: Mapped[str | None] = mapped_column(String(40))
     attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     max_attempts: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
+    priority: Mapped[int] = mapped_column(Integer, default=10, nullable=False, index=True)
+    scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now_utc, nullable=False, index=True)
+    locked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
     next_attempt_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True)
     sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     error_message: Mapped[str | None] = mapped_column(Text)
@@ -104,3 +107,9 @@ class OutboundMessage(Base):
 
 Index("ix_messages_contact_created", Message.contact_id, Message.created_at)
 Index("ix_outbound_messages_status_next_attempt", OutboundMessage.status, OutboundMessage.next_attempt_at)
+Index(
+    "ix_outbound_messages_dispatch_order",
+    OutboundMessage.status,
+    OutboundMessage.priority,
+    OutboundMessage.scheduled_at,
+)

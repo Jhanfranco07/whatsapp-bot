@@ -12,7 +12,7 @@ from app.database.repositories import (
 from app.services.chatbot_service import ChatbotService
 from app.services.contact_states import ContactState
 from app.services.intent_classifier import IntentClassifier
-from app.services.outbound_queue_service import OutboundQueueService
+from app.services.outbound_queue_service import OutboundPriority, OutboundQueueService
 from app.services.rate_limiter import InMemoryRateLimiter
 from app.utils.phone_utils import normalize_phone
 from app.whatsapp.sender import get_whatsapp_provider
@@ -138,6 +138,11 @@ class ConversationService:
                 result.bot_reply,
                 source="conversation",
                 source_id=str(contact.id),
+                priority=(
+                    OutboundPriority.OPT_OUT
+                    if intent == "detener_conversacion"
+                    else OutboundPriority.CONVERSATION
+                ),
             )
 
         contact.status = result.new_status
@@ -186,12 +191,6 @@ class ConversationService:
             context,
         )
 
-        reply_sent = False
-        if payload.send_reply and should_reply and queued_outbound:
-            self.db.commit()
-            send_result = self.outbound_queue.dispatch(queued_outbound)
-            reply_sent = send_result.success
-
         self.db.commit()
         logger.info(
             "Inbound procesado: phone=%s intent=%s source=%s created=%s",
@@ -209,5 +208,5 @@ class ConversationService:
             "classification_source": classification_source,
             "bot_reply": result.bot_reply if should_reply else None,
             "should_reply": should_reply,
-            "reply_sent": reply_sent,
+            "reply_sent": False,
         }

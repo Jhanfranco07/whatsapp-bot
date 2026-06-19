@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import app.services.conversation_service as module
 from app.schemas.webhook_schema import InboundMessage
 from app.services.conversation_service import ConversationService
+from app.services.outbound_queue_service import OutboundPriority
 
 
 class FakeDb:
@@ -32,6 +33,15 @@ class FakeMessages:
         self.rows.append((direction, text, intent, entities))
 
 
+class FakeOutboundQueue:
+    def __init__(self):
+        self.rows = []
+
+    def enqueue(self, contact, text, **kwargs):
+        self.rows.append((contact, text, kwargs))
+        return SimpleNamespace(id="outbound-1")
+
+
 def build_service(monkeypatch, context=None):
     contact = SimpleNamespace(
         id="contact-1",
@@ -45,8 +55,10 @@ def build_service(monkeypatch, context=None):
         career_interest=None,
     )
     service = ConversationService(FakeDb())
+    service._rate_limiter = module.InMemoryRateLimiter(100, 60)
     service.contacts = FakeContacts(contact)
     service.messages = FakeMessages()
+    service.outbound_queue = FakeOutboundQueue()
     captured = {}
     monkeypatch.setattr(module, "get_conversation_context", lambda db, contact_id: dict(context or {}))
     monkeypatch.setattr(
@@ -157,3 +169,28 @@ def test_explicit_stop_bypasses_rate_limit(monkeypatch):
 
     assert result["intent"] == "detener_conversacion"
     assert contact.stop_bot is True
+
+
+def test_replies_are_only_queued_with_priority(monkeypatch):
+    service, _, _ = build_service(monkeypatch)
+
+    result = service.process_inbound(
+        InboundMessage(
+            phone_number="999999999",
+            message="hola",
+            send_reply=True,
+        )
+    )
+
+    assert result["reply_sent"] is False
+    assert service.outbound_queue.rows[0][2]["priority"] == OutboundPriority.CONVERSATION
+
+
+def test_opt_out_confirmation_has_highest_priority(monkeypatch):
+    service, _, _ = build_service(monkeypatch)
+
+    service.process_inbound(
+        InboundMessage(phone_number="999999999", message="basta", send_reply=True)
+    )
+
+    assert service.outbound_queue.rows[0][2]["priority"] == OutboundPriority.OPT_OUT

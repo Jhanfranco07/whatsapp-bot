@@ -1,6 +1,6 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import select
+from sqlalchemy import or_, select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -51,13 +51,34 @@ class ContactRepository:
     def list(self):
         return list(self.db.scalars(select(Contact).order_by(Contact.created_at.desc())))
 
-    def campaign_candidates(self):
+    def campaign_candidates(self, campaign_name="campaña_inicial"):
+        already_queued = (
+            select(CampaignMessage.id)
+            .where(
+                CampaignMessage.contact_id == Contact.id,
+                CampaignMessage.campaign_name == campaign_name,
+                CampaignMessage.status.in_(("pending", "retrying", "sent")),
+            )
+            .exists()
+        )
         return list(
             self.db.scalars(
                 select(Contact).where(
                     Contact.opt_out.is_(False),
                     Contact.stop_bot.is_(False),
                     Contact.status.not_in(CAMPAIGN_EXCLUDED_STATES),
+                    ~already_queued,
+                )
+            )
+        )
+
+    def has_campaign_record(self, contact_id, campaign_name="campaña_inicial"):
+        return bool(
+            self.db.scalar(
+                select(CampaignMessage.id).where(
+                    CampaignMessage.contact_id == contact_id,
+                    CampaignMessage.campaign_name == campaign_name,
+                    CampaignMessage.status.in_(("pending", "retrying", "sent")),
                 )
             )
         )
@@ -102,7 +123,10 @@ class OutboundMessageRepository:
         source=None,
         source_id=None,
         max_attempts=3,
+        priority=10,
+        scheduled_at=None,
     ):
+        now = datetime.now(timezone.utc)
         queued = OutboundMessage(
             contact_id=contact.id,
             phone_number=contact.phone_number,
@@ -112,9 +136,12 @@ class OutboundMessageRepository:
             source_id=source_id,
             attempts=0,
             max_attempts=max_attempts,
-            next_attempt_at=datetime.now(timezone.utc),
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
+            priority=priority,
+            scheduled_at=scheduled_at or now,
+            locked_at=None,
+            next_attempt_at=None,
+            created_at=now,
+            updated_at=now,
         )
         self.db.add(queued)
         self.db.flush()
@@ -127,13 +154,76 @@ class OutboundMessageRepository:
                 select(OutboundMessage)
                 .where(
                     OutboundMessage.status.in_(("pending", "retrying")),
-                    OutboundMessage.next_attempt_at <= now,
+                    OutboundMessage.scheduled_at <= now,
+                    or_(
+                        OutboundMessage.next_attempt_at.is_(None),
+                        OutboundMessage.next_attempt_at <= now,
+                    ),
                     OutboundMessage.attempts < OutboundMessage.max_attempts,
                 )
-                .order_by(OutboundMessage.created_at.asc())
+                .order_by(
+                    OutboundMessage.priority.desc(),
+                    OutboundMessage.scheduled_at.asc(),
+                    OutboundMessage.created_at.asc(),
+                )
                 .limit(limit)
             )
         )
+
+    def claim_next(self, campaign_minimum_gap_seconds=60):
+        acquired = self.db.scalar(
+            text("SELECT pg_try_advisory_xact_lock(:lock_key)"),
+            {"lock_key": 8675309},
+        )
+        if not acquired:
+            return None
+        now = datetime.now(timezone.utc)
+        stale_lock = now - timedelta(minutes=5)
+        queued = self.db.scalar(
+            select(OutboundMessage)
+            .where(
+                OutboundMessage.status.in_(("pending", "retrying")),
+                OutboundMessage.scheduled_at <= now,
+                or_(
+                    OutboundMessage.next_attempt_at.is_(None),
+                    OutboundMessage.next_attempt_at <= now,
+                ),
+                or_(
+                    OutboundMessage.locked_at.is_(None),
+                    OutboundMessage.locked_at < stale_lock,
+                ),
+                OutboundMessage.attempts < OutboundMessage.max_attempts,
+            )
+            .order_by(
+                OutboundMessage.priority.desc(),
+                OutboundMessage.scheduled_at.asc(),
+                OutboundMessage.created_at.asc(),
+            )
+            .with_for_update(skip_locked=True)
+            .limit(1)
+        )
+        if queued:
+            if queued.source == "campaign" and campaign_minimum_gap_seconds > 0:
+                last_campaign_sent_at = self.db.scalar(
+                    select(OutboundMessage.sent_at)
+                    .where(
+                        OutboundMessage.source == "campaign",
+                        OutboundMessage.status == "sent",
+                        OutboundMessage.sent_at.is_not(None),
+                    )
+                    .order_by(OutboundMessage.sent_at.desc())
+                    .limit(1)
+                )
+                if (
+                    last_campaign_sent_at
+                    and last_campaign_sent_at
+                    + timedelta(seconds=campaign_minimum_gap_seconds)
+                    > now
+                ):
+                    return None
+            queued.locked_at = now
+            self.db.flush()
+        return queued
 
 
 def upsert_conversation(db, contact, user_message, bot_message, state, context):
@@ -155,15 +245,22 @@ def get_conversation_context(db, contact_id):
     return dict(conversation.context or {}) if conversation else {}
 
 
-def create_campaign_record(db, contact, message, result, campaign_name="campaña_inicial"):
+def create_campaign_record(
+    db,
+    contact,
+    message,
+    result=None,
+    campaign_name="campaña_inicial",
+):
+    success = bool(result and result.success)
     record = CampaignMessage(
         contact_id=contact.id,
         campaign_name=campaign_name,
         template_name="mensaje_inicial",
         message_text=message,
-        status="sent" if result.success else "failed",
-        error_message=result.error,
-        sent_at=datetime.now(timezone.utc) if result.success else None,
+        status="sent" if success else ("failed" if result else "pending"),
+        error_message=result.error if result else None,
+        sent_at=datetime.now(timezone.utc) if success else None,
     )
     db.add(record)
     return record

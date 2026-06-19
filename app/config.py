@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     database_url: str = (
         "postgresql+psycopg2://usil:usil@localhost:5432/usil_db"
     )
+    database_connect_timeout: int = 10
+    database_pool_timeout: int = 10
+    database_pool_recycle: int = 300
     whatsapp_provider: str = "bridge"
     whatsapp_dry_run: bool = True
     whatsapp_wait_time: int = 20
@@ -20,6 +23,7 @@ class Settings(BaseSettings):
     admin_api_key: str = ""
     rate_limit_messages: int = 6
     rate_limit_window_seconds: int = 60
+    campaign_minimum_gap_seconds: int = 60
     portal_oficial_url: str = "https://www.usil.edu.pe/"
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"

@@ -33,6 +33,7 @@ def run_migrations_online() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args={"connect_timeout": get_settings().database_connect_timeout},
     )
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)

@@ -6,6 +6,7 @@ __pycache__/
 venv/
 resultados/
 PyWhatKit_DB.txt
+*.log
 ~$*.xlsx
 dataAlumnos.xlsx
 bridge/node_modules/
