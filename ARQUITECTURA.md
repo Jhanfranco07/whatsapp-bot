@@ -63,6 +63,9 @@ ConversationService
         |       +--> outbound_messages
         |
         v
+Worker scripts/process_outbound.py
+        |
+        v
 OutboundQueueService
         |
         +--> BridgeProvider
@@ -108,6 +111,7 @@ Estados:
 - `retrying`: fallo recuperable; queda programado para otro intento.
 - `sent`: el proveedor confirmo el envio.
 - `failed`: se agotaron los intentos configurados.
+- `cancelled`: el mensaje se invalido antes del envio, por ejemplo por una baja.
 
 Campos clave:
 
@@ -115,6 +119,9 @@ Campos clave:
 - `message_text`: cuerpo enviado.
 - `source`: origen logico, por ejemplo `conversation` o `campaign`.
 - `source_id`: referencia del origen.
+- `priority`: precedencia operativa del mensaje.
+- `scheduled_at`: instante desde el que el mensaje puede ser reclamado.
+- `locked_at`: instante en que un worker reclamo el mensaje.
 - `provider`: proveedor usado para el intento.
 - `attempts` y `max_attempts`: control de reintentos.
 - `next_attempt_at`: proximo intento programado.
@@ -129,39 +136,65 @@ Campos clave:
 - Registro de proveedor, errores y respuesta cruda.
 - Conteo de intentos.
 - Backoff simple entre reintentos.
-- Procesamiento de pendientes.
+- Procesamiento serial y seguro de pendientes.
 
-Procesamiento manual:
+Prioridades actuales:
+
+| Origen | Prioridad |
+|---|---:|
+| Campaña | 10 |
+| Respuesta conversacional | 90 |
+| Confirmación de baja | 100 |
+
+La prioridad no interrumpe un envio que ya comenzo. Se aplica al reclamar el
+siguiente mensaje. Por ello, si la campaña esta enviando el mensaje 51 y llegan
+cinco respuestas, termina el envio en curso, procesa primero las respuestas y
+despues retoma la campaña.
+
+Worker continuo recomendado:
 
 ```powershell
-python scripts/process_outbound.py --limit 20
+python scripts/process_outbound.py --watch --poll 1 --sent-delay 2
+```
+
+Procesamiento manual para diagnostico:
+
+```powershell
+python scripts/process_outbound.py --limit 1
 ```
 
 Procesamiento por API:
 
 ```text
-POST /outbound/dispatch?limit=20
+POST /outbound/dispatch?limit=1
 ```
 
 El endpoint exige `X-Admin-Api-Key` cuando `ADMIN_API_KEY` esta configurada.
 
 ## Concurrencia
 
-Existen dos niveles de proteccion:
+Existen cuatro niveles de proteccion:
 
 1. El bridge serializa mensajes entrantes por contacto mediante colas de
    promesas.
 2. `ConversationService` utiliza un `asyncio.Lock` por telefono normalizado.
+3. El worker adquiere un advisory lock transaccional de PostgreSQL para que
+   solamente un proceso seleccione el siguiente envio global.
+4. La fila se reclama con `FOR UPDATE SKIP LOCKED`, evitando que dos workers
+   procesen el mismo mensaje.
 
-Contactos distintos pueden procesarse concurrentemente, pero dos mensajes del
-mismo contacto mantienen su orden dentro de un mismo proceso.
+Contactos distintos pueden procesar su entrada concurrentemente, pero dos
+mensajes del mismo contacto mantienen su orden dentro de un mismo proceso. La
+salida a WhatsApp es globalmente serial: un solo mensaje se despacha cada vez,
+incluso si se levantan varios workers por error.
 
 `ContactRepository.get_or_create` usa una transaccion anidada para tolerar
 creaciones simultaneas del mismo telefono.
 
-Limitacion actual: locks y rate limit siguen viviendo en memoria del proceso.
-Para escalar a multiples workers o contenedores, conviene mover esa coordinacion
-a PostgreSQL o Redis.
+Los locks conversacionales y el rate limit siguen viviendo en memoria del
+proceso. Si FastAPI escala a multiples workers o contenedores, esa coordinacion
+por contacto debe moverse a PostgreSQL o Redis. La coordinacion del envio
+saliente ya reside en PostgreSQL.
 
 ## Motor semantico
 
@@ -286,21 +319,29 @@ Ultimo estado y contexto resumido de la conversacion.
 
 ### `outbound_messages`
 
-Cola persistente de mensajes salientes. Registra estado, intentos, proveedor,
-errores y respuesta cruda.
+Cola persistente de mensajes salientes. Registra prioridad, programacion,
+estado, intentos, bloqueo, proveedor, errores y respuesta cruda.
 
 ### `campaign_messages`
 
-Resultado historico de cada envio de campaña.
+Estado historico de cada destinatario de campaña. Se crea como `pending` al
+programar el envio y se actualiza cuando el worker confirma o agota el envio.
 
 ## Baja persistente
 
-Cuando `stop_bot=true`:
+Cuando se detecta por primera vez una solicitud explicita de baja:
 
 - El mensaje entrante se guarda.
-- No se genera mensaje saliente.
-- No se encola respuesta.
+- Se encola una unica confirmacion con prioridad 100.
+- El contacto queda con `opt_out=true` y `stop_bot=true`.
 - El contacto queda excluido de campañas futuras.
+
+Si el contacto ya tenia `stop_bot=true`, los mensajes posteriores se guardan
+para auditoria, pero no generan ni encolan una nueva respuesta.
+
+Ademas, antes de despachar cada mensaje de campaña el worker vuelve a consultar
+`opt_out`, `stop_bot` y el estado del contacto. Si la baja ocurrio despues de
+programar la campaña, el mensaje pendiente se marca `cancelled` y no se envia.
 
 ## Campañas
 
@@ -308,13 +349,22 @@ El proveedor recomendado es `BridgeProvider`, que reutiliza la sesion de
 WhatsApp Web.
 
 ```powershell
-python scripts/send_campaign.py --limit 1
-python scripts/send_campaign.py --delay 10
+python scripts/send_campaign.py --limit 600 --delay 60
 ```
 
-Cada mensaje de campaña se registra primero en `outbound_messages`. Si
-`dispatch_now=True`, el servicio intenta enviarlo inmediatamente; si el envio
-falla, queda registrado como `retrying` o `failed` segun los intentos.
+`CampaignService` no abre WhatsApp ni envia directamente. Selecciona contactos
+elegibles, crea su `campaign_messages` y programa cada `outbound_messages` con
+prioridad 10. El intervalo se calcula mediante `scheduled_at` y el worker
+respeta ademas una separacion minima real entre campañas, configurada con
+`CAMPAIGN_MINIMUM_GAP_SECONDS` (60 segundos por defecto).
+
+La separacion se calcula desde el ultimo envio de campaña confirmado, no desde
+el horario teorico. Asi, una pausa para atender conversaciones no provoca una
+rafaga de mensajes de campaña atrasados al reanudarse.
+
+Un contacto con un registro previo `pending`, `retrying` o `sent` para la misma
+campaña no vuelve a programarse. Esto permite reejecutar el comando sin duplicar
+destinatarios ya procesados.
 
 ## Base de datos local o cloud
 
@@ -383,18 +433,28 @@ python scripts/init_db.py
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
+En una segunda terminal se ejecuta el bridge:
+
+```powershell
+cd bridge
+npm start
+```
+
+En una tercera terminal se ejecuta el unico despachador operativo:
+
+```powershell
+python scripts/process_outbound.py --watch --poll 1 --sent-delay 2
+```
+
 Produccion en contenedores:
 
 ```powershell
 docker compose -f docker-compose.prod.yml up --build
 ```
 
-En otra terminal:
-
-```powershell
-cd bridge
-npm start
-```
+FastAPI clasifica y encola; el bridge mantiene la sesion de WhatsApp; el worker
+decide el orden y realiza todos los envios. Ninguno de los otros procesos debe
+enviar mensajes por su cuenta.
 
 ## Pruebas
 
@@ -447,8 +507,10 @@ bridge/
 migrations/
   versions/
     0002_outbound_queue.py
+    0003_outbound_scheduler.py
 scripts/
   process_outbound.py
+  send_campaign.py
 docker-compose.yml
 tests/
 ```
