@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Control de WhatsApp | USIL</title>
+  <link rel="stylesheet" href="/static/admin/styles.css">
+  <script src="/static/admin/lucide.min.js" defer></script>
+  <script src="/static/admin/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="/static/admin/logo.png" alt="USIL">
+      <div><strong>Orientador USIL</strong><span>Control de WhatsApp</span></div>
+    </div>
+    <nav aria-label="Navegación principal">
+      <button class="nav-item active" data-view="overview"><i data-lucide="layout-dashboard"></i><span>Resumen</span></button>
+      <button class="nav-item" data-view="campaigns"><i data-lucide="send"></i><span>Campañas</span></button>
+      <button class="nav-item" data-view="queue"><i data-lucide="list-checks"></i><span>Cola saliente</span></button>
+      <button class="nav-item" data-view="conversations"><i data-lucide="messages-square"></i><span>Conversaciones</span></button>
+      <button class="nav-item" data-view="contacts"><i data-lucide="users"></i><span>Contactos</span></button>
+      <button class="nav-item" data-view="settings"><i data-lucide="settings"></i><span>Configuración</span></button>
+    </nav>
+    <div class="system-state"><span class="state-dot" id="system-dot"></span><div><strong id="system-label">Verificando</strong><span id="system-detail">API y base de datos</span></div></div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <button class="icon-button mobile-menu" id="menu-button" title="Abrir menú" aria-label="Abrir menú"><i data-lucide="menu">≡</i></button>
+      <div><h1 id="page-title">Resumen</h1><p id="last-update">Sincronizando datos</p></div>
+      <div class="header-actions">
+        <select id="range-select" aria-label="Rango de métricas"><option value="7">7 días</option><option value="30" selected>30 días</option><option value="90">90 días</option><option value="365">1 año</option></select>
+        <button class="icon-button" id="refresh-button" title="Actualizar datos" aria-label="Actualizar datos"><i data-lucide="refresh-cw">↻</i></button>
+        <button class="primary-button" id="new-campaign"><i data-lucide="plus"></i>Nueva campaña</button>
+      </div>
+    </header>
+
+    <div id="alert" class="alert" hidden></div>
+
+    <section class="view active" id="view-overview">
+      <div class="kpi-grid" id="kpis"></div>
+      <div class="overview-grid">
+        <section class="panel activity-panel">
+          <div class="panel-heading"><div><h2>Actividad de mensajes</h2><span>Entrantes y salientes</span></div><div class="legend"><span><b class="inbound"></b>Entrantes</span><span><b class="outbound"></b>Salientes</span></div></div>
+          <div class="activity-chart" id="activity-chart"></div>
+        </section>
+        <section class="panel">
+          <div class="panel-heading"><div><h2>Estado de contactos</h2><span>Distribución actual</span></div></div>
+          <div class="bar-list" id="contact-status-bars"></div>
+        </section>
+      </div>
+      <div class="overview-grid lower">
+        <section class="panel"><div class="panel-heading"><div><h2>Campañas recientes</h2><span>Progreso de entrega</span></div><button class="text-button jump" data-view="campaigns">Ver todas</button></div><div id="campaign-summary"></div></section>
+        <section class="panel"><div class="panel-heading"><div><h2>Últimas conversaciones</h2><span>Actividad más reciente</span></div><button class="text-button jump" data-view="conversations">Ver todas</button></div><div class="conversation-list" id="conversation-summary"></div></section>
+      </div>
+    </section>
+
+    <section class="view" id="view-campaigns">
+      <div class="section-toolbar"><div class="filter-group"><span class="count-label" id="campaign-count">0 campañas</span></div><button class="primary-button campaign-trigger"><i data-lucide="plus"></i>Nueva campaña</button></div>
+      <section class="table-panel"><div class="table-wrap"><table><thead><tr><th>Campaña</th><th>Estado</th><th>Fecha</th><th>Total</th><th>Enviados</th><th>Pendientes</th><th>Fallidos</th><th>Intervalo</th><th>Éxito</th><th></th></tr></thead><tbody id="campaign-table"></tbody></table></div></section>
+    </section>
+
+    <section class="view" id="view-queue">
+      <div class="section-toolbar"><div class="filter-group"><select id="queue-status"><option value="">Todos los estados</option><option value="pending">Pendiente</option><option value="retrying">Reintentando</option><option value="sent">Enviado</option><option value="failed">Fallido</option><option value="cancelled">Cancelado</option></select></div><span class="count-label" id="queue-count"></span></div>
+      <section class="table-panel"><div class="table-wrap"><table><thead><tr><th>Contacto</th><th>Origen</th><th>Mensaje</th><th>Programado</th><th>Intentos</th><th>Estado</th></tr></thead><tbody id="queue-table"></tbody></table></div></section>
+    </section>
+
+    <section class="view" id="view-conversations">
+      <div class="section-toolbar"><span class="count-label" id="conversation-count"></span></div>
+      <section class="table-panel"><div class="table-wrap"><table><thead><tr><th>Contacto</th><th>Último mensaje</th><th>Respuesta</th><th>Intención</th><th>Actualizado</th><th>Estado</th></tr></thead><tbody id="conversation-table"></tbody></table></div></section>
+    </section>
+
+    <section class="view" id="view-contacts">
+      <div class="section-toolbar"><div class="search-box"><i data-lucide="search"></i><input id="contact-search" type="search" placeholder="Buscar nombre, teléfono o correo"></div><select id="contact-status"><option value="">Todos los estados</option></select><span class="count-label" id="contact-count"></span><button class="primary-button" id="import-file-button"><i data-lucide="file-spreadsheet"></i>Importar archivo</button></div>
+      <section class="table-panel"><div class="table-wrap"><table><thead><tr><th>Contacto</th><th>Carrera</th><th>Origen</th><th>Última actividad</th><th>Estado</th><th>Bot</th><th></th></tr></thead><tbody id="contact-table"></tbody></table></div></section>
+    </section>
+
+    <section class="view" id="view-settings">
+      <div class="settings-layout">
+        <section class="panel"><div class="panel-heading"><div><h2>Operación</h2><span>Configuración efectiva</span></div></div><dl class="settings-list" id="runtime-settings"></dl></section>
+        <section class="panel"><div class="panel-heading"><div><h2>Acceso administrativo</h2><span>Credencial local del panel</span></div></div><form id="api-key-form" class="stack-form"><label>Clave administrativa<input type="password" id="admin-key" autocomplete="off" placeholder="X-Admin-Api-Key"></label><button class="secondary-button" type="submit"><i data-lucide="key-round"></i>Guardar clave</button></form></section>
+        <section class="panel"><div class="panel-heading"><div><h2>Tiempos operativos</h2><span>Aplicación dinámica</span></div></div><form id="runtime-settings-form" class="stack-form"><label>Intervalo predeterminado de campaña (segundos)<input type="number" id="default-campaign-interval" min="1" max="3600" required></label><label>Agrupación de mensajes del bot (segundos)<input type="number" id="bot-debounce" min="1" max="15" required></label><button class="primary-button" type="submit"><i data-lucide="save"></i>Aplicar tiempos</button></form></section>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="campaign-dialog">
+    <form id="campaign-form" class="modal-form">
+      <div class="modal-heading"><div><h2>Nueva campaña</h2><span>Programar mensajes en la cola</span></div><button type="button" class="icon-button close-dialog" title="Cerrar" aria-label="Cerrar"><i data-lucide="x">×</i></button></div>
+      <div class="form-grid"><label>Nombre<input name="campaign_name" required minlength="3" maxlength="120" placeholder="admision_julio_2026"></label><label>Destinatarios máximos<input name="limit" type="number" min="1" max="5000" value="600"></label><label>Intervalo (segundos)<input name="delay_seconds" type="number" min="1" max="3600" value="60"></label></div>
+      <label>Mensaje<textarea name="message_template" required minlength="10" maxlength="1200" rows="7">Hola{nombre}, somos del equipo de orientación de USIL. Vimos que te registraste para recibir información. Puedo ayudarte con carreras, admisión y canales oficiales. Si no deseas recibir más mensajes, responde SALIR.</textarea></label>
+      <div class="message-meta"><span>Usa <code>{nombre}</code> para personalizar.</span><strong id="message-length">0 / 1200</strong></div>
+      <div class="modal-actions"><button type="button" class="secondary-button close-dialog">Cancelar</button><button type="submit" class="primary-button"><i data-lucide="calendar-plus"></i>Programar campaña</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="contact-dialog"><form id="contact-form" class="modal-form compact"><div class="modal-heading"><div><h2 id="contact-dialog-name">Contacto</h2><span id="contact-dialog-phone"></span></div><button type="button" class="icon-button close-contact" title="Cerrar" aria-label="Cerrar"><i data-lucide="x">×</i></button></div><input type="hidden" name="id"><label>Estado<select name="status"></select></label><label class="toggle-row"><span><strong>Detener chatbot</strong><small>No responder nuevos mensajes</small></span><input type="checkbox" name="stop_bot"></label><label class="toggle-row"><span><strong>Baja de comunicaciones</strong><small>Excluir de campañas futuras</small></span><input type="checkbox" name="opt_out"></label><div class="modal-actions"><button type="button" class="secondary-button close-contact">Cancelar</button><button type="submit" class="primary-button">Guardar cambios</button></div></form></dialog>
+  <dialog id="import-dialog" class="wide-dialog"><div class="modal-form"><div class="modal-heading"><div><h2>Revisar contactos</h2><span>Excel o CSV, máximo 10 MB</span></div><button type="button" class="icon-button close-import" title="Cerrar" aria-label="Cerrar"><i data-lucide="x">×</i></button></div><form id="preview-file-form" class="file-picker"><input type="file" name="file" accept=".xlsx,.xls,.csv" required><button type="submit" class="secondary-button"><i data-lucide="scan-search"></i>Analizar archivo</button></form><div id="import-preview" hidden><div class="import-summary" id="import-summary"></div><div class="detected-columns" id="detected-columns"></div><div class="preview-table"><table><thead><tr><th>Fila</th><th>Nombre</th><th>Celular</th><th>Colegio</th><th>Carrera</th><th>Correo</th><th>Resultado</th></tr></thead><tbody id="preview-rows"></tbody></table></div><p class="preview-limit" id="preview-limit"></p></div><div class="modal-actions"><button type="button" class="secondary-button close-import">Cerrar</button><button type="button" class="primary-button" id="confirm-import" disabled><i data-lucide="database-zap"></i>Importar filas válidas</button></div></div></dialog>
+</body>
+</html>

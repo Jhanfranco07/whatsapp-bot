@@ -41,6 +41,7 @@ class Message(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     contact_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("contacts.id"), nullable=False, index=True)
     phone_number: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    external_id: Mapped[str | None] = mapped_column(String(180), nullable=True)
     direction: Mapped[str] = mapped_column(String(10), nullable=False)
     channel: Mapped[str] = mapped_column(String(30), default="whatsapp", nullable=False)
     message_text: Mapped[str] = mapped_column(Text, nullable=False)
@@ -76,6 +77,7 @@ class CampaignMessage(Base):
     template_name: Mapped[str | None] = mapped_column(String(120))
     message_text: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    interval_seconds: Mapped[int] = mapped_column(Integer, default=60, nullable=False)
     error_message: Mapped[str | None] = mapped_column(Text)
     sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now_utc)
@@ -105,7 +107,23 @@ class OutboundMessage(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now_utc, onupdate=now_utc)
 
 
+class RuntimeSetting(Base):
+    __tablename__ = "runtime_settings"
+
+    key: Mapped[str] = mapped_column(String(80), primary_key=True)
+    value: Mapped[str] = mapped_column(Text, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=now_utc, onupdate=now_utc
+    )
+
+
 Index("ix_messages_contact_created", Message.contact_id, Message.created_at)
+Index(
+    "ux_messages_external_id",
+    Message.external_id,
+    unique=True,
+    postgresql_where=Message.external_id.is_not(None),
+)
 Index("ix_outbound_messages_status_next_attempt", OutboundMessage.status, OutboundMessage.next_attempt_at)
 Index(
     "ix_outbound_messages_dispatch_order",

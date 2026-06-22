@@ -84,6 +84,18 @@ python -m alembic upgrade head
 Este es el flujo para usar el chatbot con mensajes reales. La simulación descrita
 más adelante es opcional y no inicia WhatsApp Web.
 
+### Inicio guiado para demostración
+
+Después de completar la instalación, ejecuta desde la raíz:
+
+```powershell
+.\INICIAR_DEMO.bat
+```
+
+El archivo valida la configuración, abre FastAPI, el bridge y el worker en
+ventanas separadas, y finalmente abre el panel administrativo. Si la sesión de
+WhatsApp todavía no existe, escanea el QR mostrado en la ventana del bridge.
+
 ### 1. Preparar la base e importar el Excel
 
 Ejecuta estos comandos desde la raíz del proyecto:
@@ -106,7 +118,8 @@ y cerrar WhatsApp Web por cada contacto. En `.env`, configura:
 
 ```text
 WHATSAPP_PROVIDER=bridge
-BRIDGE_HEADLESS=false
+WHATSAPP_DRY_RUN=false
+BRIDGE_HEADLESS=true
 ```
 
 Primero inicia el backend y el puente como se explica en el paso 3. Cuando la
@@ -123,8 +136,9 @@ campañas:
 python scripts/send_campaign.py
 ```
 
-El script espera 5 segundos entre contactos. Puedes cambiarlo con `--delay`,
-por ejemplo `python scripts/send_campaign.py --delay 10`.
+El script solo programa la campaña. El worker respeta el intervalo indicado,
+que es de 60 segundos por defecto. Puedes cambiarlo, por ejemplo con
+`python scripts/send_campaign.py --delay 90`.
 
 Para dejar la campaña ejecutándose como proceso oculto en Windows:
 
@@ -140,11 +154,9 @@ Consulta el resultado en `campaign.stdout.log` y los errores en
 `campaign.stderr.log`. FastAPI y el puente deben continuar activos.
 
 El envío se realiza mediante la misma sesión de `whatsapp-web.js` que recibe y
-responde mensajes. Se abre una sola ventana persistente de WhatsApp Web; puedes
-minimizarla y se reutilizará para toda la campaña. La consola del puente y
-FastAPI deben permanecer ejecutándose. `BRIDGE_HEADLESS=true` intenta ocultar
-Chromium por completo, pero WhatsApp Web puede no iniciar correctamente en todos
-los equipos.
+responde mensajes. Se utiliza una sola sesión persistente de WhatsApp Web. Con
+`BRIDGE_HEADLESS=true`, Chromium queda oculto. La consola del puente, FastAPI y
+el worker deben permanecer ejecutándose.
 
 La integración no es oficial. Evita enviar grandes cantidades en poco tiempo,
 contacta únicamente personas autorizadas y respeta inmediatamente las bajas
@@ -152,13 +164,22 @@ para reducir el riesgo de restricciones de WhatsApp.
 
 ### 3. Iniciar el chatbot que responde mensajes reales
 
+Antes de la demostración ejecuta la verificación previa:
+
+```powershell
+python scripts/check_setup.py
+```
+
+No continúes hasta ver `Configuración lista para iniciar`. El verificador revisa
+`.env`, PostgreSQL, Node.js, las dependencias del bridge y los puertos locales.
+
 Mantén abiertas tres terminales.
 
 Terminal 1, desde la raíz del proyecto:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-python -m uvicorn app.main:app --reload
+python scripts/start_api.py
 ```
 
 Terminal 2, desde la raíz del proyecto:
@@ -289,18 +310,17 @@ O mediante HTTP en Windows:
 ```powershell
 curl.exe -X POST http://localhost:8000/webhooks/whatsapp/inbound `
   -H "Content-Type: application/json" `
+  -H "X-Inbound-Api-Key: tu-clave-inbound" `
   -d "{\"phone_number\":\"51999999999\",\"message\":\"quiero saber sobre ingeniería de sistemas\",\"raw_payload\":{}}"
 ```
 
 El webhook registra el inbound, clasifica la intención, genera y registra la
-respuesta outbound, actualiza el estado y devuelve `bot_reply`. Por defecto no
-intenta enviar esa respuesta por WhatsApp. Puedes enviar mediante el proveedor
-configurado usando `"send_reply": true`; úsalo con cuidado porque `pywhatkit`
-abre el navegador.
+respuesta outbound, actualiza el estado y devuelve `bot_reply`. La respuesta se
+encola siempre en PostgreSQL y solo el worker la envía mediante el bridge.
 
 ## Recibir y responder mensajes reales
 
-El puente opcional `bridge/` usa `whatsapp-web.js` para escuchar mensajes
+El puente `bridge/` usa `whatsapp-web.js` para escuchar mensajes
 entrantes desde una sesión vinculada de WhatsApp Web. Es una integración no
 oficial: puede dejar de funcionar o provocar restricciones de WhatsApp. Úsala
 solo como prototipo y con una cuenta autorizada para pruebas.
@@ -311,7 +331,7 @@ Para el procedimiento completo de arranque, consulta
 Mantén FastAPI ejecutándose en una terminal:
 
 ```powershell
-python -m uvicorn app.main:app --reload
+python scripts/start_api.py
 ```
 
 En otra terminal, inicia el puente:
@@ -478,7 +498,7 @@ Invoke-RestMethod -Method Post `
   -Body '{"palabras_clave":["tema real"],"respuesta":"Respuesta verificada.","fuente_url":"https://www.usil.edu.pe/","verificado_el":"2026-06-15"}'
 ```
 
-## Panel Y Métricas
+## Panel De Control
 
 Abre:
 
@@ -486,22 +506,79 @@ Abre:
 http://localhost:8000/admin
 ```
 
+El panel permite revisar indicadores, actividad diaria, campañas, cola saliente,
+conversaciones y contactos. También permite programar o cancelar campañas y
+actualizar el estado operativo de un contacto.
+
+En **Campañas** se puede pausar una ejecución, cambiar su intervalo y
+reanudarla. Solo se reprograman los mensajes pendientes; los ya enviados no se
+repiten. En **Configuración > Tiempos operativos** se define el intervalo
+predeterminado y la ventana de agrupación del bot.
+
+En **Contactos > Importar archivo** se puede seleccionar un Excel o CSV y
+revisar las columnas detectadas y cada fila antes de guardar. El panel separa
+filas válidas, inválidas y duplicadas. La importación solo comienza al pulsar
+**Importar filas válidas**.
+
+La agrupación del bot es de 3 segundos por defecto. Cada mensaje nuevo reinicia
+la espera para ese contacto. Por ejemplo, ocho mensajes enviados rápidamente se
+combinan en una sola entrada y producen una sola respuesta. Un valor menor hace
+que el bot responda antes; uno mayor reduce respuestas fragmentadas.
+
+Si `ADMIN_API_KEY` está configurada, ingrésala en **Configuración**. La clave se
+guarda únicamente en el almacenamiento local del navegador y se envía como
+`X-Admin-Api-Key` en operaciones de escritura.
+
 Endpoints disponibles:
 
 - `GET /admin/metrics`: contactos, bajas, mensajes, campañas, intenciones, carreras y estados.
+- `GET /admin/dashboard`: resumen, series y actividad reciente.
+- `GET/POST /admin/campaigns`: consulta y programación de campañas.
+- `PATCH /admin/campaigns/{name}`: pausa, reanuda o cambia el intervalo.
+- `POST /admin/campaigns/{name}/cancel`: cancela mensajes aún no enviados.
+- `GET /admin/queue`: inspección de la cola saliente.
+- `GET /admin/conversations`: conversaciones recientes.
+- `GET/PATCH /admin/contacts`: consulta y control de contactos.
+- `POST /admin/contacts/preview`: analiza Excel o CSV sin importar.
+- `POST /admin/contacts/import`: confirma las filas válidas revisadas.
+- `GET /admin/settings`: configuración operativa efectiva, sin secretos.
+- `PATCH /admin/settings`: actualiza tiempos operativos persistentes.
 - `GET /admin/knowledge`: entradas verificadas.
 - `POST /admin/knowledge`: agrega contexto verificable, protegido con `ADMIN_API_KEY`.
 
 ## Producción Con Docker
 
-Para levantar PostgreSQL, FastAPI y el puente en contenedores:
+`INICIAR_DEMO.bat` ejecuta los procesos directamente en Windows; no usa Docker.
+El archivo `docker-compose.yml` básico levanta únicamente PostgreSQL local.
 
-```powershell
-docker compose -f docker-compose.prod.yml up --build
+Para ejecutar el sistema completo en contenedores se usa
+`docker-compose.prod.yml`, que incluye PostgreSQL, FastAPI, bridge y worker.
+Configura claves distintas y no predeterminadas en `.env`:
+
+```dotenv
+POSTGRES_PASSWORD=una-clave-postgres-segura
+INBOUND_API_KEY=una-clave-inbound-larga
+ADMIN_API_KEY=una-clave-admin-larga
 ```
 
-El servicio `api` ejecuta `alembic upgrade head` antes de iniciar FastAPI.
-El bridge conserva la sesión de WhatsApp en el volumen `whatsapp_auth`.
+Con Docker Desktop iniciado:
+
+```powershell
+docker compose -f docker-compose.prod.yml config
+docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml logs -f bridge
+```
+
+Escanea el QR mostrado en los logs del bridge. Después consulta:
+
+```powershell
+docker compose -f docker-compose.prod.yml ps
+```
+
+El servicio `api` ejecuta `alembic upgrade head`, el worker procesa la cola y
+el bridge conserva la sesión en el volumen `whatsapp_auth`. El panel queda en
+`http://127.0.0.1:8000/admin`; PostgreSQL y el puerto saliente del bridge no se
+publican al host.
 
 ## Pruebas
 

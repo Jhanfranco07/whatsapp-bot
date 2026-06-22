@@ -5,7 +5,8 @@
   "description": "Puente local no oficial entre WhatsApp Web y FastAPI",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "check": "node --check index.js"
   },
   "dependencies": {
     "dotenv": "^16.5.0",

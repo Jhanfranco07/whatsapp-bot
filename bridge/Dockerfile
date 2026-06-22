@@ -21,10 +21,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-COPY . .
+COPY --chown=node:node . .
+RUN mkdir -p /bridge/.wwebjs_auth && chown -R node:node /bridge
+
+USER node
 
 CMD ["npm", "start"]

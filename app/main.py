@@ -1,8 +1,10 @@
 import logging
 import inspect
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -19,6 +21,8 @@ from app.services.conversation_service import ConversationService
 from app.services.lead_service import LeadService
 from app.services.outbound_queue_service import OutboundQueueService
 from app.services.semantic_engine import get_semantic_engine
+from app.services.runtime_settings_service import RuntimeSettingsService
+from app.security import require_admin_key, require_inbound_key, verify_admin_key
 from app.utils.logger import configure_logging
 
 
@@ -30,12 +34,39 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     """Construye el índice TF-IDF una sola vez al iniciar FastAPI."""
+    settings.validate_production()
     get_semantic_engine()
     yield
 
 
-app = FastAPI(title="Orientador USIL", version="1.0.0", lifespan=lifespan)
+app = FastAPI(
+    title="Orientador USIL",
+    version="1.0.0",
+    lifespan=lifespan,
+    docs_url=None if settings.app_env.lower() == "production" else "/docs",
+    redoc_url=None if settings.app_env.lower() == "production" else "/redoc",
+)
+app.mount(
+    "/static",
+    StaticFiles(directory=Path(__file__).resolve().parent / "static"),
+    name="static",
+)
 app.include_router(admin_router)
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    if request.url.path.startswith("/admin"):
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self'; "
+            "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'"
+        )
+    return response
 
 
 @app.get("/")
@@ -44,7 +75,7 @@ def root():
         "ok": True,
         "service": "orientador-usil",
         "health": "/health",
-        "docs": "/docs",
+        "docs": app.docs_url,
     }
 
 
@@ -83,10 +114,28 @@ async def inbound(
     request: Request,
     db: Session = Depends(get_db),
     x_inbound_api_key: str | None = Header(default=None),
+    x_admin_api_key: str | None = Header(default=None),
 ):
     is_webhook = request.url.path == "/webhooks/whatsapp/inbound"
-    if is_webhook and settings.inbound_api_key and x_inbound_api_key != settings.inbound_api_key:
-        raise HTTPException(401, "Clave inbound inválida")
+    if is_webhook:
+        require_inbound_key(x_inbound_api_key)
+    else:
+        verify_admin_key(x_admin_api_key)
+    external_id = payload.raw_payload.get("whatsapp_message_id")
+    existing = MessageRepository(db).get_by_external_id(external_id)
+    if existing:
+        contact = ContactRepository(db).get_by_phone(existing.phone_number)
+        return {
+            "ok": True,
+            "phone_number": existing.phone_number,
+            "contact_status": contact.status if contact else "DESCONOCIDO",
+            "intent": existing.intent or "duplicado",
+            "entities": {"duplicate": True},
+            "classification_source": "idempotency",
+            "bot_reply": None,
+            "should_reply": False,
+            "reply_sent": False,
+        }
     try:
         service = ConversationService(db)
         handler = getattr(service, "process_inbound_async", service.process_inbound)
@@ -100,11 +149,11 @@ async def inbound(
         raise HTTPException(503, "No se pudo guardar la conversación") from error
 
 
-@app.post("/campaigns/send")
+@app.post("/campaigns/send", dependencies=[Depends(require_admin_key)])
 def send_campaign(
     limit: int | None = Query(default=None, ge=1),
     phone_number: str | None = Query(default=None),
-    delay_seconds: float = Query(default=60, ge=1, le=3600),
+    delay_seconds: float | None = Query(default=None, ge=1, le=3600),
     db: Session = Depends(get_db),
 ):
     return CampaignService(db).send_initial(limit, phone_number, delay_seconds)
@@ -114,19 +163,39 @@ def send_campaign(
 def dispatch_outbound(
     limit: int = Query(default=1, ge=1, le=20),
     db: Session = Depends(get_db),
-    x_admin_api_key: str | None = Header(default=None),
+    _: None = Depends(require_admin_key),
 ):
-    if settings.admin_api_key and x_admin_api_key != settings.admin_api_key:
-        raise HTTPException(401, "Clave admin inválida")
     return OutboundQueueService(db).dispatch_pending(limit)
 
 
-@app.get("/contacts", response_model=list[ContactRead])
+@app.get("/bridge/settings")
+def bridge_settings(
+    db: Session = Depends(get_db),
+    _: None = Depends(require_inbound_key),
+):
+    runtime = RuntimeSettingsService(db)
+    return {
+        "bot_message_debounce_seconds": runtime.get_int(
+            "bot_message_debounce_seconds"
+        )
+    }
+
+
+@app.get(
+    "/contacts",
+    response_model=list[ContactRead],
+    dependencies=[Depends(require_admin_key)],
+)
 def list_contacts(db: Session = Depends(get_db)):
     return ContactRepository(db).list()
 
 
-@app.post("/contacts", response_model=ContactRead, status_code=201)
+@app.post(
+    "/contacts",
+    response_model=ContactRead,
+    status_code=201,
+    dependencies=[Depends(require_admin_key)],
+)
 def create_contact(payload: ContactCreate, db: Session = Depends(get_db)):
     try:
         contact, created = LeadService(db).create(payload)
@@ -138,7 +207,7 @@ def create_contact(payload: ContactCreate, db: Session = Depends(get_db)):
         raise HTTPException(409, "El teléfono ya está registrado") from error
 
 
-@app.post("/contacts/import")
+@app.post("/contacts/import", dependencies=[Depends(require_admin_key)])
 def import_contacts(payload: list[ContactCreate], db: Session = Depends(get_db)):
     service = LeadService(db)
     result = {"created": 0, "duplicates": 0, "errors": []}
@@ -152,7 +221,11 @@ def import_contacts(payload: list[ContactCreate], db: Session = Depends(get_db))
     return result
 
 
-@app.get("/contacts/{phone_number}/messages", response_model=list[MessageRead])
+@app.get(
+    "/contacts/{phone_number}/messages",
+    response_model=list[MessageRead],
+    dependencies=[Depends(require_admin_key)],
+)
 def contact_messages(phone_number: str, db: Session = Depends(get_db)):
     contact = ContactRepository(db).get_by_phone(phone_number)
     if not contact:

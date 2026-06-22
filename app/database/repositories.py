@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from uuid import UUID
 
 from sqlalchemy import or_, select, text
 from sqlalchemy.exc import IntegrityError
@@ -89,9 +90,13 @@ class MessageRepository:
         self.db = db
 
     def create(self, contact, direction, text, intent=None, entities=None, raw_payload=None):
+        external_id = None
+        if direction == "inbound" and raw_payload:
+            external_id = raw_payload.get("whatsapp_message_id")
         message = Message(
             contact_id=contact.id,
             phone_number=contact.phone_number,
+            external_id=external_id,
             direction=direction,
             message_text=text,
             intent=intent,
@@ -101,6 +106,13 @@ class MessageRepository:
         self.db.add(message)
         self.db.flush()
         return message
+
+    def get_by_external_id(self, external_id: str | None):
+        if not external_id:
+            return None
+        return self.db.scalar(
+            select(Message).where(Message.external_id == external_id)
+        )
 
     def history(self, contact_id):
         return list(
@@ -203,7 +215,17 @@ class OutboundMessageRepository:
             .limit(1)
         )
         if queued:
-            if queued.source == "campaign" and campaign_minimum_gap_seconds > 0:
+            if queued.source == "campaign":
+                effective_gap = campaign_minimum_gap_seconds
+                if queued.source_id:
+                    try:
+                        campaign_record = self.db.get(
+                            CampaignMessage, UUID(str(queued.source_id))
+                        )
+                        if campaign_record:
+                            effective_gap = campaign_record.interval_seconds
+                    except ValueError:
+                        pass
                 last_campaign_sent_at = self.db.scalar(
                     select(OutboundMessage.sent_at)
                     .where(
@@ -216,8 +238,9 @@ class OutboundMessageRepository:
                 )
                 if (
                     last_campaign_sent_at
+                    and effective_gap > 0
                     and last_campaign_sent_at
-                    + timedelta(seconds=campaign_minimum_gap_seconds)
+                    + timedelta(seconds=effective_gap)
                     > now
                 ):
                     return None
@@ -251,6 +274,7 @@ def create_campaign_record(
     message,
     result=None,
     campaign_name="campaña_inicial",
+    interval_seconds=60,
 ):
     success = bool(result and result.success)
     record = CampaignMessage(
@@ -259,6 +283,7 @@ def create_campaign_record(
         template_name="mensaje_inicial",
         message_text=message,
         status="sent" if success else ("failed" if result else "pending"),
+        interval_seconds=interval_seconds,
         error_message=result.error if result else None,
         sent_at=datetime.now(timezone.utc) if success else None,
     )

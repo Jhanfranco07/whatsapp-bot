@@ -151,6 +151,11 @@ siguiente mensaje. Por ello, si la campaña esta enviando el mensaje 51 y llegan
 cinco respuestas, termina el envio en curso, procesa primero las respuestas y
 despues retoma la campaña.
 
+Una campaña pausada cambia sus salientes no procesados a `paused`, estado que
+el worker no reclama. Al reanudarla, esos registros vuelven a `pending` y se
+recalculan sus `scheduled_at` con el nuevo intervalo. Los registros `sent` no se
+modifican.
+
 Worker continuo recomendado:
 
 ```powershell
@@ -187,6 +192,17 @@ Contactos distintos pueden procesar su entrada concurrentemente, pero dos
 mensajes del mismo contacto mantienen su orden dentro de un mismo proceso. La
 salida a WhatsApp es globalmente serial: un solo mensaje se despacha cada vez,
 incluso si se levantan varios workers por error.
+
+Antes de enviar un inbound a FastAPI, el bridge agrupa los mensajes consecutivos
+del mismo contacto durante `bot_message_debounce_seconds`. La configuracion vive
+en PostgreSQL y el bridge la refresca cada 30 segundos. Cada lote genera una
+clasificacion y como maximo una respuesta, evitando llenar la cola cuando una
+persona divide una consulta en varios mensajes.
+
+El bridge reintenta temporalmente un inbound cuando FastAPI no responde. Cada
+lote incluye un `whatsapp_message_id` almacenado como `messages.external_id` con
+indice unico. Un reintento confirmado previamente se reconoce y no genera una
+segunda respuesta.
 
 `ContactRepository.get_or_create` usa una transaccion anidada para tolerar
 creaciones simultaneas del mismo telefono.
@@ -400,8 +416,19 @@ DATABASE_URL=postgresql+psycopg2://usuario:clave@host:5432/postgres?sslmode=requ
 |---|---|---|
 | GET | `/health` | Salud de FastAPI y PostgreSQL |
 | GET | `/health/llm` | Salud del motor semantico, ruta conservada por compatibilidad |
-| GET | `/admin` | Panel administrativo basico |
+| GET | `/admin` | Panel operativo de campañas y conversaciones |
 | GET | `/admin/metrics` | Metricas operativas |
+| GET | `/admin/dashboard` | Indicadores, series y actividad reciente |
+| GET/POST | `/admin/campaigns` | Consulta y programacion de campañas |
+| PATCH | `/admin/campaigns/{name}` | Pausa, reanuda o cambia el intervalo |
+| POST | `/admin/campaigns/{name}/cancel` | Cancela pendientes de una campaña |
+| GET | `/admin/queue` | Inspeccion de la cola saliente |
+| GET | `/admin/conversations` | Conversaciones recientes |
+| GET/PATCH | `/admin/contacts` | Consulta y control de contactos |
+| POST | `/admin/contacts/preview` | Valida y previsualiza Excel o CSV |
+| POST | `/admin/contacts/import` | Importa filas previamente revisadas |
+| GET | `/admin/settings` | Configuracion operativa sin secretos |
+| PATCH | `/admin/settings` | Actualiza tiempos operativos persistentes |
 | GET/POST | `/admin/knowledge` | Conocimiento verificable |
 | POST | `/webhooks/whatsapp/inbound` | Entrada real desde WhatsApp |
 | POST | `/simulate/inbound` | Simulacion manual |
@@ -452,6 +479,11 @@ Produccion en contenedores:
 docker compose -f docker-compose.prod.yml up --build
 ```
 
+El compose de produccion ejecuta cuatro servicios: `postgres`, `api`, `bridge`
+y `worker`. La API aplica migraciones antes de quedar saludable; el worker no
+inicia hasta que PostgreSQL y WhatsApp esten listos. Solo la API se publica en
+`127.0.0.1:8000`.
+
 FastAPI clasifica y encola; el bridge mantiene la sesion de WhatsApp; el worker
 decide el orden y realiza todos los envios. Ninguno de los otros procesos debe
 enviar mensajes por su cuenta.
@@ -490,6 +522,7 @@ app/
     conversation_service.py
     campaign_service.py
     outbound_queue_service.py
+    runtime_settings_service.py
   database/
     models.py
     repositories.py
@@ -508,6 +541,8 @@ migrations/
   versions/
     0002_outbound_queue.py
     0003_outbound_scheduler.py
+    0004_runtime_campaign_controls.py
+    0005_inbound_idempotency.py
 scripts/
   process_outbound.py
   send_campaign.py

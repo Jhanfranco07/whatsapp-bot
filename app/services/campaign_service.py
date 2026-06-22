@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from app.database.repositories import ContactRepository, create_campaign_record
 from app.services.contact_states import CAMPAIGN_EXCLUDED_STATES
 from app.services.outbound_queue_service import OutboundPriority, OutboundQueueService
+from app.services.runtime_settings_service import RuntimeSettingsService
 from app.whatsapp.sender import get_whatsapp_provider
 
 
@@ -24,8 +25,27 @@ class CampaignService:
         self.contacts = ContactRepository(db)
         self.outbound_queue = OutboundQueueService(db, self.provider)
 
-    def send_initial(self, limit=None, phone_number=None, delay_seconds=60):
-        campaign_name = "campaña_inicial"
+    def send_initial(self, limit=None, phone_number=None, delay_seconds=None):
+        return self.schedule(
+            campaign_name="campaña_inicial",
+            message_template=MESSAGE_TEMPLATE,
+            limit=limit,
+            phone_number=phone_number,
+            delay_seconds=delay_seconds,
+        )
+
+    def schedule(
+        self,
+        campaign_name,
+        message_template,
+        limit=None,
+        phone_number=None,
+        delay_seconds=None,
+    ):
+        if delay_seconds is None:
+            delay_seconds = RuntimeSettingsService(self.db).get_int(
+                "campaign_default_interval_seconds"
+            )
         if phone_number:
             contact = self.contacts.get_by_phone(phone_number)
             contacts = (
@@ -46,12 +66,13 @@ class CampaignService:
         start_at = datetime.now(timezone.utc)
         for position, contact in enumerate(contacts):
             name = f", {contact.full_name}" if contact.full_name else ""
-            message = MESSAGE_TEMPLATE.format(nombre=name)
+            message = message_template.replace("{nombre}", name)
             record = create_campaign_record(
                 self.db,
                 contact,
                 message,
                 campaign_name=campaign_name,
+                interval_seconds=int(delay_seconds),
             )
             self.db.flush()
             self.outbound_queue.enqueue(

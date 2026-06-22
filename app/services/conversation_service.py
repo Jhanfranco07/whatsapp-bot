@@ -130,10 +130,9 @@ class ConversationService:
 
         self.messages.create(contact, "inbound", payload.message, intent, entities, payload.raw_payload)
         should_reply = result.should_reply and entities.get("should_reply", True)
-        queued_outbound = None
         if should_reply:
             self.messages.create(contact, "outbound", result.bot_reply, intent, entities)
-            queued_outbound = self.outbound_queue.enqueue(
+            self.outbound_queue.enqueue(
                 contact,
                 result.bot_reply,
                 source="conversation",

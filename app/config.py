@@ -29,6 +29,21 @@ class Settings(BaseSettings):
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
 
+    def validate_production(self) -> None:
+        if self.app_env.lower() != "production":
+            return
+        missing = []
+        for name, value in (
+            ("ADMIN_API_KEY", self.admin_api_key),
+            ("INBOUND_API_KEY", self.inbound_api_key),
+        ):
+            if not value or value.startswith("cambia-esta-clave"):
+                missing.append(name)
+        if missing:
+            raise RuntimeError(
+                "Producción requiere claves seguras: " + ", ".join(missing)
+            )
+
 
 @lru_cache
 def get_settings() -> Settings:

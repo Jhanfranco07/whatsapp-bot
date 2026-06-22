@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.semantic_engine import SemanticEngine, get_semantic_engine
+from app.services.semantic_engine import get_semantic_engine
 
 
 @pytest.fixture(scope="module")

@@ -16,6 +16,9 @@ class FakeProvider:
 
 
 class FakeDb:
+    def get(self, model, key):
+        return None
+
     def add(self, item):
         pass
 
@@ -80,6 +83,28 @@ def test_campaign_only_uses_filtered_candidates():
     assert result["sent"] == 0
     assert provider.sent == []
     assert service.outbound_queue.rows[0][2]["priority"] == 10
+
+
+def test_custom_campaign_uses_name_template_and_delay():
+    contact = SimpleNamespace(
+        id="4", full_name="Lucia", phone_number="51982222222", status="NUEVO"
+    )
+    requested_names = []
+    service = CampaignService(FakeDb(), FakeProvider())
+    service.contacts = SimpleNamespace(
+        campaign_candidates=lambda name: requested_names.append(name) or [contact]
+    )
+    service.outbound_queue = FakeQueue()
+
+    result = service.schedule(
+        campaign_name="admision_julio",
+        message_template="Hola{nombre}, conoce nuestras carreras.",
+        delay_seconds=75,
+    )
+
+    assert result["queued"] == 1
+    assert requested_names == ["admision_julio"]
+    assert service.outbound_queue.rows[0][1] == "Hola, Lucia, conoce nuestras carreras."
 
 
 def test_campaign_can_target_phone():

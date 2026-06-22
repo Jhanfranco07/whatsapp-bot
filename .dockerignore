@@ -6,4 +6,6 @@ __pycache__/
 .venv/
 bridge/node_modules/
 bridge/.wwebjs_auth/
+bridge/.wwebjs_cache/
+tests/
 *.log
